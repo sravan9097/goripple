@@ -1,0 +1,218 @@
+<div
+  class="nav-container"
+  [attr.data-phase]="phase()"
+  [attr.data-centre]="centre()"
+  [class.final]="loadedIn()"
+  [class.titled]="titled()"
+  [class.animating-in]="animatingIn()"
+  [class.closing]="!!enlargingId()"
+  [class.overlay]="overlayOpen()"
+  [class.reduced]="prefersReduced()"
+>
+  <!-- Tiles: a pinwheel around the centre cell, filling the viewport -->
+  <nav class="nav-wrapper" aria-label="Rippl sections">
+    @for (tile of tiles; track tile.id; let i = $index) {
+      <div
+        class="nav-tile"
+        [class]="'nav-tile-' + (i + 1)"
+        [class.enlarge]="enlargingId() === tile.id"
+        [attr.data-i]="i"
+      >
+        <a
+          class="tile"
+          [class]="'tile-' + tile.id"
+          [style.--tile-bg]="tile.accent"
+          [style.--tile-ink]="tile.ink"
+          [href]="'/' + tile.id"
+          [attr.tabindex]="tilesFocusable() ? 0 : -1"
+          [attr.aria-hidden]="tilesFocusable() ? null : 'true'"
+          (click)="onTileActivate(tile, $event)"
+        >
+          <span class="tile-title">
+            @if (gridLines(tile.title); as lines) {
+              <span class="tile-title-line">{{ lines[0] }}</span>
+              <span class="tile-title-line">{{ lines[1] }}</span>
+            } @else {
+              {{ tile.title }}
+            }
+          </span>
+          <span class="tile-visual" aria-hidden="true">
+            <ng-container [ngTemplateOutlet]="tileArt" [ngTemplateOutletContext]="{ id: tile.id }" />
+          </span>
+        </a>
+      </div>
+    }
+  </nav>
+
+  <!--
+    brand.dropbox.com's grid: there is no grid. Every tile owns its four edges,
+    extended across the screen, and they ride the tile's transform, so as the
+    tiles fly in the rules travel and shrink with them. A copy of the grid under
+    the tiles carries the rules, so a tile's face covers its own and no tile is
+    ever crossed by a neighbour's.
+  -->
+  <div class="nav-wrapper nav-wrapper-gridlines" aria-hidden="true">
+    @for (tile of tiles; track tile.id; let i = $index) {
+      <div class="nav-tile nav-tile-gridlines" [class]="'nav-tile-' + (i + 1)" [attr.data-i]="i">
+        <span class="tile-line nav-l"></span>
+        <span class="tile-line nav-r"></span>
+        <span class="tile-line nav-t"></span>
+        <span class="tile-line nav-b"></span>
+      </div>
+    }
+  </div>
+
+  <!--
+    The four edges of the centre box, extended across the screen: the rules
+    shared with the tiles on its left, right, top and bottom. They stay on the
+    box, so they never fly in from elsewhere, and they fade out as it lands.
+  -->
+  <div class="menu-gridlines" aria-hidden="true">
+    <span class="tile-line nav-l"></span>
+    <span class="tile-line nav-r"></span>
+    <span class="tile-line nav-t"></span>
+    <span class="tile-line nav-b"></span>
+  </div>
+
+  <!-- Centre: S mark / tagline / menu button -->
+  <div class="menu">
+    <button
+      type="button"
+      class="nav-button"
+      [attr.aria-label]="returnMode() ? 'Close the menu and go back' : null"
+      [attr.tabindex]="returnMode() ? 0 : -1"
+      (click)="onCentreActivate()"
+    >
+      <span class="ripple" aria-hidden="true">
+        <span class="ring ring-1"></span>
+        <span class="ring ring-2"></span>
+        <span class="ring ring-3"></span>
+      </span>
+
+      <!--
+        Final Rippl wordmark (brand/ripplLogo*.svg). Outline draws first
+        (letters + tip square in black), then fills; the square slowly turns
+        Stolt red. On scroll the red square grows into the menu button.
+      -->
+      <span class="centre-mark" aria-hidden="true">
+        <svg class="home-logo" viewBox="0 0 488 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- R -->
+          <path
+            class="logo-letter"
+            pathLength="1"
+            d="M21 61.0078C29.06 55.7081 38.7079 53.57 47.8564 54.0713C60.3678 54.7571 73.2551 60.4376 81.3223 71.501C86.4174 78.4886 89.768 87.418 90 98.3848L70.002 98.8066C69.8554 91.8809 67.8168 86.9222 65.1562 83.2734C61.2058 77.8558 54.3288 74.445 46.7607 74.0303C39.2025 73.6161 32.2643 76.2486 28.0254 81.1914C23.1185 86.9132 21.241 94.2398 21 98.7393V190H0V54H21V61.0078Z"
+          />
+          <!-- i -->
+          <path class="logo-letter" pathLength="1" d="M102 54H123V190H102V54Z" />
+          <!-- p -->
+          <path
+            class="logo-letter"
+            pathLength="1"
+            d="M157 72.8574C169.211 61.1759 185.767 54 204 54C241.555 54 272 84.4446 272 122C272 159.555 241.555 190 204 190C185.767 190 169.211 182.823 157 171.142V250H136V54H157V72.8574ZM204 75C178.043 75 157 96.0426 157 122C157 147.957 178.043 169 204 169C229.957 169 251 147.957 251 122C251 96.0426 229.957 75 204 75Z"
+          />
+          <!-- p -->
+          <path
+            class="logo-letter"
+            pathLength="1"
+            d="M305 72.8574C317.211 61.1759 333.767 54 352 54C389.555 54 420 84.4446 420 122C420 159.555 389.555 190 352 190C333.767 190 317.211 182.823 305 171.142V250H284V54H305V72.8574ZM352 75C326.043 75 305 96.0426 305 122C305 147.957 326.043 169 352 169C377.957 169 399 147.957 399 122C399 96.0426 377.957 75 352 75Z"
+          />
+          <!-- l -->
+          <path class="logo-letter" pathLength="1" d="M433 0H454V190H433V0Z" />
+          <!-- missing-E square -->
+          <rect class="logo-dot" pathLength="1" x="467" y="169" width="21" height="21" />
+        </svg>
+      </span>
+      <!-- The wordmark's red square, grown to half the box, then the S mark over it. -->
+      <span class="cm-dot" aria-hidden="true"></span>
+      <img class="cm-s" src="/brand/SNLogoIcon.svg" alt="" aria-hidden="true" />
+      <span class="centre-close" aria-hidden="true"></span>
+
+      <span class="nav-button-titles">
+        <span class="nav-button-title title-1">{{ taglineOne }}</span>
+        <span class="nav-button-title title-2">{{ taglineTwo }}</span>
+      </span>
+
+      <span class="scroll-chevrons" aria-hidden="true">
+        <svg class="scroll-chevron chev-1" viewBox="0 0 52 18" fill="none">
+          <path d="M2 2l24 14L50 2" stroke="currentColor" stroke-width="2" />
+        </svg>
+        <svg class="scroll-chevron chev-2" viewBox="0 0 52 18" fill="none">
+          <path d="M2 2l24 14L50 2" stroke="currentColor" stroke-width="2" />
+        </svg>
+      </span>
+    </button>
+  </div>
+
+</div>
+
+<!-- Tile art: eight geometric compositions that invert on hover -->
+<ng-template #tileArt let-id="id">
+  @switch (id) {
+    @case ('what') {
+      <span class="art art-what">
+        <i class="drop"></i>
+        <i class="rip rip-1"></i>
+        <i class="rip rip-2"></i>
+        <i class="rip rip-3"></i>
+      </span>
+    }
+    @case ('why') {
+      <span class="art art-why">
+        @for (c of nine; track c) {
+          <i [class.seed]="c === 4"></i>
+        }
+      </span>
+    }
+    @case ('how') {
+      <span class="art art-how">
+        <i class="node n-1"></i>
+        <i class="link l-1"></i>
+        <i class="node n-2"></i>
+        <i class="link l-2"></i>
+        <i class="node n-3"></i>
+      </span>
+    }
+    @case ('foundations') {
+      <span class="art art-foundations">
+        <i class="blk b-1"><b></b></i>
+        <i class="blk b-2"><b></b></i>
+        <i class="blk b-3"><b></b></i>
+        <i class="blk b-4"><b></b></i>
+      </span>
+    }
+    @case ('components') {
+      <span class="art art-components">
+        <i class="layer ly-1"></i>
+        <i class="layer ly-2"></i>
+        <i class="layer ly-3"></i>
+      </span>
+    }
+    @case ('patterns') {
+      <span class="art art-patterns">
+        <i class="wf-side"></i>
+        <i class="wf-top"></i>
+        <i class="wf-row r-1"></i>
+        <i class="wf-row r-2"></i>
+        <i class="wf-row r-3"></i>
+      </span>
+    }
+    @case ('who') {
+      <span class="art art-who">
+        <i class="unit u-1"></i>
+        <i class="unit u-2"></i>
+        <i class="unit u-3"></i>
+        <i class="unit u-4"></i>
+        <i class="unit u-5"></i>
+      </span>
+    }
+    @case ('resources') {
+      <span class="art art-resources">
+        <i class="crate"></i>
+        <svg class="out" viewBox="0 0 40 40" fill="none">
+          <path d="M6 34L34 6" stroke="currentColor" stroke-width="2.5" />
+          <path d="M20 6h14v14" stroke="currentColor" stroke-width="2.5" />
+        </svg>
+      </span>
+    }
+  }
+</ng-template>

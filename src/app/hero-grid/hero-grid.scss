@@ -1,0 +1,1201 @@
+:host {
+  --ts: 2;
+  --inv: 0.5;
+  --gl-op: 1;
+  --tl-draw: 0;
+  --box-ink: 0;
+  --m-centre: 0;
+  --m-grow: 0;
+  --m-s: 0;
+  --centre-size: min(800px, calc(min(100vw, 100vh) - 64px));
+  --tile-ease: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+
+  display: block;
+  position: relative;
+  height: 200vh;
+}
+
+.nav-container {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  width: 100%;
+  overflow: hidden;
+  background: var(--site-paper);
+  isolation: isolate;
+}
+
+/* ─────────────────────────────  tile grid  ─────────────────────────── */
+
+/*
+ * Dropbox's mosaic: a symmetric 5x3 grid whose centre cell is the menu button,
+ * with the eight tiles pinwheeling around it so no two neighbours are the
+ * same size. The gridline wrapper repeats the same template so its rules
+ * land on the same edges.
+ */
+.nav-wrapper {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1.45fr var(--site-tile) 1.45fr 1fr;
+  grid-template-rows: 1fr var(--site-tile) 1fr;
+  gap: var(--site-gap);
+  padding: var(--site-gap);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.nav-tile-1 { grid-area: 1 / 1 / 3 / 2; }
+.nav-tile-2 { grid-area: 1 / 2 / 2 / 4; }
+.nav-tile-3 { grid-area: 1 / 4 / 3 / 5; }
+.nav-tile-4 { grid-area: 1 / 5 / 2 / 6; }
+.nav-tile-5 { grid-area: 3 / 1 / 4 / 2; }
+.nav-tile-6 { grid-area: 2 / 2 / 4 / 3; }
+.nav-tile-7 { grid-area: 3 / 3 / 4 / 5; }
+.nav-tile-8 { grid-area: 2 / 5 / 4 / 6; }
+
+.nav-tile {
+  --tx: 0px;
+  --ty: 0px;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  transform: scale(var(--ts)) translate(var(--tx), var(--ty));
+  will-change: transform;
+}
+
+/* Only the tile wrapper takes clicks; the gridline copy sits above it and
+ * must never intercept them. */
+.nav-container.settled-grid .nav-wrapper:not(.nav-wrapper-gridlines) {
+  pointer-events: auto;
+}
+
+.nav-wrapper-gridlines,
+.nav-wrapper-gridlines * {
+  pointer-events: none !important;
+}
+
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  padding: clamp(10px, 1.6vw, 26px);
+  overflow: hidden;
+  /* Artwork tracks the tile's ink, so a fill change never orphans the art. */
+  --tile-art: currentColor;
+  color: var(--tile-ink, var(--site-ink));
+  text-decoration: none;
+  background: var(--tile-bg);
+  transition:
+    background-color var(--tile-ease),
+    color var(--tile-ease);
+}
+
+.tile * {
+  pointer-events: none;
+}
+
+.tile-title {
+  position: relative;
+  z-index: 2;
+  order: 1;
+  align-self: flex-start;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--site-font-display);
+  font-weight: 800;
+  font-size: clamp(30px, 3.4vw, 60px);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+
+.tile-title-line {
+  display: block;
+}
+
+.tile-visual {
+  position: relative;
+  z-index: 1;
+  order: 2;
+  flex: 1;
+  display: grid;
+  place-items: end;
+  min-height: 0;
+  color: inherit;
+  container-type: size;
+}
+
+/*
+ * Fill and ink come from the tile model as inline custom properties, so the
+ * palette lives in content.ts and not in two places.
+ */
+
+/* Hovering drops the tile out of the palette into grey — the one panel that
+ * is not brand-coloured is the one under the cursor. */
+@media (any-hover: hover) {
+  .tile:hover {
+    background-color: var(--rippl-ref-color-neutral-200);
+    color: var(--site-ink);
+  }
+}
+
+.tile:focus-visible {
+  outline: 3px solid var(--site-ink);
+  outline-offset: -6px;
+}
+
+/* ─────────────────────────────  tile art  ─────────────────────────── */
+
+.art {
+  position: relative;
+  display: block;
+  justify-self: end;
+  align-self: end;
+  /* Square, and never larger than the space under the title. */
+  width: min(96px, 40cqw, 100cqh);
+  aspect-ratio: 1;
+  color: inherit;
+}
+
+.art i {
+  position: absolute;
+  display: block;
+  background: var(--tile-art, currentColor);
+  transition:
+    background-color var(--tile-ease),
+    box-shadow var(--tile-ease),
+    transform var(--tile-ease),
+    inset var(--tile-ease),
+    width var(--tile-ease),
+    height var(--tile-ease),
+    opacity var(--tile-ease);
+}
+
+@media (any-hover: hover) {
+  .tile:hover .art i {
+    background-color: transparent;
+    box-shadow: inset 0 0 0 2px currentColor;
+  }
+}
+
+/* What — a drop with square ripples */
+.art-what .drop {
+  inset: 42% 42% 42% 42%;
+  z-index: 2;
+}
+.art-what .rip {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--tile-art);
+}
+.art-what .rip-1 {
+  inset: 28%;
+  opacity: 0.85;
+}
+.art-what .rip-2 {
+  inset: 14%;
+  opacity: 0.55;
+}
+.art-what .rip-3 {
+  inset: 0;
+  opacity: 0.3;
+}
+
+@media (any-hover: hover) {
+  .tile:hover .art-what .rip {
+    box-shadow: inset 0 0 0 2px currentColor;
+  }
+  .tile:hover .art-what .rip-1 {
+    inset: 18%;
+  }
+  .tile:hover .art-what .rip-2 {
+    inset: 6%;
+  }
+  .tile:hover .art-what .rip-3 {
+    inset: -8%;
+    opacity: 0.5;
+  }
+}
+
+/* Why — a 3x3 field with one seed lit */
+.art-why {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 12%;
+}
+.art-why i {
+  position: relative;
+  inset: auto;
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--tile-art);
+  opacity: 0.4;
+}
+.art-why i.seed {
+  background: var(--tile-art);
+  box-shadow: none;
+  opacity: 1;
+}
+
+@media (any-hover: hover) {
+  .tile:hover .art-why i {
+    box-shadow: inset 0 0 0 2px currentColor;
+    background-color: transparent;
+    opacity: 1;
+  }
+  .tile:hover .art-why i.seed {
+    background-color: currentColor;
+    box-shadow: none;
+  }
+}
+
+/* How — three nodes on a rule, links stretch on hover */
+.art-how .node {
+  top: 50%;
+  width: 24%;
+  height: 24%;
+  transform: translateY(-50%);
+  z-index: 2;
+}
+.art-how .n-1 {
+  left: 0;
+}
+.art-how .n-2 {
+  left: 38%;
+}
+.art-how .n-3 {
+  left: 76%;
+}
+.art-how .link {
+  top: 50%;
+  height: 2px;
+  transform: translateY(-50%);
+}
+.art-how .l-1 {
+  left: 24%;
+  width: 14%;
+}
+.art-how .l-2 {
+  left: 62%;
+  width: 14%;
+}
+
+@media (any-hover: hover) {
+  .tile:hover .art-how .link {
+    background-color: currentColor;
+    box-shadow: none;
+  }
+  .tile:hover .art-how .n-2 {
+    left: 38%;
+    transform: translateY(-50%) rotate(45deg);
+  }
+}
+
+/* Foundations — four colour blocks, each with a dot; they swap on hover */
+.art-foundations {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 8%;
+}
+.art-foundations .blk {
+  position: relative;
+  inset: auto;
+  display: grid;
+  place-items: center;
+}
+.art-foundations .blk b {
+  width: 46%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: color-mix(in oklch, var(--tile-bg) 70%, #fff);
+  transition:
+    background-color var(--tile-ease),
+    box-shadow var(--tile-ease);
+}
+.art-foundations .b-1 {
+  background: var(--rippl-ref-color-navy-blue-700);
+}
+.art-foundations .b-2 {
+  background: var(--rippl-ref-color-orange-500);
+}
+.art-foundations .b-3 {
+  background: var(--rippl-ref-color-magenta-500);
+}
+.art-foundations .b-4 {
+  background: var(--rippl-ref-color-cyan-500);
+}
+
+@media (any-hover: hover) {
+  .tile:hover .art-foundations .blk b {
+    background-color: transparent;
+    box-shadow: inset 0 0 0 2px currentColor;
+  }
+  .tile:hover .art-foundations .b-1 {
+    transform: translate(calc(100% + 8%), 0);
+  }
+  .tile:hover .art-foundations .b-2 {
+    transform: translate(calc(-100% - 8%), 0);
+  }
+  .tile:hover .art-foundations .b-3 {
+    transform: translate(calc(100% + 8%), 0);
+  }
+  .tile:hover .art-foundations .b-4 {
+    transform: translate(calc(-100% - 8%), 0);
+  }
+}
+
+/* Components — stacked layers that fan out */
+.art-components .layer {
+  width: 74%;
+  height: 26%;
+}
+.art-components .ly-1 {
+  left: 0;
+  top: 8%;
+  opacity: 0.45;
+}
+.art-components .ly-2 {
+  left: 13%;
+  top: 37%;
+  opacity: 0.7;
+}
+.art-components .ly-3 {
+  left: 26%;
+  top: 66%;
+}
+
+@media (any-hover: hover) {
+  .tile:hover .art-components .layer {
+    opacity: 1;
+  }
+  .tile:hover .art-components .ly-1 {
+    left: 26%;
+  }
+  .tile:hover .art-components .ly-3 {
+    left: 0;
+  }
+}
+
+/* Patterns — a wireframe screen that reduces to outlines */
+.art-patterns .wf-side {
+  left: 0;
+  top: 0;
+  width: 20%;
+  height: 100%;
+}
+.art-patterns .wf-top {
+  left: 26%;
+  top: 0;
+  width: 74%;
+  height: 18%;
+}
+.art-patterns .wf-row {
+  left: 26%;
+  width: 74%;
+  height: 14%;
+  opacity: 0.55;
+}
+.art-patterns .r-1 {
+  top: 28%;
+}
+.art-patterns .r-2 {
+  top: 50%;
+}
+.art-patterns .r-3 {
+  top: 72%;
+  width: 46%;
+}
+
+@media (any-hover: hover) {
+  .tile:hover .art-patterns .wf-row {
+    opacity: 1;
+  }
+  .tile:hover .art-patterns .r-3 {
+    width: 74%;
+  }
+}
+
+/* Who — a row of units of differing height, like a fleet */
+.art-who .unit {
+  bottom: 0;
+  width: 14%;
+}
+.art-who .u-1 {
+  left: 0;
+  height: 44%;
+}
+.art-who .u-2 {
+  left: 21.5%;
+  height: 72%;
+}
+.art-who .u-3 {
+  left: 43%;
+  height: 100%;
+}
+.art-who .u-4 {
+  left: 64.5%;
+  height: 72%;
+}
+.art-who .u-5 {
+  left: 86%;
+  height: 44%;
+}
+
+@media (any-hover: hover) {
+  .tile:hover .art-who .u-1,
+  .tile:hover .art-who .u-5 {
+    height: 72%;
+  }
+  .tile:hover .art-who .u-2,
+  .tile:hover .art-who .u-4 {
+    height: 100%;
+  }
+  .tile:hover .art-who .u-3 {
+    height: 44%;
+  }
+}
+
+/* Resources — a crate with an arrow leaving it */
+.art-resources .crate {
+  left: 0;
+  bottom: 0;
+  width: 66%;
+  height: 66%;
+}
+.art-resources .out {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 46%;
+  height: 46%;
+  color: var(--tile-art);
+  transition:
+    transform var(--tile-ease),
+    color var(--tile-ease);
+}
+
+@media (any-hover: hover) {
+  .tile:hover .art-resources .out {
+    color: currentColor;
+    transform: translate(14%, -14%);
+  }
+}
+
+/* ────────────────────────────  gridlines  ─────────────────────────── */
+
+/* Under the tiles: the rules show in the gaps and where no tile has landed
+ * yet, never across a tile's face. */
+.nav-wrapper-gridlines {
+  z-index: 0;
+  opacity: var(--gl-op);
+}
+
+.nav-tile-gridlines {
+  overflow: visible;
+}
+
+/* The four corner tiles are thrown furthest, so they arrive last. They come
+   in bare; only the four tiles around the centre carry rules. */
+.nav-tile-1.nav-tile-gridlines,
+.nav-tile-4.nav-tile-gridlines,
+.nav-tile-5.nav-tile-gridlines,
+.nav-tile-8.nav-tile-gridlines {
+  display: none;
+}
+
+.tile-line {
+  position: absolute;
+  background: var(--site-line-strong);
+  pointer-events: none;
+}
+
+/* Each rule is centred on its tile; long enough to still cross the viewport
+ * while the tile is thrown well outside it, so the lines lead the tiles in. */
+.nav-l,
+.nav-r {
+  top: 50%;
+  width: 1px;
+  /* The throw is sized off the wider viewport edge, so a line in vh has to
+     be several screens tall to still cross this one. ponytail: 800vh covers
+     up to about a 3:1 window; go longer if wider screens clip it. */
+  height: 800vh;
+  transform: translateY(-50%) scaleX(var(--inv));
+}
+
+.nav-t,
+.nav-b {
+  left: 50%;
+  width: 300vw;
+  height: 1px;
+  transform: translateX(-50%) scaleY(var(--inv));
+}
+
+/* Sit in the gutter, not on the tile face, so the box fill cannot cover them. */
+.nav-l {
+  left: calc(var(--site-gap) / -2);
+}
+.nav-r {
+  right: calc(var(--site-gap) / -2);
+}
+.nav-t {
+  top: calc(var(--site-gap) / -2);
+}
+.nav-b {
+  bottom: calc(var(--site-gap) / -2);
+}
+
+/* Tile rules sit on the tile's own edges (Dropbox), not in the gutter: the
+ * wrapper is under the tiles, so a face hides its own rules and only the
+ * extensions show, reading as the tile's edges continued. */
+.nav-tile-gridlines .nav-l {
+  left: 0;
+}
+.nav-tile-gridlines .nav-r {
+  right: 0;
+}
+.nav-tile-gridlines .nav-t {
+  top: 0;
+}
+.nav-tile-gridlines .nav-b {
+  bottom: 0;
+}
+
+/* Hidden until every tile is on screen, then each rule draws out from its
+ * tile in both directions as --tl-draw runs 0 → 1 with the scroll. */
+.nav-tile-gridlines .nav-l,
+.nav-tile-gridlines .nav-r {
+  transform: translateY(-50%) scaleX(var(--inv)) scaleY(var(--tl-draw));
+}
+.nav-tile-gridlines .nav-t,
+.nav-tile-gridlines .nav-b {
+  transform: translateX(-50%) scaleY(var(--inv)) scaleX(var(--tl-draw));
+}
+
+/* EDGE_ANCHORS: same directional stroke as the centre box's four rules.
+ * Left tile's top grows left→right, right tile's bottom right→left,
+ * bottom tile's left top→bottom, top tile's right bottom→top. */
+@media (min-width: 992px) {
+  .nav-tile-gridlines.nav-tile-6 .nav-t {
+    transform: translateX(-50%) scaleY(var(--inv)) scaleX(0);
+    transform-origin: left center;
+  }
+  .nav-tile-gridlines.nav-tile-3 .nav-b {
+    transform: translateX(-50%) scaleY(var(--inv)) scaleX(0);
+    transform-origin: right center;
+  }
+  .nav-tile-gridlines.nav-tile-7 .nav-l {
+    transform: translateY(-50%) scaleX(var(--inv)) scaleY(0);
+    transform-origin: top center;
+  }
+  .nav-tile-gridlines.nav-tile-2 .nav-r {
+    transform: translateY(-50%) scaleX(var(--inv)) scaleY(0);
+    transform-origin: bottom center;
+  }
+
+  .nav-container.final .nav-tile-gridlines.nav-tile-6 .nav-t,
+  .nav-container.final .nav-tile-gridlines.nav-tile-3 .nav-b,
+  .nav-container.reduced .nav-tile-gridlines.nav-tile-6 .nav-t,
+  .nav-container.reduced .nav-tile-gridlines.nav-tile-3 .nav-b {
+    transform: translateX(-50%) scaleY(var(--inv)) scaleX(1);
+  }
+
+  .nav-container.final .nav-tile-gridlines.nav-tile-7 .nav-l,
+  .nav-container.final .nav-tile-gridlines.nav-tile-2 .nav-r,
+  .nav-container.reduced .nav-tile-gridlines.nav-tile-7 .nav-l,
+  .nav-container.reduced .nav-tile-gridlines.nav-tile-2 .nav-r {
+    transform: translateY(-50%) scaleX(var(--inv)) scaleY(1);
+  }
+
+  .nav-container.animating-in.final .nav-tile-gridlines.nav-tile-6 .nav-t,
+  .nav-container.animating-in.final .nav-tile-gridlines.nav-tile-3 .nav-b,
+  .nav-container.animating-in.final .nav-tile-gridlines.nav-tile-7 .nav-l,
+  .nav-container.animating-in.final .nav-tile-gridlines.nav-tile-2 .nav-r {
+    transition: transform 1.25s cubic-bezier(0.4, 0, 0.3, 1);
+  }
+}
+
+/* ─────────────────────────  centre / menu  ────────────────────────── */
+
+.menu {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 10;
+  width: var(--centre-size);
+  height: var(--centre-size);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* Same box as .menu, but not inside it: the white fill and the menu's clip
+ * were cutting the rules off, and they vanished as the box shrank. */
+.menu-gridlines {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 0;
+  width: var(--centre-size);
+  height: var(--centre-size);
+  transform: translate(-50%, -50%);
+  opacity: var(--gl-op);
+  pointer-events: none;
+}
+
+.menu-gridlines .tile-line {
+  background: color-mix(in oklch, var(--site-ink) 55%, transparent);
+}
+
+/* Flush against the box, just outside its face so the fill cannot cover them. */
+.menu-gridlines .nav-l {
+  left: -1px;
+}
+.menu-gridlines .nav-r {
+  right: -1px;
+}
+.menu-gridlines .nav-t {
+  top: -1px;
+}
+.menu-gridlines .nav-b {
+  bottom: -1px;
+}
+
+/*
+ * Each rule already spans the full viewport, then draws along that length.
+ * A translate would slide the origin, so the line would only cover part of
+ * the screen and the rest would stay blank until the end.
+ * Left grows top to bottom, right bottom to top, top left to right,
+ * bottom right to left. These four strokes are the box.
+ */
+.menu-gridlines .nav-l,
+.menu-gridlines .nav-r {
+  top: calc(50% - 50vh);
+  height: 100vh;
+}
+.menu-gridlines .nav-t,
+.menu-gridlines .nav-b {
+  left: calc(50% - 50vw);
+  width: 100vw;
+}
+.menu-gridlines .nav-l {
+  transform: scaleY(0);
+  transform-origin: top center;
+}
+.menu-gridlines .nav-r {
+  transform: scaleY(0);
+  transform-origin: bottom center;
+}
+.menu-gridlines .nav-t {
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+.menu-gridlines .nav-b {
+  transform: scaleX(0);
+  transform-origin: right center;
+}
+
+.nav-container.final .menu-gridlines .nav-l,
+.nav-container.final .menu-gridlines .nav-r,
+.nav-container.reduced .menu-gridlines .nav-l,
+.nav-container.reduced .menu-gridlines .nav-r {
+  transform: scaleY(1);
+}
+
+.nav-container.final .menu-gridlines .nav-t,
+.nav-container.final .menu-gridlines .nav-b,
+.nav-container.reduced .menu-gridlines .nav-t,
+.nav-container.reduced .menu-gridlines .nav-b {
+  transform: scaleX(1);
+}
+
+.nav-container.animating-in.final .menu-gridlines .tile-line {
+  transition: transform 1.25s cubic-bezier(0.4, 0, 0.3, 1);
+}
+
+.nav-container.reduced .menu-gridlines .tile-line {
+  transition: none !important;
+}
+
+/*
+ * The centre box is on screen from the first frame (it carries the outline
+ * wordmark). The tiles wait for the fill; the gridline wrapper is left alone
+ * so its own --gl-op fade still governs it.
+ */
+.nav-container:not(.final) .nav-wrapper:not(.nav-wrapper-gridlines) {
+  opacity: 0;
+}
+
+.nav-container.final .nav-wrapper:not(.nav-wrapper-gridlines) {
+  opacity: 1;
+  transition: opacity 1.1s var(--site-ease-nav) 0.25s;
+}
+
+/*
+ * Paper while the wordmark draws, then ink in step with the scroll
+ * (--box-ink). No colour transition: a timer here lags a slow scroll and
+ * sticks when you scroll back.
+ */
+.nav-button {
+  /* Where the settled wordmark sits in the box; the icon starts on its dot. */
+  --mark-l: clamp(20px, 5%, 56px);
+  --mark-w: min(46%, 280px);
+  position: absolute;
+  inset: 0;
+  display: block;
+  padding: 0;
+  overflow: hidden;
+  background: color-mix(in oklch, var(--site-ink) calc(var(--box-ink) * 100%), var(--site-surface));
+  color: color-mix(in oklch, var(--site-paper) calc(var(--box-ink) * 100%), var(--site-ink));
+  box-shadow: none;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* The centre is a logo on the landing grid. It only becomes a button when
+   the grid was reopened from a section, and then it closes that menu. */
+.nav-container.overlay .nav-button {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* ──────────────────────  centre mark: outline → solid  ────────────── */
+
+/*
+ * Starts large and centred. When .final lands it scales down and drops to the
+ * bottom-left of the box in the same motion as the fill. Geometry is only
+ * eased during that load-in; while scrolling it tracks the box exactly.
+ */
+.centre-mark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(78%, 640px);
+  aspect-ratio: 488 / 250;
+  transform: translate(-50%, -50%);
+}
+
+.nav-container.animating-in.final .centre-mark {
+  transition:
+    width 1.4s cubic-bezier(0.5, 0, 0.05, 1),
+    left 1.25s cubic-bezier(0.5, 0, 0.3, 1),
+    bottom 1.25s cubic-bezier(0.5, 0, 0.3, 1),
+    top 1.25s cubic-bezier(0.5, 0, 0.3, 1),
+    transform 1.25s cubic-bezier(0.5, 0, 0.3, 1);
+}
+
+.nav-container.final .centre-mark,
+.nav-container.reduced .centre-mark {
+  width: var(--mark-w);
+  /* Bottom-left of the box, then to its centre as --m-centre runs 0 → 1.
+     Lengths, so the load-in can ease down from the centred top. */
+  left: calc(
+    (1 - var(--m-centre)) * var(--mark-l) + var(--m-centre) * (50% - var(--mark-w) / 2)
+  );
+  top: calc(
+    (1 - var(--m-centre)) * (100% - var(--mark-l) - var(--mark-w) * 250 / 488) +
+      var(--m-centre) * (50% - var(--mark-w) * 125 / 488)
+  );
+  transform: none;
+}
+
+.home-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  /* Scroll-linked, so scrolling back brings the letters straight back. */
+  opacity: calc(1 - var(--m-grow));
+}
+
+.home-logo .logo-letter,
+.home-logo .logo-dot {
+  fill-opacity: 0;
+  stroke-width: 2px;
+  /* pathLength="1" on each glyph; overshoot so compound paths (p counters) fully cover. */
+  stroke-dasharray: 1.08;
+  stroke-dashoffset: 1.08;
+}
+
+.home-logo .logo-letter {
+  fill: color-mix(in oklch, var(--site-paper) calc(var(--box-ink) * 100%), var(--site-ink));
+  stroke: color-mix(in oklch, var(--site-paper) calc(var(--box-ink) * 100%), var(--site-ink));
+}
+
+/* Tip square: draws as a black border with the letters, then fills Stolt red. */
+.home-logo .logo-dot {
+  fill: var(--site-dot);
+  stroke: color-mix(in oklch, var(--site-paper) calc(var(--box-ink) * 100%), var(--site-ink));
+}
+
+.nav-container.animating-in:not(.final) .home-logo .logo-letter,
+.nav-container.animating-in:not(.final) .home-logo .logo-dot {
+  animation: logoDraw 1.6s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.45s;
+}
+
+@keyframes logoDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.nav-container.final .home-logo .logo-letter,
+.nav-container.reduced .home-logo .logo-letter {
+  stroke-dashoffset: 0;
+  fill-opacity: 1;
+  stroke-opacity: 0;
+  transition:
+    fill-opacity 0.8s ease-in-out,
+    stroke-opacity 0.5s ease-in-out 0.2s;
+}
+
+.nav-container.final .home-logo .logo-dot,
+.nav-container.reduced .home-logo .logo-dot {
+  stroke-dashoffset: 0;
+  fill-opacity: 1;
+  stroke-opacity: 0;
+  transition:
+    fill-opacity 1.4s ease-in-out 0.35s,
+    stroke-opacity 0.7s ease-in-out 0.9s;
+}
+
+/*
+ * One square, shared by the red backing and the S mark: from the wordmark's
+ * tip square (x 467, y 169, 21 wide in the 488×250 logo) to half the box,
+ * then on to fill it. The backing stays solid for the whole grow, so the
+ * mark's own transparency never shows the black box, and it drops out only
+ * once the mark is opaque.
+ */
+.cm-dot,
+.cm-s {
+  position: absolute;
+  left: calc(
+    (1 - var(--m-grow)) * (50% - var(--mark-w) / 2 + var(--mark-w) * 467 / 488) +
+      var(--m-grow) * (1 - var(--m-s)) * 25%
+  );
+  top: calc(
+    (1 - var(--m-grow)) * (50% - var(--mark-w) * 125 / 488 + var(--mark-w) * 169 / 488) +
+      var(--m-grow) * (1 - var(--m-s)) * 25%
+  );
+  width: calc(
+    (1 - var(--m-grow)) * var(--mark-w) * 21 / 488 + var(--m-grow) * (50% + var(--m-s) * 50%)
+  );
+  pointer-events: none;
+}
+
+.cm-dot {
+  aspect-ratio: 1;
+  background: var(--site-dot);
+  opacity: calc(clamp(0, var(--m-grow) * 1000, 1) * clamp(0, (1 - var(--m-s)) * 1000, 1));
+}
+
+.cm-s {
+  height: calc(
+    (1 - var(--m-grow)) * var(--mark-w) * 21 / 488 + var(--m-grow) * (50% + var(--m-s) * 50%)
+  );
+  /* Brand file is 67x58: never stretch it into the square, and pad with its
+     own white so the slot reads as one mark. */
+  object-fit: contain;
+  background: #fff;
+  opacity: var(--m-s);
+}
+
+/* The chevrons and menu affordance belong to the settled box, not the reveal. */
+.nav-container:not(.titled) .scroll-chevrons {
+  opacity: 0 !important;
+}
+
+/* Square ripple rings, fired once when the dot lands. */
+.ripple {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 0 2px var(--site-dot);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.nav-container.rings .ring {
+  animation: squareRipple 1.5s cubic-bezier(0.2, 0, 0.3, 1) forwards;
+}
+
+.nav-container.rings .ring-2 {
+  animation-delay: 0.18s;
+}
+.nav-container.rings .ring-3 {
+  animation-delay: 0.36s;
+}
+
+@keyframes squareRipple {
+  from {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  to {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+}
+
+/* Taglines */
+.nav-button-titles {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.nav-button-title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  padding: clamp(20px, 5%, 56px);
+  padding-bottom: 0;
+  font-family: var(--site-font-display);
+  font-weight: 700;
+  font-size: clamp(19px, 3vw, 46px);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  text-align: left;
+  text-wrap: balance;
+  opacity: 0;
+  color: currentColor;
+  /* No transition: opacity tracks --box-ink with the background, both ways. */
+}
+
+/* Crossfade with the paper → ink settle so scroll-back matches scroll-forward. */
+.nav-container.titled:not([data-centre='3']) .nav-button-title.title-1 {
+  opacity: calc(1 - var(--box-ink));
+}
+
+.nav-container.titled:not([data-centre='3']) .nav-button-title.title-2 {
+  opacity: var(--box-ink);
+}
+
+/* The reopened menu's close cross, sized to the box so it scales on mobile. */
+.centre-close {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 50%;
+  height: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.centre-close::before,
+.centre-close::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  height: 3px;
+  background: #fff;
+}
+
+.centre-close::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+.centre-close::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* The reopened menu's centre is a plain close button: white, black cross. */
+.nav-container.overlay .nav-button {
+  background: var(--site-paper);
+}
+
+.nav-container.overlay .centre-close {
+  opacity: 1;
+}
+
+.nav-container.overlay .centre-close::before,
+.nav-container.overlay .centre-close::after {
+  background: var(--site-ink);
+}
+
+.nav-container.overlay .cm-s,
+.nav-container.overlay .cm-dot {
+  opacity: 0;
+}
+
+.nav-button:focus-visible {
+  outline: 2px solid var(--site-ink);
+  outline-offset: 3px;
+}
+
+/* Scroll chevrons */
+.scroll-chevrons {
+  position: absolute;
+  right: clamp(14px, 3%, 30px);
+  bottom: clamp(12px, 3%, 26px);
+  width: 52px;
+  height: 46px;
+  color: var(--site-line-strong);
+  opacity: 0;
+}
+
+.nav-container.titled[data-centre='1'] .scroll-chevrons {
+  opacity: 1;
+}
+
+.scroll-chevron {
+  position: absolute;
+  right: 0;
+  width: 52px;
+  transition: transform 1.6s cubic-bezier(0.2, 0, 0.3, 1);
+}
+
+.chev-1 {
+  bottom: 16px;
+}
+.chev-2 {
+  bottom: 2px;
+}
+
+.nav-container.titled[data-centre='1'] .scroll-chevron {
+  animation: chevronPulse 2.5s cubic-bezier(0.6, 0, 0.6, 1) 1.4s infinite;
+}
+
+.nav-container.titled[data-centre='1'] .chev-2 {
+  animation-delay: 1.475s;
+}
+
+@keyframes chevronPulse {
+  0%,
+  72%,
+  100% {
+    transform: translateY(0);
+    color: var(--site-line-strong);
+  }
+  26% {
+    transform: translateY(14px);
+    color: var(--site-dot);
+  }
+}
+
+@media (max-width: 991px) {
+  .scroll-chevrons {
+    width: 26px;
+    height: 26px;
+  }
+  .scroll-chevron {
+    width: 26px;
+  }
+  .chev-1 {
+    bottom: 10px;
+  }
+  .chev-2 {
+    bottom: 2px;
+  }
+}
+
+/* ────────────────────────  tile page opening  ─────────────────────── */
+
+.nav-container.closing .nav-tile:not(.enlarge) {
+  opacity: 0;
+  transition: opacity 0.45s var(--site-ease-nav);
+}
+
+.nav-container.closing .nav-wrapper-gridlines,
+.nav-container.closing .menu {
+  opacity: 0;
+  transition: opacity 0.4s var(--site-ease-nav);
+}
+
+/* Geometry is a FLIP written inline, so the tile grows from its own rect
+ * into the viewport in its own colour before the route changes. */
+.nav-tile.enlarge {
+  z-index: 99;
+}
+
+.nav-tile.enlarge .tile-title {
+  font-size: clamp(36px, 7vw, 92px);
+  transition: font-size 0.7s cubic-bezier(0.65, 0, 0.15, 1);
+}
+
+.nav-tile.enlarge .tile-visual {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+/* ─────────────────────────────  overlay  ──────────────────────────── */
+
+.nav-container.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  height: 100dvh;
+}
+
+.nav-container.overlay .nav-tile {
+  --tx: 0px;
+  --ty: 0px;
+  transform: none;
+}
+
+.nav-container.overlay .nav-wrapper {
+  pointer-events: auto;
+}
+
+.nav-container.overlay .nav-button-title,
+.nav-container.overlay .scroll-chevrons {
+  opacity: 0 !important;
+}
+
+/* ─────────────────────────────  mobile  ──────────────────────────── */
+
+@media (max-width: 991px) {
+  .nav-wrapper {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+  }
+
+  .nav-tile {
+    grid-area: auto;
+  }
+
+  .tile {
+    padding: 12px;
+  }
+
+  .art {
+    width: min(58%, 84px);
+  }
+
+  .nav-button-title {
+    font-size: 17px;
+    padding: 18px;
+  }
+
+  .nav-tile.enlarge .tile {
+    padding-left: 24px;
+  }
+}
+
+/* ──────────────────────────  reduced motion  ─────────────────────── */
+
+/* No fly-in to scroll through, so the hero is exactly one viewport tall. */
+:host(.is-reduced) {
+  height: 100dvh;
+}
+
+.nav-container.reduced .nav-tile {
+  --tx: 0px;
+  --ty: 0px;
+  transform: none;
+}
+
+.nav-container.reduced .morph-dot,
+.nav-container.reduced .ring {
+  display: none;
+}

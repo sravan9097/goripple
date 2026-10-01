@@ -1,0 +1,164 @@
+/* Tokens loaded via angular.json styles. */
+
+/* Atlas Grotesk Bold slot — replace Inter when files arrive. */
+@font-face {
+  font-family: 'Atlas Grotesk';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Atlas Grotesk Bold');
+}
+
+:root {
+  --site-font-display: 'Atlas Grotesk', 'Inter', system-ui, sans-serif;
+  --site-font-body: var(--rippl-ref-type-font-family-roboto);
+  --site-dot: var(--rippl-ref-color-stolt-red-500);
+  --site-gap: 10px;
+  --site-tile: 90px;
+  --site-ease-swoop: cubic-bezier(0.5, 0, 0.05, 1);
+  --site-ease-nav: cubic-bezier(0.4, 0, 0.2, 1);
+  --site-ease-enlarge: cubic-bezier(0.65, 0, 0.15, 1);
+  --site-ease-intro: cubic-bezier(1, 0.25, 0.85, 1);
+  --site-ink: var(--rippl-ref-color-neutral-950);
+  --site-paper: var(--rippl-ref-color-white, #fff);
+  --site-surface: var(--rippl-ref-color-white, #fff);
+  --site-line: color-mix(in oklch, var(--site-ink) 11%, transparent);
+  --site-line-strong: color-mix(in oklch, var(--site-ink) 20%, transparent);
+  --site-accent: var(--rippl-sys-color-primary);
+}
+
+@media (max-width: 991px) {
+  :root {
+    --site-gap: 5px;
+    --site-tile: 64px;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: auto;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+  /* The scroll is choreography, not a document; no scrollbar, as on Dropbox. */
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  font-family: var(--site-font-body);
+  color: var(--site-ink);
+  background: var(--site-paper);
+  overscroll-behavior: none;
+  min-height: 100dvh;
+}
+
+body.lock-scroll {
+  overflow: hidden;
+}
+
+::selection {
+  background: var(--site-dot);
+  color: #fff;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.title,
+.h1,
+.h2,
+.h3,
+.h4 {
+  font-family: var(--site-font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.title {
+  font-size: clamp(36px, 10vw, 200px);
+}
+
+.h1 {
+  font-size: clamp(36px, 6vw, 60px);
+}
+
+.h2 {
+  font-size: clamp(28px, 4vw, 40px);
+}
+
+.h3 {
+  font-size: clamp(22px, 3vw, 30px);
+}
+
+.h4 {
+  font-size: clamp(18px, 2.4vw, 24px);
+}
+
+.p-large {
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.p {
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.annotation {
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 500;
+}
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 24px;
+  width: min(1200px, calc(100% - 48px));
+  margin-inline: auto;
+}
+
+@media (max-width: 991px) {
+  .section-grid {
+    grid-template-columns: 1fr;
+    width: min(100% - 32px, 720px);
+    gap: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

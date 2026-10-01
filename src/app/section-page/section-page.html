@@ -1,0 +1,245 @@
+<a class="skip-link" href="#section-body">Skip to the content</a>
+
+<header class="page-bar" [style.--accent]="tile().accent" [style.--accent-ink]="tile().ink">
+  <a class="page-menu" routerLink="/" [queryParams]="{ menu: 1 }" aria-label="Open the Rippl menu">
+    <span class="menu-bars" aria-hidden="true"><i></i><i></i><i></i></span>
+  </a>
+  <a class="page-home" routerLink="/"><app-wordmark /></a>
+  <span class="page-where annotation">{{ section().kicker }} · {{ tile().title }}</span>
+</header>
+
+<main class="story" id="section-body">
+  <!-- Hairline column rules, the way the Dropbox section pages are ruled -->
+  <div class="column-rules" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+
+  <section class="page-section" [attr.data-section]="tile().id">
+    <span class="section-rule" aria-hidden="true"></span>
+
+    <div class="page-grid" revealOnScroll>
+      <p class="sec-index annotation">{{ section().kicker }}</p>
+      <h2 class="sec-title">{{ section().title }}</h2>
+
+      <div class="sec-copy">
+        @for (para of section().body; track para) {
+          <p class="p-large">{{ para }}</p>
+        }
+      </div>
+
+      <figure class="sec-figure">
+        <div class="figure-frame">
+          @switch (tile().id) {
+            @case ('what') {
+              <app-drop-pool />
+            }
+            @case ('why') {
+              <app-propagate />
+            }
+            @case ('how') {
+              <div class="fig-bezier">
+                <svg viewBox="0 0 240 160" fill="none" preserveAspectRatio="none">
+                  <path
+                    class="curve"
+                    d="M12 148C12 148 60 148 120 80C180 12 228 12 228 12"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  />
+                  <path class="tangent" d="M12 148H76" stroke="currentColor" stroke-width="2" />
+                  <path class="tangent" d="M228 12H164" stroke="currentColor" stroke-width="2" />
+                </svg>
+                <span class="handle h1"></span>
+                <span class="handle h2"></span>
+                <span class="handle h3"></span>
+                <span class="handle h4"></span>
+                <span class="bezier-label annotation">cubic-bezier(0.2, 0, 0, 1)</span>
+              </div>
+              <ol class="fig-chain">
+                @for (step of howSteps; track step.label) {
+                  <li>
+                    <span class="chain-box"></span>
+                    <span class="chain-label">{{ step.label }}</span>
+                    <span class="annotation">{{ step.detail }}</span>
+                  </li>
+                }
+              </ol>
+            }
+            @case ('foundations') {
+              <div class="fig-specimen">
+                <span class="specimen">Aa</span>
+                <ul class="specimen-notes annotation">
+                  <li>Display · Atlas Grotesk Bold</li>
+                  <li>Body · Roboto</li>
+                  <li>15 type roles · 3 modes</li>
+                </ul>
+              </div>
+              <app-swatches />
+            }
+            @case ('components') {
+              <div class="fig-kit">
+                <span class="kit-btn">Book a slot</span>
+                <span class="kit-btn ghost">Cancel</span>
+                <span class="kit-switch"><i></i></span>
+                <span class="kit-chip">Rotterdam</span>
+                <span class="kit-badge">12</span>
+                <span class="kit-field">Vessel name</span>
+                <span class="kit-bar"><i></i></span>
+              </div>
+            }
+            @case ('patterns') {
+              <div class="fig-wireframe">
+                <span class="wf-side">
+                  <i></i><i></i><i></i><i></i>
+                </span>
+                <span class="wf-body">
+                  <i class="wf-head"></i>
+                  <i class="wf-filter"></i>
+                  <i class="wf-row"></i>
+                  <i class="wf-row"></i>
+                  <i class="wf-row"></i>
+                  <i class="wf-row"></i>
+                </span>
+                <span class="wf-drawer"></span>
+              </div>
+            }
+            @case ('who') {
+              <div class="fig-fleet">
+                @for (icon of whoIcons; track icon.name) {
+                  <img [src]="icon.src" [alt]="icon.name" loading="lazy" decoding="async" />
+                }
+              </div>
+            }
+            @case ('resources') {
+              <div class="fig-mark" aria-hidden="true">
+                <span class="mark-box"></span>
+                <span class="mark-box"></span>
+                <span class="mark-box"></span>
+              </div>
+            }
+          }
+        </div>
+
+        @if (section().caption) {
+          <figcaption class="annotation">{{ section().caption }}</figcaption>
+        }
+      </figure>
+
+      @if (tile().id === 'foundations') {
+        <ul class="token-row annotation">
+          @for (item of foundations; track item) {
+            <li>{{ item }}</li>
+          }
+        </ul>
+      }
+
+      @if (tile().id === 'patterns') {
+        <ul class="token-row annotation">
+          @for (item of patterns; track item) {
+            <li>{{ item }}</li>
+          }
+        </ul>
+      }
+
+      @if (tile().id === 'who') {
+        <div class="divisions">
+          @for (division of divisions; track division.name) {
+            <img [src]="division.src" [alt]="division.name" loading="lazy" decoding="async" />
+          }
+        </div>
+      }
+
+      @if (tile().id === 'resources') {
+        <ul class="resource-links">
+          @for (link of links; track link.label) {
+            <li>
+              @if (link.comingSoon) {
+                <span class="resource-link is-soon">
+                  <span>{{ link.label }}</span>
+                  <span class="soon annotation">soon</span>
+                </span>
+              } @else {
+                <a class="resource-link" [href]="link.href" target="_blank" rel="noopener">
+                  <span>{{ link.label }}</span>
+                  <span class="arrow" aria-hidden="true">↗</span>
+                </a>
+              }
+              @if (link.note) {
+                <span class="link-note annotation">{{ link.note }}</span>
+              }
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </section>
+
+  <!-- The closing page only belongs at the end of the last chapter -->
+  @if (!next()) {
+    <aside class="outro" revealOnScroll>
+      <div class="outro-frame">
+        <span class="outro-line l"></span>
+        <span class="outro-line r"></span>
+        <span class="outro-line t"></span>
+        <span class="outro-line b"></span>
+
+        <blockquote class="outro-quote">
+          <span class="hang">“</span>{{ outro.text }}”
+        </blockquote>
+        <p class="annotation outro-attr">— {{ outro.attribution }}</p>
+
+        <p class="p-large outro-copy">
+          Rippl is a toolkit, not a rulebook. Take the tokens, take the components, and build
+          something that feels unmistakably Stolt.
+        </p>
+
+        <div class="outro-credits">
+          @for (credit of credits; track credit.name) {
+            <span class="credit" [style.--credit]="credit.colour">{{ credit.name }}</span>
+          }
+        </div>
+      </div>
+    </aside>
+  }
+</main>
+
+<!-- Previous / next, the way you page through a printed guideline -->
+<nav class="pager" aria-label="Chapters">
+  @if (previous(); as prev) {
+    <a
+      class="pager-link prev"
+      [routerLink]="'/' + prev.id"
+      [style.--accent]="prev.accent"
+      [style.--accent-ink]="prev.ink"
+    >
+      <span class="pager-dir annotation">← Previous</span>
+      <span class="pager-title">{{ prev.title }}</span>
+    </a>
+  } @else {
+    <a class="pager-link prev is-home" routerLink="/">
+      <span class="pager-dir annotation">← Back</span>
+      <span class="pager-title">Menu</span>
+    </a>
+  }
+
+  @if (next(); as nxt) {
+    <a
+      class="pager-link next"
+      [routerLink]="'/' + nxt.id"
+      [style.--accent]="nxt.accent"
+      [style.--accent-ink]="nxt.ink"
+    >
+      <span class="pager-dir annotation">Next →</span>
+      <span class="pager-title">{{ nxt.title }}</span>
+    </a>
+  } @else {
+    <a class="pager-link next is-home" routerLink="/">
+      <span class="pager-dir annotation">Next →</span>
+      <span class="pager-title">Back to the menu</span>
+    </a>
+  }
+</nav>
+
+<footer class="site-footer">
+  <a routerLink="/"><app-wordmark /></a>
+  <p class="annotation">Stolt-Nielsen Design System · Initial launch</p>
+</footer>
