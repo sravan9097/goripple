@@ -32,10 +32,16 @@ import {
 
 type Phase = 'opening' | 'settled';
 
-/** Outline stroke, then the scale-down / drop / fill, in ms from mount. */
-const DRAW_DELAY_MS = 450;
-const DRAW_DURATION_MS = 1600;
-const DRAW_MS = DRAW_DELAY_MS + DRAW_DURATION_MS + 100;
+/**
+ * Load-in, in ms from mount. The drop falls, rings spread from the impact and
+ * the wordmark fades up with them; then the mark settles into the corner.
+ * The CSS delays (.intro-drop, .intro-ring, logoFade) are the same numbers.
+ */
+const DROP_AT_MS = 300;
+const DROP_FALL_MS = 800;
+const IMPACT_MS = DROP_AT_MS + DROP_FALL_MS;
+const FADE_MS = 1500;
+const INTRO_MS = IMPACT_MS + FADE_MS + 100;
 const MOVE_MS = 1450;
 
 @Component({
@@ -193,15 +199,15 @@ export class HeroGrid implements OnDestroy {
       window.setTimeout(() => {
         this.phase.set('settled');
         this.loadedIn.set(true);
-      }, DRAW_MS),
+      }, INTRO_MS),
     );
-    this.timers.push(window.setTimeout(() => this.titled.set(true), DRAW_MS + MOVE_MS));
+    this.timers.push(window.setTimeout(() => this.titled.set(true), INTRO_MS + MOVE_MS));
     this.timers.push(
       window.setTimeout(() => {
         document.body.classList.remove('lock-scroll');
         this.animatingIn.set(false);
         this.scheduleProgress();
-      }, DRAW_MS + MOVE_MS + 200),
+      }, INTRO_MS + MOVE_MS + 200),
     );
   }
 
