@@ -754,6 +754,11 @@
   pointer-events: none;
 }
 
+/* During the load-in the ghost E sits past the box's edge and falls out of it. */
+.nav-container.animating-in:not(.final) .nav-button {
+  overflow: visible;
+}
+
 /* The centre is a logo on the landing grid. It only becomes a button when
    the grid was reopened from a section, and then it closes that menu. */
 .nav-container.overlay .nav-button {
@@ -814,34 +819,108 @@
   fill: color-mix(in oklch, var(--site-paper) calc(var(--box-ink) * 100%), var(--site-ink));
 }
 
-/* Tip square: arrives as a black border with the letters, then fills Stolt red. */
+/*
+ * Load-in reveal, all in the wordmark's own 488x250 space. The rest states
+ * below are the settled mark, so the reopened menu and reduced motion need no
+ * animation; .animating-in plays each piece from its start with `both` fill.
+ * The drop lands in the first p's bowl at (204, 122): see --dx on .intro.
+ */
+
+/* Square wave from the impact; at rest it covers the whole mark. */
+.reveal-sq {
+  x: -400px;
+  y: -400px;
+  width: 1400px;
+  height: 1400px;
+}
+
+.nav-container.animating-in .reveal-sq {
+  animation: hgReveal 1.3s cubic-bezier(0.2, 0, 0.3, 1) both 1.1s;
+}
+
+@keyframes hgReveal {
+  from {
+    x: 204px;
+    y: 122px;
+    width: 0;
+    height: 0;
+  }
+  to {
+    x: -400px;
+    y: -400px;
+    width: 1400px;
+    height: 1400px;
+  }
+}
+
+/* Ghost E: hinged at the end of the l's crossbar; it loosens, tips and falls out of the word. */
+.logo-e {
+  opacity: 0;
+  transform-box: view-box;
+  transform-origin: 477.5px 122px;
+}
+
+.logo-e path {
+  fill: none;
+  stroke: color-mix(in oklch, var(--site-paper) calc(var(--box-ink) * 100%), var(--site-ink));
+  stroke-width: 21;
+}
+
+.nav-container.animating-in .logo-e {
+  animation: hgEFall 1s cubic-bezier(0.5, 0, 1, 0.6) both 2.2s;
+}
+
+@keyframes hgEFall {
+  0% {
+    opacity: 0.45;
+    transform: none;
+  }
+  30% {
+    opacity: 0.45;
+    transform: rotate(-3deg);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(38deg) translateY(260px);
+  }
+}
+
+/* Tip square: the drop, filled with colour at impact, then carried to its slot and squared off. */
 .home-logo .logo-dot {
   fill: var(--site-dot);
-  fill-opacity: 0;
-  stroke: color-mix(in oklch, var(--site-paper) calc(var(--box-ink) * 100%), var(--site-ink));
-  stroke-width: 2px;
 }
 
-/* The wordmark surfaces with the ripple: it fades up from the impact as the rings travel. */
-.nav-container.animating-in:not(.final) .home-logo {
-  opacity: 0;
-  animation: logoFade 1.5s ease-out forwards 1.1s;
+.nav-container.animating-in .logo-dot {
+  animation:
+    hgDotIn 0.25s ease-out both 1.1s,
+    hgDotHome 0.75s cubic-bezier(0.4, 0, 0.2, 1) both 2.45s;
 }
 
-@keyframes logoFade {
+@keyframes hgDotIn {
+  from {
+    opacity: 0;
+  }
   to {
     opacity: 1;
   }
 }
 
-.nav-container.final .home-logo .logo-dot,
-.nav-container.reduced .home-logo .logo-dot {
-  stroke-dashoffset: 0;
-  fill-opacity: 1;
-  stroke-opacity: 0;
-  transition:
-    fill-opacity 1.4s ease-in-out 0.35s,
-    stroke-opacity 0.7s ease-in-out 0.9s;
+@keyframes hgDotHome {
+  0% {
+    x: 193.5px;
+    y: 111.5px;
+    rx: 10.5px;
+  }
+  45% {
+    x: 330px;
+    y: 30px;
+    rx: 10.5px;
+  }
+  100% {
+    x: 467px;
+    y: 169px;
+    rx: 0;
+  }
 }
 
 /*
@@ -898,6 +977,8 @@
  * past the box without being clipped by it.
  */
 .intro {
+  /* Impact point: the first p's bowl, 40/488 of the mark left of the box centre. */
+  --dx: calc(-40 / 488 * min(78%, 640px));
   position: absolute;
   left: 50%;
   top: 50%;
@@ -914,10 +995,10 @@
   display: block;
 }
 
-/* Outlined drop: starts above the viewport, falls under gravity, lands at the centre. */
+/* Outlined drop: starts above the viewport, falls under gravity, lands in the p. */
 .intro-drop {
   position: absolute;
-  left: 50%;
+  left: calc(50% + var(--dx));
   top: 50%;
   width: 26px;
   height: 34px;
@@ -943,7 +1024,7 @@
 /* Square rings from the impact point, three in a row, fading as they reach the edges. */
 .intro-ring {
   position: absolute;
-  inset: 0;
+  inset: 0 calc(-1 * var(--dx)) 0 var(--dx);
   box-shadow: inset 0 0 0 1.5px currentColor;
   opacity: 0;
   transform: scale(0.04);
@@ -1199,6 +1280,11 @@
   .nav-button-title {
     font-size: 17px;
     padding: 18px;
+  }
+
+  /* Room for the ghost E inside the screen; the tuck-in eases it back. */
+  .nav-container.animating-in:not(.final) .centre-mark {
+    left: 42%;
   }
 
   .nav-tile.enlarge .tile {

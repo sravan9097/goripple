@@ -33,15 +33,17 @@ import {
 type Phase = 'opening' | 'settled';
 
 /**
- * Load-in, in ms from mount. The drop falls, rings spread from the impact and
- * the wordmark fades up with them; then the mark settles into the corner.
- * The CSS delays (.intro-drop, .intro-ring, logoFade) are the same numbers.
+ * Load-in, in ms from mount. The drop falls into the p, rings and a square
+ * reveal wave spread from the impact so the word reads "ripple", then the
+ * ghost E falls away and the drop squares into its slot; then the mark settles
+ * into the corner. The CSS delays (.intro-drop, .intro-ring, hgReveal, hgEFall,
+ * hgDotHome) are the same numbers.
  */
 const DROP_AT_MS = 300;
 const DROP_FALL_MS = 800;
 const IMPACT_MS = DROP_AT_MS + DROP_FALL_MS;
-const FADE_MS = 1500;
-const INTRO_MS = IMPACT_MS + FADE_MS + 100;
+const SIGNATURE_MS = 2100;
+const INTRO_MS = IMPACT_MS + SIGNATURE_MS + 100;
 const MOVE_MS = 1450;
 
 @Component({
