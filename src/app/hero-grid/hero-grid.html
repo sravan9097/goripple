@@ -4,7 +4,6 @@
   [attr.data-centre]="centre()"
   [class.final]="loadedIn()"
   [class.titled]="titled()"
-  [class.animating-in]="animatingIn()"
   [class.closing]="!!enlargingId()"
   [class.overlay]="overlayOpen()"
   [class.reduced]="prefersReduced()"
@@ -75,22 +74,70 @@
   </div>
 
   <!--
-    Load-in only: an outlined drop falls from above the screen into the bowl of
-    the first p, and square rings spread from the impact. The reveal itself is
-    in the wordmark SVG below. Timings pair with INTRO constants in hero-grid.ts.
+    Opening (the scroll story's, scenes.ts on v1): the drop falls on load, then
+    the scroll scrubs it. The ripple reveals "ripple", the E falls away, the
+    drop squares into the slot, and the whole thing eases into the centre box
+    with the tagline. Hidden once .final lands and the box's own mark takes over
+    in exactly the same place. The SVG's viewBox is the viewport in px.
   -->
-  <div class="intro" aria-hidden="true">
-    <svg class="intro-drop" viewBox="0 0 24 32" fill="none">
-      <path
-        d="M12 2C12 2 3 13.5 3 20a9 9 0 0 0 18 0C21 13.5 12 2 12 2Z"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linejoin="round"
-      />
+  <div class="opening" aria-hidden="true">
+    <div class="open-bg"></div>
+    <svg class="open-svg" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="hg-glimmer">
+          <stop offset="0" stop-color="#fff" stop-opacity="0.34" />
+          <stop offset="1" stop-color="#fff" stop-opacity="0" />
+        </radialGradient>
+        <mask id="hg-reveal" class="o-maskdef" maskUnits="userSpaceOnUse" x="0" y="0">
+          <g class="o-at"><circle class="o-glimmer" fill="url(#hg-glimmer)" /></g>
+          <circle class="o-mask" fill="#fff" r="0" />
+        </mask>
+      </defs>
+
+      <g class="o-at">
+        <circle class="o-burst" style="--k: 0" />
+        <circle class="o-burst" style="--k: 1" />
+        <circle class="o-burst" style="--k: 2" />
+        <circle class="o-idle" />
+      </g>
+
+      <circle class="o-ring" r="0" />
+      <circle class="o-ring" r="0" />
+      <circle class="o-ring" r="0" />
+
+      <g mask="url(#hg-reveal)">
+        <g class="o-mark">
+          @for (d of letters; track $index) {
+            <path class="o-letter" [attr.d]="d" />
+          }
+          <!-- The ghost E: same stroke and bowl as the p, so the word reads Ripple. -->
+          <g class="o-e">
+            <path d="M592.5 122A57.5 57.5 0 1 0 575.66 162.66" />
+            <path d="M477.5 122H603" />
+          </g>
+        </g>
+      </g>
+
+      <circle class="o-echo" r="0" />
+
+      <g class="o-drop">
+        <circle class="o-ghost" style="--g: 0.5; --lag: 0.06s" />
+        <circle class="o-ghost" style="--g: 0.28; --lag: 0.12s" />
+        <g class="o-breathe">
+          <g class="o-fall"><rect class="o-drop-shape" /></g>
+        </g>
+      </g>
     </svg>
-    <span class="intro-ring ring-1"></span>
-    <span class="intro-ring ring-2"></span>
-    <span class="intro-ring ring-3"></span>
+
+    <!-- Same class as the box's tagline, so it lands on the same spot in the same type. -->
+    <span class="o-tag nav-button-title">{{ taglineOne }}</span>
+
+    <div class="cue">
+      <span class="cue-in annotation">
+        Scroll
+        <svg viewBox="0 0 52 18" fill="none"><path d="M2 2l24 14L50 2" stroke="currentColor" stroke-width="2" /></svg>
+      </span>
+    </div>
   </div>
 
   <!-- Centre: S mark / tagline / menu button -->
@@ -103,46 +150,16 @@
       (click)="onCentreActivate()"
     >
       <!--
-        Final Rippl wordmark (brand/ripplLogo*.svg). On load a square wave from
-        the impact uncovers the letters, so the word first reads "ripple"; the
-        ghost E then tips and falls away, and the drop travels to its slot and
-        squares off into the tip square. On scroll the red square grows into
-        the menu button.
+        Final Rippl wordmark (brand/ripplLogo*.svg), in the corner of the box
+        once the opening has handed off. On scroll the square grows into the
+        menu button.
       -->
       <span class="centre-mark" aria-hidden="true">
         <svg class="home-logo" viewBox="0 0 488 250" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <mask id="hg-reveal" maskUnits="userSpaceOnUse" x="-1200" y="-1200" width="3000" height="3000">
-              <rect class="reveal-sq" fill="#fff" />
-            </mask>
-          </defs>
-          <g mask="url(#hg-reveal)">
-            <!-- R -->
-            <path
-              class="logo-letter"
-              d="M21 61.0078C29.06 55.7081 38.7079 53.57 47.8564 54.0713C60.3678 54.7571 73.2551 60.4376 81.3223 71.501C86.4174 78.4886 89.768 87.418 90 98.3848L70.002 98.8066C69.8554 91.8809 67.8168 86.9222 65.1562 83.2734C61.2058 77.8558 54.3288 74.445 46.7607 74.0303C39.2025 73.6161 32.2643 76.2486 28.0254 81.1914C23.1185 86.9132 21.241 94.2398 21 98.7393V190H0V54H21V61.0078Z"
-            />
-            <!-- i -->
-            <path class="logo-letter" d="M102 54H123V190H102V54Z" />
-            <!-- p -->
-            <path
-              class="logo-letter"
-              d="M157 72.8574C169.211 61.1759 185.767 54 204 54C241.555 54 272 84.4446 272 122C272 159.555 241.555 190 204 190C185.767 190 169.211 182.823 157 171.142V250H136V54H157V72.8574ZM204 75C178.043 75 157 96.0426 157 122C157 147.957 178.043 169 204 169C229.957 169 251 147.957 251 122C251 96.0426 229.957 75 204 75Z"
-            />
-            <!-- p -->
-            <path
-              class="logo-letter"
-              d="M305 72.8574C317.211 61.1759 333.767 54 352 54C389.555 54 420 84.4446 420 122C420 159.555 389.555 190 352 190C333.767 190 317.211 182.823 305 171.142V250H284V54H305V72.8574ZM352 75C326.043 75 305 96.0426 305 122C305 147.957 326.043 169 352 169C377.957 169 399 147.957 399 122C399 96.0426 377.957 75 352 75Z"
-            />
-            <!-- l -->
-            <path class="logo-letter" d="M433 0H454V190H433V0Z" />
-            <!-- The ghost E: the stroke and bowl of the p, so the word reads Ripple before it falls away. -->
-            <g class="logo-e">
-              <path d="M592.5 122A57.5 57.5 0 1 0 575.66 162.66" />
-              <path d="M477.5 122H603" />
-            </g>
-          </g>
-          <!-- missing-E square: on load it is the drop, landed in the p, before it squares into this slot -->
+          @for (d of letters; track $index) {
+            <path class="logo-letter" [attr.d]="d" />
+          }
+          <!-- missing-E square -->
           <rect class="logo-dot" x="467" y="169" width="21" height="21" />
         </svg>
       </span>
