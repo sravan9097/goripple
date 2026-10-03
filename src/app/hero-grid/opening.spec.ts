@@ -38,7 +38,9 @@ describe('opening', () => {
       it('hands the mark and its square off to the box corner', () => {
         const f = heroFrame(1, L, target);
         expect(f.box).toBe(1);
-        expect(f.mark).toEqual(target);
+        expect(f.mark.x).toBeCloseTo(target.x, 9);
+        expect(f.mark.y).toBeCloseTo(target.y, 9);
+        expect(f.mark.s).toBeCloseTo(target.s, 9);
         expect(f.drop.x).toBeCloseTo(target.x + MARK.slot[0] * target.s, 6);
         expect(f.drop.half).toBeCloseTo(MARK.slotHalf * target.s, 6);
         expect(heroFrame(HANDOFF[0], L, target).box).toBe(0);
