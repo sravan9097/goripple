@@ -64,7 +64,7 @@ interface Shore {
         position: relative;
         aspect-ratio: 1;
         width: 100%;
-        max-width: 360px;
+        max-width: min(72vh, 560px);
         margin-inline: auto;
         overflow: hidden;
         cursor: crosshair;

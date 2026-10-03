@@ -8,148 +8,171 @@
   <span class="page-where annotation">{{ section().kicker }} · {{ tile().title }}</span>
 </header>
 
-<main class="story" id="section-body">
-  <!-- Hairline column rules, the way the Dropbox section pages are ruled -->
-  <div class="column-rules" aria-hidden="true">
-    <span></span><span></span><span></span><span></span><span></span>
-  </div>
-
-  <section class="page-section" [attr.data-section]="tile().id">
-    <span class="section-rule" aria-hidden="true"></span>
-
-    <div class="page-grid" revealOnScroll>
-      <p class="sec-index annotation">{{ section().kicker }}</p>
-      <h2 class="sec-title">{{ section().title }}</h2>
-
-      <div class="sec-copy">
-        @for (para of section().body; track para) {
-          <p class="p-large">{{ para }}</p>
+<main class="story" id="section-body" [attr.data-section]="tile().id" [style.--accent]="tile().accent">
+  <!--
+    Opener: the act's line on the tile's colour, one word per share of the
+    scroll (the way the Dropbox section pages open), then the scene.
+  -->
+  <section class="opener" scene data-pin style="--len: 170vh">
+    <div class="pin">
+      <p class="opener-where annotation">{{ section().kicker }} · {{ section().act }}</p>
+      <h1 class="opener-title" [style.--n]="wordCount()">
+        @for (line of openerLines(); track $index) {
+          <span class="o-line">
+            @for (w of line; track w.i) {
+              <span class="w" [style.--i]="w.i">{{ w.t }}</span>
+            }
+          </span>
         }
-      </div>
+      </h1>
+      <span class="cue" aria-hidden="true">
+        <svg viewBox="0 0 52 18" fill="none"><path d="M2 2l24 14L50 2" stroke="currentColor" stroke-width="2" /></svg>
+      </span>
+    </div>
+  </section>
 
-      <figure class="sec-figure">
-        <div class="figure-frame">
-          @switch (tile().id) {
-            @case ('what') {
-              <app-drop-pool />
+  <!-- Scene: the act, enacted -->
+  @switch (tile().id) {
+    @case ('what') {
+      <section class="stage paper" scene aria-label="The drop">
+        <div class="stage-inner">
+          <app-drop-pool />
+        </div>
+      </section>
+    }
+    @case ('why') {
+      <!-- Four islands start identical, then drift: the same button, built four times. -->
+      <section class="stage navy s-frag" scene data-pin style="--len: 320vh" aria-label="The world before">
+        <div class="pin">
+          <div class="frag-grid">
+            <div class="frag-caps" aria-live="polite">
+              @for (cap of islandCaptions; track cap; let last = $last) {
+                <p class="frag-cap h3">
+                  {{ cap }}
+                  @if (last) {
+                    <span class="amber">{{ islandGap }}</span>
+                  }
+                </p>
+              }
+            </div>
+            <div class="drift-stage" aria-hidden="true">
+              @for (prod of islands; track prod.area) {
+                <div class="island" [style]="drift[prod.area]">
+                  <span class="annotation island-name">{{ prod.name }}</span>
+                  <span class="drift-btn">
+                    <span class="w1">{{ islandButton }}</span>
+                    <span class="w2">{{ prod.cta }}</span>
+                  </span>
+                  <span class="annotation island-when">{{ prod.when }}</span>
+                </div>
+              }
+              <i class="frag-dot"></i>
+            </div>
+          </div>
+        </div>
+      </section>
+    }
+    @case ('how') {
+      <!-- One dot changes at the centre; the colour spreads ring by ring. -->
+      <section class="stage navy s-new" scene data-pin style="--len: 240vh" aria-label="The idea">
+        <div class="pin">
+          <div class="new-dots" aria-hidden="true">
+            <span class="nd-ring"></span>
+            <span class="nd-ring nd-ring-2"></span>
+            @for (dot of dots; track $index) {
+              <i [class.nd-centre]="dot.centre" [style.--d]="dot.d" [style.--c]="dot.c"></i>
             }
-            @case ('why') {
-              <app-propagate />
+          </div>
+        </div>
+      </section>
+    }
+    @case ('foundations') {
+      <!-- "ripple": the last letter loosens, lets go and falls; the drop squares into its place. -->
+      <section class="stage navy s-name" scene data-pin style="--len: 260vh" aria-label="The name">
+        <div class="pin">
+          <svg class="name-svg" viewBox="0 0 620 250" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+            @for (d of letters; track $index) {
+              <path class="n-letter" [attr.d]="d" />
             }
-            @case ('how') {
-              <div class="fig-bezier">
-                <svg viewBox="0 0 240 160" fill="none" preserveAspectRatio="none">
-                  <path
-                    class="curve"
-                    d="M12 148C12 148 60 148 120 80C180 12 228 12 228 12"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  />
-                  <path class="tangent" d="M12 148H76" stroke="currentColor" stroke-width="2" />
-                  <path class="tangent" d="M228 12H164" stroke="currentColor" stroke-width="2" />
-                </svg>
-                <span class="handle h1"></span>
-                <span class="handle h2"></span>
-                <span class="handle h3"></span>
-                <span class="handle h4"></span>
-                <span class="bezier-label annotation">cubic-bezier(0.2, 0, 0, 1)</span>
+            <g class="n-e">
+              <path d="M592.5 122A57.5 57.5 0 1 0 575.66 162.66" />
+              <path d="M477.5 122H603" />
+            </g>
+            <circle class="n-echo" cx="477.5" cy="179.5" r="10.5" />
+            <rect class="n-square" x="467" y="169" width="21" height="21" />
+          </svg>
+        </div>
+      </section>
+    }
+    @case ('components') {
+      <!-- Pick the one colour at the centre: every part is drawn from it, so every part follows. -->
+      <section class="stage paper s-kit" scene aria-label="The world inside">
+        <div class="stage-inner kit-wrap" [style.--kit]="kit().value">
+          <div class="kit-centre" role="radiogroup" aria-label="The colour at the centre">
+            <span class="annotation">The centre</span>
+            @for (c of palette; track c.name) {
+              <button
+                type="button"
+                class="kit-swatch"
+                role="radio"
+                [attr.aria-checked]="kit() === c"
+                [attr.aria-label]="c.name"
+                [style.--c]="c.value"
+                (click)="kit.set(c)"
+              ></button>
+            }
+          </div>
+          <div class="fig-kit">
+            <span class="kit-btn">Book a slot</span>
+            <span class="kit-btn ghost">Cancel</span>
+            <span class="kit-switch"><i></i></span>
+            <span class="kit-chip">Rotterdam</span>
+            <span class="kit-badge">12</span>
+            <span class="kit-field">Vessel name<i></i></span>
+            <span class="kit-tabs"><i class="on">Voyages</i><i>Berths</i><i>Crew</i></span>
+            <span class="kit-bar"><i></i></span>
+            <span class="kit-table">
+              <i class="kt-head"></i><i></i><i></i><i></i>
+            </span>
+          </div>
+        </div>
+      </section>
+    }
+    @case ('patterns') {
+      <!-- Two verbs, equal in weight. Hover: the other colour pours in from the pointer. -->
+      <section class="stage paper s-move" scene aria-label="The two verbs">
+        <div class="stage-inner move-grid">
+          @for (card of verbs; track card.title; let i = $index) {
+            <article class="move-card" [class.alt]="i === 1" (pointerenter)="aim($event)">
+              <div class="mc-top">
+                <span class="annotation">{{ card.kicker }}</span>
+                <i class="mc-chip" aria-hidden="true"></i>
               </div>
-              <ol class="fig-chain">
-                @for (step of howSteps; track step.label) {
-                  <li>
-                    <span class="chain-box"></span>
-                    <span class="chain-label">{{ step.label }}</span>
-                    <span class="annotation">{{ step.detail }}</span>
-                  </li>
-                }
-              </ol>
-            }
-            @case ('foundations') {
-              <div class="fig-specimen">
-                <span class="specimen">Aa</span>
-                <ul class="specimen-notes annotation">
-                  <li>Display · Atlas Grotesk Bold</li>
-                  <li>Body · Roboto</li>
-                  <li>15 type roles · 3 modes</li>
-                </ul>
-              </div>
-              <app-swatches />
-            }
-            @case ('components') {
-              <div class="fig-kit">
-                <span class="kit-btn">Book a slot</span>
-                <span class="kit-btn ghost">Cancel</span>
-                <span class="kit-switch"><i></i></span>
-                <span class="kit-chip">Rotterdam</span>
-                <span class="kit-badge">12</span>
-                <span class="kit-field">Vessel name</span>
-                <span class="kit-bar"><i></i></span>
-              </div>
-            }
-            @case ('patterns') {
-              <div class="fig-wireframe">
-                <span class="wf-side">
-                  <i></i><i></i><i></i><i></i>
-                </span>
-                <span class="wf-body">
-                  <i class="wf-head"></i>
-                  <i class="wf-filter"></i>
-                  <i class="wf-row"></i>
-                  <i class="wf-row"></i>
-                  <i class="wf-row"></i>
-                  <i class="wf-row"></i>
-                </span>
-                <span class="wf-drawer"></span>
-              </div>
-            }
-            @case ('who') {
-              <div class="fig-fleet">
-                @for (icon of whoIcons; track icon.name) {
-                  <img [src]="icon.src" [alt]="icon.name" loading="lazy" decoding="async" />
-                }
-              </div>
-            }
-            @case ('resources') {
-              <div class="fig-mark" aria-hidden="true">
-                <span class="mark-box"></span>
-                <span class="mark-box"></span>
-                <span class="mark-box"></span>
-              </div>
-            }
+              <h2 class="h1">{{ card.title }}</h2>
+              <p class="p-large">{{ card.body }}</p>
+            </article>
           }
         </div>
-
-        @if (section().caption) {
-          <figcaption class="annotation">{{ section().caption }}</figcaption>
-        }
-      </figure>
-
-      @if (tile().id === 'foundations') {
-        <ul class="token-row annotation">
-          @for (item of foundations; track item) {
-            <li>{{ item }}</li>
-          }
-        </ul>
-      }
-
-      @if (tile().id === 'patterns') {
-        <ul class="token-row annotation">
-          @for (item of patterns; track item) {
-            <li>{{ item }}</li>
-          }
-        </ul>
-      }
-
-      @if (tile().id === 'who') {
-        <div class="divisions">
-          @for (division of divisions; track division.name) {
-            <img [src]="division.src" [alt]="division.name" loading="lazy" decoding="async" />
-          }
+      </section>
+    }
+    @case ('who') {
+      <!-- Two halves slide together, merge, and open into the promise. -->
+      <section class="stage amber-bg s-shared" scene data-pin style="--len: 260vh" aria-label="The promise">
+        <div class="pin">
+          <div class="merge" aria-hidden="true">
+            <i class="half half-l"></i>
+            <i class="half half-r"></i>
+          </div>
+          <div class="promise-box">
+            <app-wordmark class="pb-mark" [redDot]="false" />
+            <p class="h3">{{ sharedPromise }}</p>
+          </div>
         </div>
-      }
-
-      @if (tile().id === 'resources') {
-        <ul class="resource-links">
+      </section>
+    }
+    @case ('resources') {
+      <section class="stage paper s-links" aria-label="Where to start">
+        <ul class="resource-links stage-inner" revealOnScroll>
           @for (link of links; track link.label) {
             <li>
               @if (link.comingSoon) {
@@ -169,8 +192,69 @@
             </li>
           }
         </ul>
+      </section>
+    }
+  }
+
+  @if (section().caption) {
+    <p class="stage-caption annotation">{{ section().caption }}</p>
+  }
+
+  <!-- Lead: the act in two or three sentences -->
+  <section class="lead" revealOnScroll>
+    @for (para of section().lead; track para) {
+      <p class="h3">{{ para }}</p>
+    }
+  </section>
+
+  <!-- Pillars: the big statement, then each point -->
+  @if (section().pillars; as pillars) {
+    <section class="pillars">
+      <p class="pillars-label annotation">{{ section().pillarsLabel }}</p>
+      @if (pillarWords(); as words) {
+        <h2 class="pillar-words" revealOnScroll>
+          @for (word of words; track $index; let i = $index; let last = $last) {
+            <span class="pw">
+              @if (last && words.length > 1) {
+                <span class="amp">&amp;</span>
+              }
+              {{ word }}<sup>{{ i + 1 }}</sup>
+            </span>
+          }
+        </h2>
+      }
+      <ol class="pillar-list">
+        @for (p of pillars; track p.title; let i = $index) {
+          <li class="pillar" revealOnScroll>
+            <span class="pillar-n">{{ i + 1 }}</span>
+            <h3 class="h3">{{ p.title }}</h3>
+            <p class="p-large">{{ p.body }}</p>
+          </li>
+        }
+      </ol>
+    </section>
+  }
+
+  @if (section().notes; as notes) {
+    <ul class="notes" revealOnScroll>
+      @for (note of notes; track note) {
+        <li class="p-large">{{ note }}</li>
+      }
+    </ul>
+  }
+
+  @if (tile().id === 'who') {
+    <div class="divisions" revealOnScroll>
+      @for (division of divisions; track division.name) {
+        <img [src]="division.src" [alt]="division.name" loading="lazy" decoding="async" />
       }
     </div>
+  }
+
+  <!-- Closing line -->
+  <section class="closing" revealOnScroll>
+    <i class="closing-bar" aria-hidden="true"></i>
+    <p class="closing-line">{{ section().closing }}</p>
   </section>
 
   <!-- The closing page only belongs at the end of the last chapter -->
@@ -185,56 +269,44 @@
         <blockquote class="outro-quote">
           <span class="hang">“</span>{{ outro.text }}”
         </blockquote>
-        <p class="annotation outro-attr">— {{ outro.attribution }}</p>
+        <p class="annotation outro-attr">{{ outro.attribution }}</p>
 
         <p class="p-large outro-copy">
-          Rippl is a toolkit, not a rulebook. Take the tokens, take the components, and build
-          something that feels unmistakably Stolt.
+          They will recognise it, believe it and belong to it. That is the landing experience.
+          One drop, and the rings do the rest.
         </p>
-
-        <div class="outro-credits">
-          @for (credit of credits; track credit.name) {
-            <span class="credit" [style.--credit]="credit.colour">{{ credit.name }}</span>
-          }
-        </div>
       </div>
     </aside>
   }
 </main>
 
-<!-- Previous / next, the way you page through a printed guideline -->
+<!-- Previous / next: a quiet line at the foot, not a second menu -->
 <nav class="pager" aria-label="Chapters">
   @if (previous(); as prev) {
-    <a
-      class="pager-link prev"
-      [routerLink]="'/' + prev.id"
-      [style.--accent]="prev.accent"
-      [style.--accent-ink]="prev.ink"
-    >
-      <span class="pager-dir annotation">← Previous</span>
+    <a class="pager-link prev" [routerLink]="'/' + prev.id">
+      <span class="pager-arrow" aria-hidden="true">←</span>
+      <span class="pager-dir annotation">Previous</span>
       <span class="pager-title">{{ prev.title }}</span>
     </a>
   } @else {
-    <a class="pager-link prev is-home" routerLink="/">
-      <span class="pager-dir annotation">← Back</span>
+    <a class="pager-link prev" routerLink="/">
+      <span class="pager-arrow" aria-hidden="true">←</span>
+      <span class="pager-dir annotation">Back</span>
       <span class="pager-title">Menu</span>
     </a>
   }
 
   @if (next(); as nxt) {
-    <a
-      class="pager-link next"
-      [routerLink]="'/' + nxt.id"
-      [style.--accent]="nxt.accent"
-      [style.--accent-ink]="nxt.ink"
-    >
-      <span class="pager-dir annotation">Next →</span>
+    <a class="pager-link next" [routerLink]="'/' + nxt.id">
+      <span class="pager-dir annotation">Next</span>
       <span class="pager-title">{{ nxt.title }}</span>
+      <span class="pager-arrow" aria-hidden="true">→</span>
     </a>
   } @else {
-    <a class="pager-link next is-home" routerLink="/">
-      <span class="pager-dir annotation">Next →</span>
+    <a class="pager-link next" routerLink="/" [queryParams]="{ menu: 1 }">
+      <span class="pager-dir annotation">Next</span>
       <span class="pager-title">Back to the menu</span>
+      <span class="pager-arrow" aria-hidden="true">→</span>
     </a>
   }
 </nav>

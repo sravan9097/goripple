@@ -57,6 +57,15 @@ export const OPENING = {
 /** Once the square has landed, the whole composition eases into the centre box. */
 export const HANDOFF = [0.53, 1] as const;
 
+/**
+ * The reveal plays once. After it lands, scrolling back through the tagline
+ * frames stays on the landed frame instead of running the drop and ripple again.
+ */
+export function landedReveal(q: number, landed: boolean): { q: number; landed: boolean } {
+  const done = landed || q >= 1;
+  return { q: done ? 1 : q, landed: done };
+}
+
 export interface Placement {
   x: number;
   y: number;

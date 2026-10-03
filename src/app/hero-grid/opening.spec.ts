@@ -1,4 +1,13 @@
-import { HANDOFF, heroFrame, MARK, OPENING, openingFrame, openingLayout } from './opening';
+import { HANDOFF, heroFrame, landedReveal, MARK, OPENING, openingFrame, openingLayout } from './opening';
+
+describe('landed reveal', () => {
+  it('scrubs until the hand-off lands, then stays landed when scroll goes back', () => {
+    expect(landedReveal(0.4, false)).toEqual({ q: 0.4, landed: false });
+    const landed = landedReveal(1, false);
+    expect(landed).toEqual({ q: 1, landed: true });
+    expect(landedReveal(0.2, landed.landed)).toEqual({ q: 1, landed: true });
+  });
+});
 
 describe('opening', () => {
   for (const [w, h] of [

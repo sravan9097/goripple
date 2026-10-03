@@ -31,7 +31,7 @@ import {
   yeet,
   type CentreState,
 } from './choreography';
-import { heroFrame, lerp, openingLayout, span, type OpeningLayout, type Placement } from './opening';
+import { heroFrame, landedReveal, lerp, openingLayout, span, type OpeningLayout, type Placement } from './opening';
 
 type Phase = 'opening' | 'settled';
 
@@ -101,6 +101,8 @@ export class HeroGrid implements OnDestroy {
   private mq?: MediaQueryList;
   /** Smoothed scroll position; the rAF loop runs until it catches up with the real one. */
   private y = 0;
+  /** Set once the reveal reaches the box, so scrolling back does not replay it. */
+  private revealLanded = false;
   private o!: OpeningEls;
   private layout!: OpeningLayout;
   /** The box's settled corner mark, where the opening lands its own copy. */
@@ -368,7 +370,9 @@ export class HeroGrid implements OnDestroy {
     // the rest collapses the box (p).
     const settledView = this.overlayOpen() || this.prefersReduced();
     const openPx = OPEN_SCROLL_VH * vh;
-    const q = settledView ? 1 : clamp01(this.y / openPx);
+    const reveal = landedReveal(settledView ? 1 : clamp01(this.y / openPx), this.revealLanded);
+    this.revealLanded = reveal.landed;
+    const q = reveal.q;
     const p = settledView ? 1 : clamp01((this.y - openPx) / Math.max(1, el.offsetHeight - vh - openPx));
     this.paintOpening(q);
 

@@ -1143,9 +1143,16 @@
   letter-spacing: -0.03em;
   text-align: left;
   text-wrap: balance;
+  white-space: pre-line;
   opacity: 0;
   color: currentColor;
   /* No transition: opacity tracks --box-ink with the background, both ways. */
+}
+
+/* The primary tagline is the headline of the navy box: larger, on its own two lines. */
+.nav-button-title.title-1,
+.o-tag {
+  font-size: clamp(28px, 5vw, 76px);
 }
 
 /* Crossfade with the paper → ink settle so scroll-back matches scroll-forward. */
@@ -1355,6 +1362,11 @@
   .nav-button-title {
     font-size: 17px;
     padding: 18px;
+  }
+
+  .nav-button-title.title-1,
+  .o-tag {
+    font-size: 28px;
   }
 
   .nav-tile.enlarge .tile {
