@@ -1,0 +1,284 @@
+<div class="progress" aria-hidden="true"><i></i></div>
+
+<!-- The one amber object carried between scenes; anchors hide while it travels. -->
+<span class="traveller" aria-hidden="true"></span>
+
+<!-- 01 + 02 · The drop: the ripple reveals the name, the drop becomes the signature -->
+<section class="scene s-open navy" data-scene data-pin style="--len: 320vh">
+  <div class="pin open-pin">
+    <h1 class="sr-only">Rippl. {{ copy.promise[0] }} {{ copy.promise[1] }}</h1>
+    <div class="open-inner">
+      <svg class="open-svg" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="story-glimmer">
+            <stop offset="0" stop-color="#fff" stop-opacity="0.34" />
+            <stop offset="1" stop-color="#fff" stop-opacity="0" />
+          </radialGradient>
+          <mask id="story-reveal" class="o-maskdef" maskUnits="userSpaceOnUse" x="0" y="0">
+            <g class="o-at"><circle class="o-glimmer" fill="url(#story-glimmer)" /></g>
+            <circle class="o-mask" fill="#fff" r="0" />
+          </mask>
+        </defs>
+
+        <g class="o-at">
+          <circle class="o-burst" style="--k: 0" />
+          <circle class="o-burst" style="--k: 1" />
+          <circle class="o-burst" style="--k: 2" />
+          <circle class="o-idle" />
+        </g>
+
+        <circle class="o-ring" r="0" />
+        <circle class="o-ring" r="0" />
+        <circle class="o-ring" r="0" />
+
+        <g mask="url(#story-reveal)">
+          <g class="o-mark">
+            @for (d of letters; track $index) {
+              <path class="o-letter" [attr.d]="d" />
+            }
+            <!-- The ghost E: same stroke and bowl as the p, so the word reads Ripple. -->
+            <g class="o-e">
+              <path d="M592.5 122A57.5 57.5 0 1 0 575.66 162.66" />
+              <path d="M477.5 122H603" />
+            </g>
+          </g>
+        </g>
+
+        <circle class="o-echo" r="0" />
+
+        <g class="o-drop">
+          <circle class="o-ghost" style="--g: 0.5; --lag: 0.06s" />
+          <circle class="o-ghost" style="--g: 0.28; --lag: 0.12s" />
+          <g class="o-breathe">
+            <g class="o-fall"><rect class="o-drop-shape anchor" data-hold="0.9,0.9" /></g>
+          </g>
+        </g>
+      </svg>
+
+      <p class="o-tag h1" aria-hidden="true">
+        <span class="line"><span>{{ copy.promise[0] }}</span></span>
+        <span class="line amber"><span>{{ copy.promise[1] }}</span></span>
+      </p>
+    </div>
+
+    <div class="cue" aria-hidden="true">
+      <span class="cue-in annotation">
+        Scroll
+        <svg viewBox="0 0 52 18" fill="none"><path d="M2 2l24 14L50 2" stroke="currentColor" stroke-width="2" /></svg>
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- 03 · The world before: every product built alone -->
+<section class="scene s-frag navy" data-scene data-pin style="--len: 300vh">
+  <div class="pin">
+    <header class="sec-head annotation">
+      <span>{{ copy.fragmentation.index }}</span><i></i><span>{{ copy.fragmentation.label }}</span>
+    </header>
+    <div class="frag-grid">
+      <div class="frag-copy">
+        <h2 class="frag-title h1 lines" revealOnScroll>
+          @for (line of copy.fragmentation.title; track line) {
+            <span class="line"><span>{{ line }}</span></span>
+          }
+        </h2>
+        <div class="frag-caps">
+          @for (cap of copy.fragmentation.captions; track cap; let last = $last) {
+            <p class="frag-cap h3">
+              {{ cap }}
+              @if (last) {
+                <span class="amber">{{ copy.fragmentation.gap }}</span>
+              }
+            </p>
+          }
+        </div>
+      </div>
+
+      <!-- Four islands start identical, then drift: the same button, built four times. -->
+      <div class="drift-stage" aria-hidden="true">
+        @for (prod of copy.fragmentation.products; track prod.area) {
+          <div class="island" [style]="drift[prod.area]">
+            <span class="annotation island-name">{{ prod.name }}</span>
+            <span class="drift-btn">
+              <span class="w1">{{ copy.fragmentation.button }}</span>
+              <span class="w2">{{ prod.cta }}</span>
+            </span>
+            <span class="annotation island-when">{{ prod.when }}</span>
+          </div>
+        }
+        <i class="frag-dot anchor" data-hold="0.1,0.85"></i>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 · Iteration: the drop becomes the dot of the i -->
+<section class="scene s-iter paper" data-scene>
+  <header class="sec-head annotation">
+    <span>{{ copy.iteration.index }}</span><i></i><span>{{ copy.iteration.label }}</span>
+  </header>
+  <div class="iter-grid">
+    <h2 class="iter-word title" aria-label="iteration">
+      <span class="iter-i" aria-hidden="true">ı<i class="iter-dot anchor" data-hold="0.45,0.55"></i></span><span aria-hidden="true">{{ copy.iteration.word }}</span>
+    </h2>
+    <ul class="iter-asides annotation" revealOnScroll>
+      @for (aside of copy.iteration.asides; track aside) {
+        <li>{{ aside }}</li>
+      }
+    </ul>
+    <div class="iter-body" revealOnScroll>
+      <p class="h3">{{ copy.iteration.body }}</p>
+    </div>
+  </div>
+</section>
+
+<!-- 05 · The new way: one dot becomes every dot -->
+<section class="scene s-new navy" data-scene data-pin style="--len: 220vh">
+  <div class="pin">
+    <header class="sec-head annotation">
+      <span>{{ copy.newWay.index }}</span><i></i><span>{{ copy.newWay.label }}</span>
+    </header>
+    <div class="new-grid">
+      <div class="new-copy" revealOnScroll>
+        <p class="kicker annotation">{{ copy.newWay.kicker }}</p>
+        <h2 class="h1 lines" revealOnScroll>
+          <span class="line"><span>{{ copy.newWay.title[0] }}</span></span>
+          <span class="line amber"><span>{{ copy.newWay.title[1] }}</span></span>
+        </h2>
+        <i class="bar" aria-hidden="true"></i>
+        <p class="p-large">{{ copy.newWay.body }}</p>
+      </div>
+      <div class="new-dots" aria-hidden="true">
+        <span class="nd-ring"></span>
+        <span class="nd-ring nd-ring-2"></span>
+        @for (dot of dots; track $index) {
+          <i
+            [class.anchor]="dot.centre"
+            [class.nd-centre]="dot.centre"
+            [attr.data-hold]="dot.centre ? '0.1,0.9' : null"
+            [attr.data-round]="dot.centre ? '' : null"
+            [style.--d]="dot.d"
+            [style.--c]="dot.c"
+          ></i>
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 · The name: the dot squares off into the signature -->
+<section class="scene s-name navy" data-scene data-pin style="--len: 200vh">
+  <div class="pin">
+    <header class="sec-head annotation">
+      <span>{{ copy.naming.index }}</span><i></i><span>{{ copy.naming.label }}</span>
+    </header>
+    <div class="name-mark" aria-hidden="true">
+      <app-wordmark class="anchor" data-hold="0.3,0.35" />
+    </div>
+    <div class="name-copy" revealOnScroll>
+      <p class="h3">{{ copy.naming.body }}</p>
+      <p class="h4 amber">{{ copy.naming.signature }}</p>
+    </div>
+  </div>
+</section>
+
+<!-- 07 · How Rippl works: a brochure that unfolds idea by idea -->
+<section class="scene s-how paper" data-scene data-pin style="--len: 300vh">
+  <div class="pin">
+    <header class="sec-head annotation">
+      <span>{{ copy.how.index }}</span><i></i><span>{{ copy.how.label }}</span>
+    </header>
+    <h2 class="how-title h1">{{ copy.how.title }}</h2>
+    <div class="brochure-stage">
+      <div class="brochure">
+        <div class="leaf l1">
+          <div class="face front"><ng-container *ngTemplateOutlet="panel; context: { $implicit: panels[0] }" /></div>
+        </div>
+        <div class="leaf l2">
+          <div class="face front"><ng-container *ngTemplateOutlet="panel; context: { $implicit: panels[1] }" /></div>
+          <div class="face back cover" aria-hidden="true"><app-wordmark /></div>
+          <div class="leaf l3">
+            <div class="face front"><ng-container *ngTemplateOutlet="panel; context: { $implicit: panels[2] }" /></div>
+            <div class="face back" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<ng-template #panel let-idea>
+  <div class="panel">
+    <div class="panel-top">
+      <span class="annotation">{{ idea.kicker }}</span>
+      <i class="panel-chip" [style.background]="idea.colour"></i>
+    </div>
+    <div class="panel-dots" aria-hidden="true">
+      @for (dot of panelDots; track dot.n) {
+        <i [class.hi]="dot.n === idea.hi" [class.big]="dot.n === idea.hi && idea.big" [style.--row]="dot.row"></i>
+      }
+    </div>
+    <p class="h4">{{ idea.line }}</p>
+    <p class="p">{{ idea.detail }}</p>
+  </div>
+</ng-template>
+
+<!-- 08 · The two verbs: hover and the colours trade places -->
+<section class="scene s-move paper" data-scene>
+  <header class="sec-head annotation">
+    <span>{{ copy.movements.index }}</span><i></i><span>{{ copy.movements.label }}</span>
+  </header>
+  <div class="move-grid" revealOnScroll>
+    @for (card of copy.movements.cards; track card.title; let i = $index) {
+      <article class="move-card" [class.alt]="i === 1" (pointerenter)="aim($event)">
+        <div class="mc-top">
+          <span class="annotation">{{ card.kicker }}</span>
+          <i class="mc-chip" aria-hidden="true"></i>
+        </div>
+        <h3 class="h2">{{ card.title }}</h3>
+        <p class="p-large">{{ card.body }}</p>
+      </article>
+    }
+  </div>
+</section>
+
+<!-- 09 · Shared promise: two become one -->
+<section class="scene s-shared amber-bg" data-scene data-pin data-rest="0.7" style="--len: 240vh">
+  <div class="pin">
+    <header class="sec-head annotation">
+      <span>{{ copy.shared.index }}</span><i></i><span>{{ copy.shared.label }}</span>
+    </header>
+    <div class="merge" aria-hidden="true">
+      <i class="half half-l"></i>
+      <i class="half half-r"></i>
+    </div>
+    <div class="promise-box">
+      <app-wordmark class="pb-mark" />
+      <p class="h3">{{ copy.shared.body }}</p>
+    </div>
+  </div>
+</section>
+
+<!-- 10 · The promise: the square pulls back into the name, then only "Starting now." stays -->
+<section class="scene s-close navy" data-scene data-pin data-rest="0.6" style="--len: 320vh">
+  <div class="pin">
+    <div class="close-inner">
+      <div class="erasable">
+        <app-wordmark class="close-mark" />
+        <p class="close-lines h1">
+          @for (line of copy.closing.lines; track line) {
+            <span class="line"><span>{{ line }}</span></span>
+          }
+        </p>
+      </div>
+      <p class="close-last h1 amber"><span class="line"><span>{{ copy.closing.last }}</span></span></p>
+    </div>
+    <i class="eraser" aria-hidden="true"></i>
+  </div>
+</section>
+
+<footer class="story-foot navy">
+  <p class="annotation">{{ copy.closing.credit }}</p>
+  <a class="annotation" routerLink="/" [queryParams]="{ menu: 1 }">{{ copy.closing.chapters }}</a>
+</footer>

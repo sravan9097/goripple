@@ -169,6 +169,86 @@ export const LINKS: ResourceLink[] = [
   },
 ];
 
+/** Copy for the single-page scroll story on `/`, in scene order (doc.md, NARRATIVE.md §9). */
+export const STORY = {
+  promise: ['One drop.', 'Every product.'],
+  fragmentation: {
+    index: '03',
+    label: 'Product fragmentation',
+    title: ['Every product was built with care.', 'Every product was built alone.'],
+    captions: [
+      'The same button, built again by every team.',
+      'Nothing was broken. Everything was separate.',
+      'Nobody chose this. It is what happens when good teams work fast without a shared foundation.',
+    ],
+    gap: 'The fault was never a person. It was the gap.',
+    button: 'Continue',
+    products: [
+      { area: 'seafarm', name: 'Stolt Sea Farm', when: 'Year one', cta: 'Continue' },
+      { area: 'containers', name: 'Stolt Tank Containers', when: 'Year two', cta: 'Submit' },
+      { area: 'tankers', name: 'Stolt Tankers', when: 'Year three', cta: 'Confirm' },
+      { area: 'terminals', name: 'Stolthaven Terminals', when: 'Year four', cta: 'Next step' },
+    ],
+  },
+  iteration: {
+    index: '04',
+    label: 'Iteration',
+    word: 'teration',
+    asides: ['A local fix.', 'A neighbouring shift.', 'Another isolated choice.'],
+    body: 'Every new iteration solved local challenges, but often without awareness of how neighbouring products were evolving.',
+  },
+  newWay: {
+    index: '05',
+    label: 'The new way',
+    kicker: 'The new way:',
+    title: ['Change once.', 'Rippl everywhere.'],
+    body: 'Rippl is Stolt-Nielsen’s design system: one shared foundation of building blocks, patterns and guidelines that every digital product draws from, built by DICe for every Stolt business.',
+  },
+  naming: {
+    index: '06',
+    label: 'Naming story',
+    body: 'We dropped the final letter deliberately. ‘Ripple’ is a word the world owns. ‘Rippl’ is a word only we own. It is distinct, searchable, protectable, and it signals intent: this is not a metaphor we borrowed, it is a name we made.',
+    signature: 'The absence is the signature.',
+  },
+  how: {
+    index: '07',
+    label: 'How it works',
+    title: 'How Rippl works?',
+    ideas: [
+      { kicker: '01 / 03', line: 'Idea one: everything is defined once.', detail: 'Each decision is made once and kept in one place.' },
+      { kicker: '02 / 03', line: 'Idea two: every product draws from the centre.', detail: 'Products connect to Rippl. They do not copy from it.' },
+      { kicker: '03 / 03', line: 'Idea three: change ripples outward.', detail: 'When the centre improves, every connected product improves with it.' },
+    ],
+  },
+  movements: {
+    index: '08',
+    label: 'Two movements',
+    cards: [
+      {
+        kicker: '01 / Adopt',
+        title: 'GoRippl: the adoption movement.',
+        body: 'When a product joins the system, it goes Rippl: it connects to the shared foundation and starts moving with everyone else. GoRippl is the journey every product takes from island to ecosystem.',
+      },
+      {
+        kicker: '02 / Contribute',
+        title: 'DoRippl: the contribution culture.',
+        body: 'The system is built by DICe, but it grows through everyone. When you improve a component, propose a pattern or report a gap, you do Rippl: you drop something into the water and the whole organisation feels the ring.',
+      },
+    ],
+  },
+  shared: {
+    index: '09',
+    label: 'Shared promise',
+    body: 'A shared language, a living foundation and a promise of sameness, helping every Stolt product feel consistent, connected and instantly familiar.',
+  },
+  closing: {
+    lines: ['One drop.', 'Every product.'],
+    last: 'Starting now.',
+    credit: 'Rippl, built by DICe, for every Stolt business.',
+    chapters: 'Explore the chapters',
+  },
+};
+
 /** Division logos for the Who section (Logo Version 1, white bg). */
 export const DIVISIONS = [
   { name: 'Stolt-Nielsen', src: 'brand/Logos/Logo Version 1 for white background/PNG/SN_LOGO_1.png' },

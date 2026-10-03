@@ -5,14 +5,15 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
 import { TILES } from '../content';
 import { HeroGrid } from '../hero-grid/hero-grid';
+import { Story } from '../story/story';
 
 /**
- * The landing route is the Dropbox index: a scroll-driven reveal that settles
- * on the tile grid. Every tile leads to its own page.
+ * The landing route is the scroll story. The tile grid now lives only behind
+ * the corner menu (`?menu`), where every tile still leads to its own page.
  */
 @Component({
   selector: 'app-landing',
-  imports: [HeroGrid, RouterLink],
+  imports: [HeroGrid, RouterLink, Story],
   template: `
     <!--
       The grid tiles only take focus once they have flown into place, so the
@@ -24,7 +25,11 @@ import { HeroGrid } from '../hero-grid/hero-grid';
       }
     </nav>
 
-    <app-hero-grid [returnMode]="fromMenu()" (jumpTo)="open($event)" (closeMenu)="back()" />
+    @if (fromMenu()) {
+      <app-hero-grid [returnMode]="true" (jumpTo)="open($event)" (closeMenu)="back()" />
+    } @else {
+      <app-story />
+    }
   `,
   styles: `
     :host {
