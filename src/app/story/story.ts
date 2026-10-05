@@ -83,6 +83,8 @@ export class Story implements OnDestroy {
 
   private scenes: SceneRef[] = [];
   private anchors: AnchorRef[] = [];
+  /** Act 7 cards: page top and height, so the wipe needs no layout read per frame. */
+  private cards: { el: HTMLElement; top: number; height: number }[] = [];
   private layout!: OpeningLayout;
   private vh = 0;
   private y = 0;
@@ -126,14 +128,6 @@ export class Story implements OnDestroy {
     window.removeEventListener('resize', this.onResize);
     this.resizeObserver?.disconnect();
     document.body.classList.remove('lock-scroll');
-  }
-
-  /** GoRippl / DoRippl: the colour swap spreads from wherever the pointer came in. */
-  aim(event: PointerEvent): void {
-    const card = event.currentTarget as HTMLElement;
-    const r = card.getBoundingClientRect();
-    card.style.setProperty('--x', `${event.clientX - r.left}px`);
-    card.style.setProperty('--y', `${event.clientY - r.top}px`);
   }
 
   private boot(): void {
@@ -222,6 +216,10 @@ export class Story implements OnDestroy {
       s.top = r.top + window.scrollY;
       s.height = r.height;
     }
+    this.cards = Array.from(this.host.querySelectorAll<HTMLElement>('.move-card')).map((card) => {
+      const r = card.getBoundingClientRect();
+      return { el: card, top: r.top + window.scrollY, height: r.height };
+    });
     this.measureWheel();
 
     const L = openingLayout(w, h, el.tag.offsetWidth, el.tag.offsetHeight);
@@ -310,6 +308,12 @@ export class Story implements OnDestroy {
     this.paintSplit(this.scenes.find((s) => s.el.classList.contains('s-frag'))!.p);
     this.paintNaming(this.scenes.find((s) => s.el.classList.contains('s-name'))!.p);
     this.paintClosing(this.scenes[this.scenes.length - 1].p);
+
+    // Act 7: the viewport's centre line, as a share of each card's height (half at rest).
+    for (const c of this.cards) {
+      const w = reduced ? 0.5 : clamp01((y + this.vh / 2 - c.top) / c.height);
+      c.el.style.setProperty('--w', w.toFixed(4));
+    }
 
     const max = document.documentElement.scrollHeight - window.innerHeight;
     this.host.style.setProperty('--story', (max > 0 ? y / max : 0).toFixed(4));

@@ -246,24 +246,32 @@
   </div>
 </ng-template>
 
-<!-- 07 · The two verbs: hover and the colours trade places -->
+<!-- 07 · The two verbs: as the viewport's centre line passes down each card, the colours trade places behind it -->
 <section class="scene s-move paper" data-scene>
   <header class="sec-head annotation">
     <span>{{ copy.movements.index }}</span><i></i><span>{{ copy.movements.label }}</span>
   </header>
   <div class="move-grid" revealOnScroll>
     @for (card of copy.movements.cards; track card.title; let i = $index) {
-      <article class="move-card" [class.alt]="i === 1" (pointerenter)="aim($event)">
-        <div class="mc-top">
-          <span class="annotation">{{ card.kicker }}</span>
-          <i class="mc-chip" aria-hidden="true"></i>
+      <article class="move-card" [class.alt]="i === 1">
+        <ng-container *ngTemplateOutlet="moveFace; context: { $implicit: card }" />
+        <!-- The same face in the opposite colours, clipped to the part above the line (story.ts sets --w). -->
+        <div class="mc-flip" aria-hidden="true">
+          <ng-container *ngTemplateOutlet="moveFace; context: { $implicit: card }" />
         </div>
-        <h3 class="h2">{{ card.title }}</h3>
-        <p class="p-large">{{ card.body }}</p>
       </article>
     }
   </div>
 </section>
+
+<ng-template #moveFace let-card>
+  <div class="mc-top">
+    <span class="annotation">{{ card.kicker }}</span>
+    <i class="mc-chip" aria-hidden="true"></i>
+  </div>
+  <h3 class="h2">{{ card.title }}</h3>
+  <p class="p-large">{{ card.body }}</p>
+</ng-template>
 
 <!-- 08 · Shared promise: two become one, then each promise swipes up inside the square -->
 <section class="scene s-shared amber-bg" data-scene data-pin data-rest="0.9" style="--len: 320vh">
