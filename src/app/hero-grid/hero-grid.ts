@@ -1,4 +1,3 @@
-import { NgTemplateOutlet } from '@angular/common';
 import {
   afterNextRender,
   Component,
@@ -26,6 +25,7 @@ import {
   endSequence,
   gridlineOpacity,
   tileLineDraw,
+  tileScreenBox,
   tileTransform,
   tilesInteractive,
   yeet,
@@ -35,12 +35,14 @@ import { heroFrame, landedReveal, lerp, openingLayout, span, type OpeningLayout,
 
 type Phase = 'opening' | 'settled';
 
-/** Beat A: the drop falls on load (CSS dropIn); the page is held until it has landed. */
-const INTRO_LOCK_MS = 1700;
+/** Beat A: dropIn is 0.4s delay + 1.9s; hold scroll until the rebound has finished. */
+const INTRO_LOCK_MS = 2300;
 /** Viewports of scroll that scrub the opening before the collapse begins (:host height = 1 + this + 1). */
 const OPEN_SCROLL_VH = 2;
 /** Per-frame easing toward the real scroll position, for the story's smooth-scroll feel. */
 const SMOOTHING = 0.12;
+/** Menu overlay fly-in / fly-out — 25% faster than the prior 550ms swoop. */
+const OVERLAY_MS = 413;
 
 interface OpeningEls {
   root: HTMLElement;
@@ -61,7 +63,6 @@ interface OpeningEls {
 @Component({
   selector: 'app-hero-grid',
   standalone: true,
-  imports: [NgTemplateOutlet],
   templateUrl: './hero-grid.html',
   styleUrl: './hero-grid.scss',
 })
@@ -77,7 +78,6 @@ export class HeroGrid implements OnDestroy {
   readonly tiles: Tile[] = TILES;
   readonly taglineOne = TAGLINE_ONE;
   readonly taglineTwo = TAGLINE_TWO;
-  readonly nine = [0, 1, 2, 3, 4, 5, 6, 7, 8];
   readonly gridLines = tileGridLines;
   readonly letters = WORDMARK_LETTERS;
 
@@ -88,7 +88,8 @@ export class HeroGrid implements OnDestroy {
   /** The tagline and chevrons belong to the settled box; same moment as loadedIn. */
   readonly titled = signal(false);
   readonly overlayOpen = signal(false);
-  readonly enlargingId = signal<string | null>(null);
+  /** Close is in flight: X shrinks away while tiles and the paper fill leave. */
+  readonly overlayLeaving = signal(false);
   readonly prefersReduced = signal(false);
   readonly tilesFocusable = signal(false);
 
@@ -96,13 +97,24 @@ export class HeroGrid implements OnDestroy {
     return this.prefersReduced();
   }
 
+  /** Menu overlay sits on a section page; host must not stretch that page. */
+  @HostBinding('class.is-overlay-host') get overlayHost(): boolean {
+    return this.returnMode();
+  }
+
   private raf = 0;
+  private overlayRaf = 0;
   private timers: number[] = [];
   private mq?: MediaQueryList;
   /** Smoothed scroll position; the rAF loop runs until it catches up with the real one. */
   private y = 0;
   /** Set once the reveal reaches the box, so scrolling back does not replay it. */
   private revealLanded = false;
+  /**
+   * Overlay tile progress (0 = thrown off-screen, 1 = settled). Independent of
+   * scroll so the menu can fly in/out like brand.dropbox.com section pages.
+   */
+  private overlayP = 1;
   private o!: OpeningEls;
   private layout!: OpeningLayout;
   /** The box's settled corner mark, where the opening lands its own copy. */
@@ -116,6 +128,7 @@ export class HeroGrid implements OnDestroy {
   ngOnDestroy(): void {
     this.clearTimers();
     if (this.raf) cancelAnimationFrame(this.raf);
+    if (this.overlayRaf) cancelAnimationFrame(this.overlayRaf);
     this.mq?.removeEventListener('change', this.onMotionPreference);
     document.body.classList.remove('lock-scroll');
   }
@@ -133,67 +146,75 @@ export class HeroGrid implements OnDestroy {
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
-    if (this.returnMode()) this.closeMenu.emit();
+    if (this.returnMode()) this.dismissOverlay();
   }
 
   onCentreActivate(): void {
-    if (this.returnMode()) this.closeMenu.emit();
+    if (this.returnMode()) this.dismissOverlay();
   }
 
   openOverlay(): void {
     this.overlayOpen.set(true);
-    this.tilesFocusable.set(true);
+    this.overlayLeaving.set(false);
     document.body.classList.add('lock-scroll');
+    if (this.prefersReduced()) {
+      this.overlayP = 1;
+      this.tilesFocusable.set(true);
+      this.applyProgress();
+      return;
+    }
+    // Paint thrown tiles first, then swoop them in (Dropbox `.open` toggle).
+    this.overlayP = 0;
+    this.tilesFocusable.set(false);
     this.applyProgress();
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => this.animateOverlay(0, 1, () => this.tilesFocusable.set(true)));
+    });
   }
 
-  closeOverlay(): void {
-    this.overlayOpen.set(false);
-    document.body.classList.remove('lock-scroll');
-    this.scheduleProgress();
+  /** Fly the tiles out, then leave the overlay (X / Escape in return mode). */
+  private dismissOverlay(): void {
+    if (this.overlayLeaving()) return;
+    this.overlayLeaving.set(true);
+    this.tilesFocusable.set(false);
+    if (this.prefersReduced()) {
+      this.closeMenu.emit();
+      return;
+    }
+    this.animateOverlay(1, 0, () => this.closeMenu.emit());
+  }
+
+  private animateOverlay(from: number, to: number, done?: () => void): void {
+    if (this.overlayRaf) cancelAnimationFrame(this.overlayRaf);
+    const t0 = performance.now();
+    const step = (now: number): void => {
+      const t = clamp01((now - t0) / OVERLAY_MS);
+      this.overlayP = from + (to - from) * t;
+      this.applyProgress();
+      if (t < 1) {
+        this.overlayRaf = requestAnimationFrame(step);
+        return;
+      }
+      this.overlayRaf = 0;
+      this.overlayP = to;
+      this.applyProgress();
+      done?.();
+    };
+    this.zone.runOutsideAngular(() => {
+      this.overlayRaf = requestAnimationFrame(step);
+    });
   }
 
   onTileActivate(tile: Tile, event: Event): void {
-    if (!this.tilesFocusable()) {
-      event.preventDefault();
-      return;
-    }
     event.preventDefault();
-    if (this.enlargingId()) return;
-
-    if (this.prefersReduced()) {
-      if (this.overlayOpen()) this.closeOverlay();
-      this.jumpTo.emit(tile.id);
-      return;
-    }
-
-    this.enlargingId.set(tile.id);
-    const tileEl = (event.currentTarget as HTMLElement).closest('.nav-tile') as HTMLElement | null;
-    if (tileEl) {
-      const from = tileEl.getBoundingClientRect();
-      tileEl.style.position = 'fixed';
-      tileEl.style.left = `${from.left}px`;
-      tileEl.style.top = `${from.top}px`;
-      tileEl.style.width = `${from.width}px`;
-      tileEl.style.height = `${from.height}px`;
-      tileEl.style.margin = '0';
-      tileEl.style.transform = 'none';
-      tileEl.style.transition = 'none';
-      requestAnimationFrame(() => {
-        tileEl.style.transition =
-          'left 0.7s cubic-bezier(0.65, 0, 0.15, 1), top 0.7s cubic-bezier(0.65, 0, 0.15, 1), width 0.7s cubic-bezier(0.65, 0, 0.15, 1), height 0.7s cubic-bezier(0.65, 0, 0.15, 1)';
-        tileEl.style.left = '0px';
-        tileEl.style.top = '0px';
-        tileEl.style.width = '100vw';
-        tileEl.style.height = '100dvh';
-      });
-    }
-    this.timers.push(
-      window.setTimeout(() => {
-        if (this.overlayOpen()) this.closeOverlay();
-        this.jumpTo.emit(tile.id);
-      }, 720),
-    );
+    if (!this.tilesFocusable()) return;
+    // Name the tile and its title for the router's view transition: the chapter
+    // opener carries the same names (section-page.scss), so the browser morphs
+    // the colour panel and the title from here to there as one.
+    const a = event.currentTarget as HTMLElement;
+    a.style.viewTransitionName = 'section-panel';
+    a.querySelector<HTMLElement>('.tile-title')!.style.viewTransitionName = 'section-title';
+    this.jumpTo.emit(tile.id);
   }
 
   private boot(): void {
@@ -224,7 +245,13 @@ export class HeroGrid implements OnDestroy {
     this.measureOpening();
 
     if (this.returnMode()) {
-      this.settleImmediately();
+      // Overlay owns the tile motion; skip settleImmediately so we do not fade
+      // the grid in before the fly-in starts.
+      this.clearTimers();
+      this.phase.set('settled');
+      this.loadedIn.set(true);
+      this.titled.set(true);
+      this.centre.set(3);
       this.openOverlay();
       return;
     }
@@ -349,7 +376,9 @@ export class HeroGrid implements OnDestroy {
     o.tag.style.setProperty('--by', `${this.box.top}px`);
     o.tag.style.setProperty('--bs', `${this.box.size}px`);
     o.tag.style.setProperty('--to', String(span(f.box, 0.5, 1)));
-    o.root.classList.toggle('scrolled', q > 0.002);
+    // One way. Taking .scrolled off reapplies dropIn, so scrolling back to the
+    // top replays the fall over the partial P. The fall plays once.
+    if (q > 0.002) o.root.classList.add('scrolled');
   }
 
   private applyProgress(): void {
@@ -364,32 +393,38 @@ export class HeroGrid implements OnDestroy {
     const base = Math.max(vw, vh);
     const viewportMin = Math.min(vw, vh);
 
-    // The overlay is the settled grid held open, independent of scroll. Reduced
-    // motion gets the same end state, since there is no fly-in to watch.
-    // Otherwise the first OPEN_SCROLL_VH viewports scrub the opening (q), and
-    // the rest collapses the box (p).
-    const settledView = this.overlayOpen() || this.prefersReduced();
+    // Overlay: opening is already done (q = 1, centre settled); only the tiles
+    // scrub on overlayP. Reduced motion jumps to the end. Otherwise scroll
+    // drives opening (q) then the box collapse (p).
+    const overlay = this.overlayOpen();
+    const reduced = this.prefersReduced();
     const openPx = OPEN_SCROLL_VH * vh;
-    const reveal = landedReveal(settledView ? 1 : clamp01(this.y / openPx), this.revealLanded);
+    const reveal = landedReveal(overlay || reduced ? 1 : clamp01(this.y / openPx), this.revealLanded);
     this.revealLanded = reveal.landed;
     const q = reveal.q;
-    const p = settledView ? 1 : clamp01((this.y - openPx) / Math.max(1, el.offsetHeight - vh - openPx));
+    const scrollP = reduced
+      ? 1
+      : clamp01((this.y - openPx) / Math.max(1, el.offsetHeight - vh - openPx));
+    const tileP = overlay ? this.overlayP : scrollP;
+    const boxP = overlay || reduced ? 1 : scrollP;
     this.paintOpening(q);
 
+    // Paper fill tracks tile progress so white ↔ transparent runs with the fly.
+    el.style.setProperty('--overlay-fill', overlay ? String(this.overlayP) : '1');
+
     const throwDistance = yeet(base, buttonSize);
-    const first = tileTransform(0, p, isMobile, throwDistance);
+    const first = tileTransform(0, tileP, isMobile, throwDistance);
 
     el.style.setProperty('--ts', String(first.scale));
     el.style.setProperty('--inv', String(1 / first.scale));
-    el.style.setProperty('--gl-op', String(this.prefersReduced() ? 0 : gridlineOpacity(p)));
+    // Gridlines only ride the landing scroll fly-in — hide them on the menu overlay.
+    el.style.setProperty('--gl-op', String(overlay || reduced ? 0 : gridlineOpacity(tileP)));
     el.style.setProperty(
       '--tl-draw',
-      String(this.overlayOpen() || this.prefersReduced() ? 1 : tileLineDraw(p)),
+      String(overlay ? 0 : reduced ? 1 : tileLineDraw(tileP)),
     );
-    const end =
-      this.overlayOpen() || this.prefersReduced() ? { centre: 1, grow: 1, s: 1 } : endSequence(p);
-    el.style.setProperty('--centre-size', `${centreSize(p, viewportMin, buttonSize)}px`);
-    el.style.setProperty('--box-ink', String(this.overlayOpen() || this.prefersReduced() ? 1 : boxInk(p)));
+    const end = overlay || reduced ? { centre: 1, grow: 1, s: 1 } : endSequence(boxP);
+    el.style.setProperty('--box-ink', String(overlay || reduced ? 1 : boxInk(boxP)));
     el.style.setProperty('--m-centre', String(end.centre));
     el.style.setProperty('--m-grow', String(end.grow));
     el.style.setProperty('--m-s', String(end.s));
@@ -397,28 +432,56 @@ export class HeroGrid implements OnDestroy {
     const restTop = container.clientHeight / 2 - restSize / 2;
     const restLeft = container.clientWidth / 2 - restSize / 2;
     const tiles = container.querySelectorAll<HTMLElement>('.nav-tile');
+    const cx = container.clientWidth / 2;
+    const cy = container.clientHeight / 2;
+    // Half the largest square around the centre that no tile face reaches into.
+    let room = Infinity;
     tiles.forEach((tile) => {
       const i = Number(tile.dataset['i']);
-      let { x, y } = tileTransform(i, p, isMobile, throwDistance);
-      const anchor = isMobile ? undefined : EDGE_ANCHORS[i];
+      let { x, y } = tileTransform(i, tileP, isMobile, throwDistance);
+      // Overlay matches Dropbox's menu: pure yeet vectors, no edge anchors.
+      const anchor = overlay || isMobile ? undefined : EDGE_ANCHORS[i];
       if (anchor?.edge === 'top' || anchor?.edge === 'bottom') {
-        y = anchoredThrow(tile.offsetTop, tile.offsetHeight, restTop + restSize * anchor.at, anchor.edge, p);
+        y = anchoredThrow(
+          tile.offsetTop,
+          tile.offsetHeight,
+          restTop + restSize * anchor.at,
+          anchor.edge,
+          tileP,
+        );
       } else if (anchor) {
-        x = anchoredThrow(tile.offsetLeft, tile.offsetWidth, restLeft + restSize * anchor.at, anchor.edge, p);
+        x = anchoredThrow(
+          tile.offsetLeft,
+          tile.offsetWidth,
+          restLeft + restSize * anchor.at,
+          anchor.edge,
+          tileP,
+        );
       }
       tile.style.setProperty('--tx', `${x}px`);
       tile.style.setProperty('--ty', `${y}px`);
+      const b = tileScreenBox(
+        { x: tile.offsetLeft, y: tile.offsetTop, width: tile.offsetWidth, height: tile.offsetHeight },
+        { scale: first.scale, x, y },
+      );
+      room = Math.min(room, Math.max(b.left - cx, cx - b.right, b.top - cy, cy - b.bottom));
     });
+    // The tiles close in on their own curve while the box shrinks on a straight
+    // one, so cap the box at the gap they leave: it never covers a tile.
+    const size = centreSize(boxP, viewportMin, buttonSize);
+    const capped = !overlay && !reduced && centreState(boxP) === 3;
+    el.style.setProperty('--centre-size', `${capped ? Math.min(size, Math.max(buttonSize, 2 * room)) : size}px`);
 
-    const settled = this.overlayOpen() || tilesInteractive(p);
+    const settled = (overlay && this.overlayP > 0.95) || (!overlay && tilesInteractive(scrollP));
     container.classList.toggle('settled-grid', settled);
 
-    const state = centreState(p);
+    const state = centreState(boxP);
     const final = q >= 1;
     if (state !== this.centre() || settled !== this.tilesFocusable() || final !== this.loadedIn()) {
       this.zone.run(() => {
         this.centre.set(state);
-        this.tilesFocusable.set(settled);
+        // Overlay owns focusability via its own animation callbacks.
+        if (!overlay) this.tilesFocusable.set(settled);
         this.loadedIn.set(final);
         this.titled.set(final);
         this.phase.set(final ? 'settled' : 'opening');

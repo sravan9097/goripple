@@ -152,6 +152,31 @@ button {
   }
 }
 
+/*
+ * Route change (withViewTransitions in app.config.ts): a clicked tile and its
+ * title are named section-panel / section-title, and the chapter opener
+ * carries the same names. Shared-element morph: the group interpolates the
+ * box; only the new snapshot is shown, so type and colour scale/move instead
+ * of crossfading (which reads as disappear → appear).
+ */
+::view-transition-group(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: 0.7s;
+  animation-timing-function: var(--site-ease-enlarge);
+}
+
+::view-transition-old(section-panel),
+::view-transition-old(section-title) {
+  animation: none;
+  opacity: 0;
+}
+
+::view-transition-new(section-panel),
+::view-transition-new(section-title) {
+  animation: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -160,5 +185,11 @@ button {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }

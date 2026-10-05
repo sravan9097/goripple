@@ -80,15 +80,22 @@
   border-bottom: 1px solid var(--site-line);
 }
 
-/* Dropbox parks a coloured menu square hard against the viewport edge. */
+/* Paper while the opener title reveal holds; section colour once it clears. */
 .page-menu {
   display: grid;
   place-items: center;
   width: var(--bar);
   height: 100%;
+  background: var(--site-paper);
+  color: var(--site-ink);
+  transition:
+    background 0.25s var(--site-ease-nav),
+    color 0.25s var(--site-ease-nav);
+}
+
+.page-menu.is-accent {
   background: var(--accent);
   color: var(--accent-ink);
-  transition: background 0.25s var(--site-ease-nav);
 }
 
 .page-menu:hover {
@@ -165,7 +172,23 @@
 
 /* ─────────────────────────────  opener  ───────────────────────────── */
 
+/*
+ * brand.dropbox.com's chapter opener: a viewport of the tile's colour, the
+ * title between two rules that run the width of the screen, a vertical at
+ * the title's left edge and another near two-thirds across, a rule below.
+ * The rules draw in with the same stagger (horizontals 0.2s apart,
+ * verticals 0.1s behind) after Dropbox's 0.4s hold, which here also lets the
+ * tile → opener morph land first. The act's line fills the top-right cell.
+ */
 .opener {
+  /* The two verticals. The title starts on the left one. */
+  --vl: clamp(24px, 12vw, 200px);
+  --vr: 64%;
+  --t0: 0.4s;
+  --draw: 0.7s cubic-bezier(0.6, 0, 0.6, 1);
+  position: relative;
+  height: calc(100vh - var(--bar));
+  overflow: hidden;
   background: var(--accent);
   color: var(--white);
 }
@@ -175,43 +198,96 @@
   color: var(--navy);
 }
 
-.opener .pin {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 0 var(--pad) clamp(48px, 10vh, 120px);
+.o-rule,
+.title-wrap::before,
+.title-wrap::after {
+  position: absolute;
+  background: currentColor;
+  opacity: 0.35;
 }
 
-.opener-where {
+.o-vl,
+.o-vr {
+  top: 0;
+  width: 1px;
+  height: 100%;
+  transform-origin: top;
+  animation: drawY var(--draw) both;
+}
+
+.o-vl {
+  left: var(--vl);
+  animation-delay: calc(var(--t0) + 0.1s);
+}
+
+.o-vr {
+  left: var(--vr);
+  animation-delay: calc(var(--t0) + 0.3s);
+}
+
+/* The title's own rules sit on its box, so they always meet its type. */
+.title-wrap {
   position: absolute;
-  top: 28px;
-  left: var(--pad);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  opacity: 0.8;
+  left: 0;
+  right: 0;
+  top: 50%;
+  translate: 0 -50%;
+  padding-left: var(--vl);
+}
+
+.title-wrap::before,
+.title-wrap::after {
+  content: '';
+}
+
+.title-wrap::before,
+.title-wrap::after,
+.o-hb {
+  left: 0;
+  width: 100%;
+  height: 1px;
+  transform-origin: left;
+  animation: drawX var(--draw) var(--t0) both;
+}
+
+.title-wrap::before {
+  top: 0;
+}
+
+.title-wrap::after {
+  bottom: 0;
+  animation-delay: calc(var(--t0) + 0.2s);
+}
+
+.o-hb {
+  top: 82%;
+  animation-delay: calc(var(--t0) + 0.4s);
 }
 
 .opener-title {
+  display: flex;
+  flex-direction: column;
   font-family: var(--site-font-display);
   font-weight: 700;
-  font-size: clamp(40px, 8.2vw, 128px);
-  line-height: 1;
+  font-size: clamp(44px, 7.4vw, 116px);
+  line-height: 1.1;
   letter-spacing: -0.04em;
-  text-wrap: balance;
-  max-width: 14ch;
 }
 
-.o-line {
+.opener-title-line {
   display: block;
+  white-space: nowrap;
 }
 
-/* Each word takes its own share of the scroll: dim, then up and lit. */
-.w {
-  --k: clamp(0, calc(var(--p) * (var(--n) + 2) - var(--i)), 1);
-  display: inline-block;
-  margin-right: 0.22em;
-  opacity: calc(0.16 + 0.84 * var(--k));
-  transform: translateY(calc((1 - var(--k)) * 0.2em));
+/* The act's line, in the cell above the title and right of the second vertical. */
+.opener-sub {
+  position: absolute;
+  left: var(--vr);
+  right: var(--pad);
+  top: clamp(24px, 4vh, 48px);
+  padding-left: clamp(16px, 2vw, 28px);
+  white-space: pre-line;
+  animation: riseIn var(--draw) calc(var(--t0) + 0.36s) both;
 }
 
 .cue {
@@ -220,8 +296,27 @@
   bottom: 24px;
   width: 26px;
   transform: translateX(-50%);
-  opacity: clamp(0, calc(0.7 - var(--p) * 4), 0.7);
+  opacity: 0.7;
   animation: nudge 1.8s ease-in-out infinite;
+}
+
+@keyframes drawX {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes drawY {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
 }
 
 @keyframes nudge {
@@ -1211,6 +1306,20 @@
 /* ─────────────────────────────  narrow  ───────────────────────────── */
 
 @media (max-width: 719px) {
+  .opener {
+    --vl: 20px;
+  }
+
+  .opener-title {
+    padding-right: var(--pad);
+  }
+
+  .opener-sub {
+    left: var(--vl);
+    padding-left: 0;
+    font-size: 18px;
+  }
+
   .s-frag .pin {
     padding-top: 24px;
     padding-bottom: 24px;

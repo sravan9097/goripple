@@ -1,6 +1,15 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import {
+  afterNextRender,
+  Component,
+  computed,
+  ElementRef,
+  inject,
+  OnDestroy,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
 import {
   DIVISIONS,
@@ -14,7 +23,9 @@ import {
   SHARED_PROMISE,
   TILES,
   VERBS,
+  tileGridLines,
 } from '../content';
+import { HeroGrid } from '../hero-grid/hero-grid';
 import { RevealOnScroll } from '../reveal.directive';
 import { Scene } from '../scene.directive';
 import { DropPool } from '../visuals/drop-pool';
@@ -39,15 +50,20 @@ const DOT_PALETTE = [
 
 @Component({
   selector: 'app-section-page',
-  imports: [RouterLink, RevealOnScroll, Scene, DropPool, Wordmark],
+  imports: [RouterLink, RevealOnScroll, Scene, DropPool, Wordmark, HeroGrid],
   templateUrl: './section-page.html',
   styleUrl: './section-page.scss',
 })
-export class SectionPage {
+export class SectionPage implements OnDestroy {
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly url = toSignal(
-    inject(ActivatedRoute).url.pipe(map((segments) => segments[0]?.path ?? '')),
+    this.route.url.pipe(map((segments) => segments[0]?.path ?? '')),
     { initialValue: '' },
   );
+  private readonly bar = viewChild<ElementRef<HTMLElement>>('bar');
+  private readonly opener = viewChild<ElementRef<HTMLElement>>('opener');
+  private menuObserver?: IntersectionObserver;
 
   /** The route only exists for ids in TILES, so the lookup always lands. */
   readonly tile = computed(() => TILES.find((t) => t.id === this.url()) ?? TILES[0]);
@@ -58,14 +74,49 @@ export class SectionPage {
   readonly previous = computed(() => TILES[this.index() - 1]);
   readonly next = computed(() => TILES[this.index() + 1]);
 
-  /** Opener words with a running index, so each can rise on its own share of the scroll. */
-  readonly openerLines = computed(() => {
-    let i = 0;
-    return this.section()
-      .title.split('\n')
-      .map((line) => line.split(' ').map((t) => ({ t, i: i++ })));
-  });
-  readonly wordCount = computed(() => this.openerLines().flat().length);
+  /** False through the opener title reveal; true once that section has cleared. */
+  readonly menuAccent = signal(false);
+
+  /**
+   * Menu opens on this section (`?menu=1`) so the grid overlays it — white can
+   * fade to transparent and reveal the page underneath (Dropbox behaviour).
+   */
+  readonly menuOpen = toSignal(
+    this.route.queryParamMap.pipe(map((query) => query.has('menu'))),
+    { initialValue: this.route.snapshot.queryParamMap.has('menu') },
+  );
+
+  constructor() {
+    afterNextRender(() => this.watchOpener());
+  }
+
+  ngOnDestroy(): void {
+    this.menuObserver?.disconnect();
+  }
+
+  closeOverlayMenu(): void {
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { menu: null },
+      queryParamsHandling: 'merge',
+    });
+  }
+
+  openFromMenu(id: string): void {
+    void this.router.navigate(['/', id]);
+  }
+
+  private watchOpener(): void {
+    const el = this.opener()?.nativeElement;
+    if (!el) return;
+    // Shrink the root by the sticky bar so "past" means below the page chrome.
+    const top = Math.round(this.bar()?.nativeElement.getBoundingClientRect().height ?? 56);
+    this.menuObserver = new IntersectionObserver(
+      ([entry]) => this.menuAccent.set(!entry.isIntersecting),
+      { rootMargin: `-${top}px 0px 0px 0px`, threshold: 0 },
+    );
+    this.menuObserver.observe(el);
+  }
 
   /** The big numbered line above the pillars, only when every pillar has a word for it. */
   readonly pillarWords = computed(() => {
@@ -73,6 +124,7 @@ export class SectionPage {
     return words.length && words.every(Boolean) ? (words as string[]) : null;
   });
 
+  readonly gridLines = tileGridLines;
   readonly links = LINKS;
   readonly divisions = DIVISIONS;
   readonly outro = OUTRO_QUOTE;
