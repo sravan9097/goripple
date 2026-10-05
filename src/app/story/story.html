@@ -133,14 +133,29 @@
       <span>{{ copy.newWay.index }}</span><i></i><span>{{ copy.newWay.label }}</span>
     </header>
     <div class="new-grid">
-      <div class="new-copy" revealOnScroll>
+      <div class="new-copy">
         <p class="kicker annotation">{{ copy.newWay.kicker }}</p>
-        <h2 class="h1 lines" revealOnScroll>
-          <span class="line"><span>{{ copy.newWay.title[0] }}</span></span>
-          <span class="line amber"><span>{{ copy.newWay.title[1] }}</span></span>
+        <h2
+          class="new-title h1 lines"
+          [attr.aria-label]="copy.newWay.title + ' ' + copy.newWay.flip.join(' ')"
+          revealOnScroll
+        >
+          <span class="line" aria-hidden="true">
+            <span>
+              {{ copy.newWay.title }}
+              <span class="wheel"><span class="wheel-list">
+                <em>{{ copy.newWay.flip[0] }}</em>
+                <em class="amber">{{ copy.newWay.flip[1] }}</em>
+              </span></span>
+            </span>
+          </span>
         </h2>
         <i class="bar" aria-hidden="true"></i>
-        <p class="p-large">{{ copy.newWay.body }}</p>
+        <div class="new-lines">
+          @for (line of copy.newWay.lines; track line; let i = $index) {
+            <p [style.--a]="0.16 + i * 0.22">{{ line }}</p>
+          }
+        </div>
       </div>
       <div class="new-dots" aria-hidden="true">
         <span class="nd-ring"></span>

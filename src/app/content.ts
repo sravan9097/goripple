@@ -187,8 +187,15 @@ export const STORY = {
     index: '04',
     label: 'The new way',
     kicker: 'The new way:',
-    title: ['Change once.', 'Rippl everywhere.'],
-    body: 'Rippl is Stolt-Nielsen’s design system: one shared foundation of building blocks, patterns and guidelines that every digital product draws from, built by DICe for every Stolt business.',
+    title: 'Change',
+    /** Turns on scroll, the same wheel as section 3: once, then Rippl everywhere. */
+    flip: ['once.', 'Rippl everywhere.'],
+    /** Fill from outline, one line per beat, as the dots spread. */
+    lines: [
+      'Rippl is Stolt-Nielsen’s design system.',
+      'One shared foundation of building blocks, patterns and guidelines.',
+      'Every product draws from it, built by DICe for every Stolt business.',
+    ],
   },
   naming: {
     index: '05',

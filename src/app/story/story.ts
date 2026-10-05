@@ -276,11 +276,12 @@ export class Story implements OnDestroy {
 
   /** Act 3: the word wheel's two widths, so its slot narrows as it turns. */
   private measureWheel(): void {
-    const wheel = this.host.querySelector<HTMLElement>('.wheel');
-    const [a, b] = Array.from(wheel?.querySelectorAll<HTMLElement>('em') ?? []);
-    if (!wheel || !a || !b) return;
-    wheel.style.setProperty('--wa', `${a.offsetWidth}px`);
-    wheel.style.setProperty('--wb', `${b.offsetWidth}px`);
+    this.host.querySelectorAll<HTMLElement>('.wheel').forEach((wheel) => {
+      const [a, b] = Array.from(wheel.querySelectorAll<HTMLElement>('em'));
+      if (!a || !b) return;
+      wheel.style.setProperty('--wa', `${a.offsetWidth}px`);
+      wheel.style.setProperty('--wb', `${b.offsetWidth}px`);
+    });
   }
 
   private anchorBox(i: number): Box {

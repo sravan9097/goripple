@@ -672,17 +672,42 @@
   opacity: 0.6;
 }
 
+.new-title {
+  margin: 0;
+  font-size: clamp(36px, 4.6vw, 72px);
+}
+
+// This section's wheel turns as the dots spread, later than section 3's.
+.s-new .wheel {
+  --w: clamp(0, calc((var(--p) - 0.28) / 0.16), 1);
+}
+
 .bar {
   display: block;
   width: 56px;
   height: 4px;
   margin: 24px 0;
   background: var(--amber);
+  transform-origin: left;
+  transform: scaleX(clamp(0.2, var(--p) * 1.4, 1));
 }
 
-.new-copy .p-large {
-  max-width: 46ch;
-  opacity: 0.85;
+// Each line fills from its outline on its own --a, and stays filled.
+.new-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55em;
+  max-width: 36ch;
+  font-size: clamp(18px, 1.6vw, 24px);
+  line-height: 1.35;
+
+  p {
+    --on: clamp(0, calc((var(--p) - var(--a)) * 8), 1);
+    margin: 0;
+    color: color-mix(in srgb, var(--white) calc(var(--on) * 100%), transparent);
+    -webkit-text-stroke: calc((1 - var(--on)) * 1px) color-mix(in srgb, var(--white) 75%, transparent);
+    paint-order: stroke fill;
+  }
 }
 
 .new-dots {
