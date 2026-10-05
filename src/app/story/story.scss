@@ -398,131 +398,160 @@
   }
 }
 
-// ── 03 · Fragmentation: four identical islands drift apart, and so do their buttons ──
+// ── 03 · Fragmentation: a bento of products, and their buttons pile up in one tile ──
 
 .s-frag .pin {
   display: grid;
-  align-items: center;
-  padding: 96px var(--pad) 40px;
+  grid-template-rows: auto 1fr;
+  justify-items: center;
+  gap: 32px;
+  padding: 96px 12px 24px;
 }
 
-.frag-grid {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: clamp(32px, 6vw, 96px);
+.frag-title {
+  justify-self: start;
+  margin: 0 calc(var(--pad) - 12px);
 }
 
-// Captions take turns in one slot; each has a `--p` window [--a, --b].
-.frag-caps {
-  position: relative;
-  min-height: 6em;
-  margin-top: clamp(24px, 5vh, 56px);
-}
-
-.frag-cap {
-  --w: clamp(0, min((var(--p) - var(--a)) * 10, (var(--b) - var(--p)) * 20 + 1), 1);
-  position: absolute;
-  inset: 0 auto auto 0;
-  max-width: 22em;
-  margin: 0;
-  opacity: var(--w);
-  transform: translateY(calc((1 - var(--w)) * 16px));
-
-  &:nth-child(1) {
-    --a: 0.12;
-    --b: 0.4;
-  }
-
-  &:nth-child(2) {
-    --a: 0.44;
-    --b: 0.68;
-  }
-
-  &:nth-child(3) {
-    --a: 0.72;
-    --b: 2;
-  }
-
-  .amber {
-    display: block;
-    margin-top: 0.5em;
-  }
-}
-
-// `--t` brings the cluster in; `--k` is the drift (time passing).
-.drift-stage {
+// Tracks are the Figma tile sizes (1402 x 597 at 1440 wide); `--t` brings the grid in.
+.bento {
   --t: clamp(0, calc((var(--p) - 0.02) * 8), 1);
-  --k: clamp(0, calc((var(--p) - 0.16) / 0.64), 1);
-  --S: min(40vh, 24vw);
-  --dx: 44px;
-  --dy: 36px;
+  --blue: var(--rippl-ref-color-cyan-500);
   position: relative;
   display: grid;
-  grid-template-columns: repeat(2, var(--S));
-  grid-template-rows: repeat(2, calc(var(--S) * 0.66));
-  gap: 28px;
+  grid-template-columns: 280fr 354fr 58fr 366fr 280fr;
+  grid-template-rows: 208fr 63fr 294fr;
+  grid-template-areas:
+    'left seafarm seafarm containers pile'
+    'left tankers dot containers right'
+    'magenta tankers terminals terminals right';
+  gap: 14px;
+  width: 100%;
+  max-width: calc((100vh - 340px) * 2.348);
+  aspect-ratio: 1402 / 597;
+  align-self: center;
+  min-height: 0;
   opacity: var(--t);
-  transform: scale(calc(0.9 + 0.1 * var(--t)));
+  transform: scale(calc(0.94 + 0.06 * var(--t)));
 }
 
-.island {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 18px 20px;
-  background: var(--white);
+.tile {
+  position: relative;
+  margin: 0;
+  min-width: 0;
+  min-height: 0;
+}
+
+// The two amber notes, each in its own `--p` window.
+.t-note {
+  --w: clamp(0, calc((var(--p) - var(--a)) * 8), 1);
+  display: grid;
+  align-content: center;
+  padding: 12%;
+  background: var(--amber);
   color: var(--navy);
-  transform: translate(calc(var(--sx) * var(--k) * var(--dx)), calc(var(--sy) * var(--k) * var(--dy)))
-    rotate(calc(var(--rot) * var(--k) * 1deg));
-  will-change: transform;
+
+  > span {
+    opacity: var(--w);
+    transform: translateY(calc((1 - var(--w)) * 12px));
+  }
 }
 
-.island-name {
-  letter-spacing: 0.08em;
+.t-left {
+  --a: 0.1;
+  grid-area: left;
+}
+
+.t-right {
+  --a: 0.74;
+  grid-area: right;
+}
+
+.t-magenta {
+  grid-area: magenta;
+  background: var(--rippl-ref-color-magenta-500);
+}
+
+.t-pile {
+  grid-area: pile;
+  background: #63666a;
+}
+
+.t-prod {
+  padding: 20px;
+  color: var(--white);
+
+  &[data-area='seafarm'] {
+    grid-area: seafarm;
+    background: var(--white);
+    color: var(--blue);
+  }
+
+  &[data-area='containers'] {
+    grid-area: containers;
+    background: var(--blue);
+  }
+
+  &[data-area='tankers'] {
+    grid-area: tankers;
+    background: #7a99ac;
+  }
+
+  &[data-area='terminals'] {
+    grid-area: terminals;
+    background: var(--rippl-ref-color-light-green-500);
+  }
+}
+
+.tile-label {
+  display: block;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
-.island-when {
-  opacity: 0.55;
-}
-
-// One button, scrubbed from the shared look to whatever each team ended up with.
-.drift-btn {
-  --sw: clamp(0, calc((var(--k) - 0.45) * 5), 1);
-  position: relative;
-  display: inline-block;
-  padding: 10px calc(16px + var(--px2, 0px) * var(--k));
-  font: 700 13px/1 var(--site-font-body);
-  letter-spacing: calc(var(--ls2, 0em) * var(--k));
-  color: color-mix(in oklab, var(--white), var(--fg2, var(--white)) calc(var(--k) * 100%));
-  background: color-mix(in oklab, var(--navy), var(--bg2, var(--navy)) calc(var(--k) * 100%));
-  border: 1.5px solid color-mix(in oklab, var(--navy), var(--bd2, var(--bg2, var(--navy))) calc(var(--k) * 100%));
-  border-radius: calc(4px + (var(--r2, 4px) - 4px) * var(--k));
-  white-space: nowrap;
-
-  .w1 {
-    opacity: calc(1 - var(--sw));
-  }
-
-  .w2 {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    opacity: var(--sw);
-  }
-}
-
-// The gap itself holds the drop: it widens as the islands drift.
-.frag-dot {
+// One button, four ways. `--m` slides button i to the pile; story.ts sets --dx/--dy.
+.cta {
+  --m: clamp(0, calc((var(--p) - 0.26 - var(--i) * 0.13) / 0.12), 1);
   position: absolute;
-  left: 50%;
-  top: 50%;
-  width: calc(16px + 24px * var(--k));
-  height: calc(16px + 24px * var(--k));
-  translate: -50% -50%;
+  left: 20px;
+  bottom: 20px;
+  z-index: calc(2 + var(--i));
+  padding: 11px 16px;
+  font: 700 14px/1.15 var(--site-font-body);
+  white-space: nowrap;
+  border: 1px solid transparent;
+  transform: translate(calc(var(--dx, 0px) * var(--m)), calc(var(--dy, 0px) * var(--m)))
+    rotate(calc((var(--i) - 1.5) * 2deg * var(--m)));
+  will-change: transform;
+
+  [data-area='seafarm'] & {
+    background: var(--blue);
+    color: var(--white);
+  }
+
+  [data-area='containers'] &,
+  [data-area='tankers'] & {
+    padding-inline: 22px;
+    color: var(--white);
+    border-color: var(--white);
+    border-radius: 999px;
+  }
+
+  [data-area='terminals'] & {
+    background: var(--white);
+    color: var(--blue);
+    border-color: var(--blue);
+  }
+}
+
+// The small amber square between the tiles holds the drop.
+.frag-dot {
+  grid-area: dot;
+  align-self: center;
+  justify-self: center;
+  width: 100%;
+  aspect-ratio: 1;
   background: var(--amber);
 }
 
@@ -938,10 +967,9 @@
 
 .s-shared {
   --S: min(46vw, 64vh, 640px);
-  --m: clamp(0, calc((var(--p) - 0.05) / 0.3), 1);
-  --g: clamp(0, calc((var(--p) - 0.38) / 0.15), 1);
-  --o: clamp(0, calc((var(--p) - 0.5) / 0.12), 1);
-  --c: clamp(0, calc((var(--p) - 0.82) / 0.18), 1);
+  --m: clamp(0, calc((var(--p) - 0.04) / 0.24), 1);
+  --g: clamp(0, calc((var(--p) - 0.3) / 0.1), 1);
+  --c: clamp(0, calc((var(--p) - 0.9) / 0.1), 1);
 
   .pin {
     display: grid;
@@ -979,19 +1007,31 @@
 .promise-box {
   position: relative;
   z-index: 1;
+  overflow: hidden;
+  color: var(--white);
+  opacity: calc(1 - var(--c) * 4);
+}
+
+// Panel i swipes up from the bottom edge in its own `--p` window; later panels sit on top.
+.pb-panel {
+  --s: clamp(0, calc((var(--p) - 0.42 - var(--i) * 0.16) / 0.1), 1);
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: calc(var(--S) * 0.05);
+  gap: calc(var(--S) * 0.04);
   padding: calc(var(--S) * 0.08);
-  color: var(--white);
-  opacity: calc(var(--o) * (1 - var(--c) * 4));
-  transform: translateY(calc((1 - var(--o)) * 20px));
+  transform: translateY(calc((1 - var(--s)) * 100%));
+  will-change: transform;
+
+  .h3 {
+    margin: 0;
+  }
 }
 
 .pb-mark {
   align-self: flex-start;
-  font-size: calc(var(--S) * 0.2);
+  font-size: calc(var(--S) * 0.22);
 }
 
 // ── 10 · Closing: zoom back from the square, then erase all but "Starting now." ──
@@ -1010,7 +1050,38 @@
 }
 
 .erasable {
+  position: relative;
   clip-path: inset(-100vh -100vw -100vh calc(var(--e) * (100% + 6vw) - 6vw));
+}
+
+.signature {
+  position: absolute;
+  right: 0;
+  bottom: 0.3em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  i {
+    display: block;
+    border-radius: 50%;
+    background: var(--white);
+    width: 8px;
+    height: 8px;
+
+    &:nth-child(2) {
+      width: 14px;
+      height: 14px;
+      background: #7a99ac;
+    }
+
+    &:nth-child(3) {
+      width: 24px;
+      height: 24px;
+      border-radius: 0;
+      background: var(--amber);
+    }
+  }
 }
 
 .close-mark {
@@ -1058,11 +1129,6 @@
   gap: 16px;
   padding: 32px var(--pad) 40px;
   border-top: 1px solid rgb(255 255 255 / 0.12);
-
-  a {
-    color: var(--amber);
-    text-underline-offset: 4px;
-  }
 }
 
 // ── Narrow screens ──
@@ -1074,42 +1140,41 @@
 
   .s-frag .pin {
     padding-top: 72px;
-    padding-bottom: 24px;
-    align-items: start;
+    gap: 20px;
   }
 
-  .frag-grid {
-    grid-template-columns: 1fr;
-    gap: 24px;
+  // Two columns; the empty magenta tile goes, the pile and the drop share the last row.
+  .bento {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(3, 1fr) 104px;
+    grid-template-areas:
+      'left seafarm'
+      'containers tankers'
+      'terminals right'
+      'dot pile';
+    gap: 10px;
+    max-width: none;
+    height: 100%;
+    aspect-ratio: auto;
   }
 
-  .frag-copy {
-    display: contents;
+  .t-magenta {
+    display: none;
   }
 
-  .frag-caps {
-    order: 1;
-    min-height: 7.5em;
-    margin-top: 0;
+  .t-prod {
+    padding: 12px;
   }
 
-  .drift-stage {
-    --S: min(38vw, 18vh);
-    --dx: 6vw;
-    --dy: 3vh;
-    grid-template-rows: repeat(2, calc(var(--S) * 0.86));
-    gap: 16px;
-    padding: var(--dy) var(--dx);
-    justify-self: center;
-  }
-
-  .island {
-    padding: 12px 14px;
-  }
-
-  .drift-btn {
-    padding-block: 8px;
+  .cta {
+    left: 12px;
+    bottom: 12px;
+    padding: 8px 12px;
     font-size: 12px;
+  }
+
+  .frag-dot {
+    width: 48px;
   }
 
   .iter-grid,
@@ -1198,12 +1263,5 @@
 
   .traveller {
     display: none;
-  }
-
-  .frag-cap {
-    position: static;
-    opacity: 1;
-    transform: none;
-    margin-top: 0.6em;
   }
 }

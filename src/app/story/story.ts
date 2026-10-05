@@ -1,6 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { afterNextRender, Component, ElementRef, inject, NgZone, OnDestroy, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { STORY } from '../content';
 import { RevealOnScroll } from '../reveal.directive';
 import { Wordmark, WORDMARK_LETTERS } from '../wordmark/wordmark';
@@ -52,7 +51,7 @@ const DOT_PALETTE = [
  */
 @Component({
   selector: 'app-story',
-  imports: [NgTemplateOutlet, RouterLink, RevealOnScroll, Wordmark],
+  imports: [NgTemplateOutlet, RevealOnScroll, Wordmark],
   templateUrl: './story.html',
   styleUrl: './story.scss',
   host: { '[class.is-reduced]': 'reduced()' },
@@ -64,15 +63,6 @@ export class Story implements OnDestroy {
   readonly copy = STORY;
   readonly letters = WORDMARK_LETTERS;
   readonly reduced = signal(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-
-  /** Drift per island: which way it floats off, and what its button has quietly become by the end. */
-  readonly drift: Record<string, string> = {
-    seafarm: '--sx: -1; --sy: -1; --rot: -1.2; --bg2: var(--rippl-ref-color-cyan-600); --r2: 99px',
-    containers:
-      '--sx: 1; --sy: -1; --rot: 0.8; --bg2: var(--rippl-ref-color-light-green-700); --r2: 0px; --px2: 10px; --ls2: 0.08em',
-    tankers: '--sx: -1; --sy: 1; --rot: 0.6; --bg2: transparent; --bd2: var(--navy); --fg2: var(--navy); --r2: 99px; --px2: 12px',
-    terminals: '--sx: 1; --sy: 1; --rot: -0.9; --bg2: var(--rippl-ref-color-magenta-700); --r2: 12px',
-  };
 
   /** 7 x 7 field; `d` is distance from the centre, so colour spreads like a ring. */
   readonly dots = Array.from({ length: 49 }, (_, i) => {
@@ -223,6 +213,7 @@ export class Story implements OnDestroy {
       s.top = r.top + window.scrollY;
       s.height = r.height;
     }
+    this.measurePile();
 
     const L = openingLayout(w, h, el.tag.offsetWidth, el.tag.offsetHeight);
     this.layout = L;
@@ -272,6 +263,33 @@ export class Story implements OnDestroy {
     const dotX = mark.offsetLeft + mark.offsetWidth * (477.5 / 488);
     const dotY = mark.offsetTop + mark.offsetHeight * (179.5 / 250);
     this.zoomFrom = { x: w / 2 - dotX, y: h / 2 - dotY };
+  }
+
+  /**
+   * Act 3: each button's offset from its tile to the pile, in untransformed
+   * layout units (offset*, not client rects) so a mid-scroll resize measures
+   * the same. Buttons stack 18px apart, in product order.
+   */
+  private measurePile(): void {
+    const bento = this.host.querySelector<HTMLElement>('.bento');
+    const pile = this.host.querySelector<HTMLElement>('.t-pile');
+    if (!bento || !pile) return;
+    const centre = (el: HTMLElement): [number, number] => {
+      let x = el.offsetWidth / 2;
+      let y = el.offsetHeight / 2;
+      for (let n: HTMLElement | null = el; n && n !== bento; n = n.offsetParent as HTMLElement | null) {
+        x += n.offsetLeft;
+        y += n.offsetTop;
+      }
+      return [x, y];
+    };
+    const [px, py] = centre(pile);
+    this.host.querySelectorAll<HTMLElement>('.cta').forEach((btn, i, all) => {
+      const [bx, by] = centre(btn);
+      const k = i - (all.length - 1) / 2;
+      btn.style.setProperty('--dx', `${(px - bx + k * 6).toFixed(1)}px`);
+      btn.style.setProperty('--dy', `${(py - by + k * 18).toFixed(1)}px`);
+    });
   }
 
   private anchorBox(i: number): Box {

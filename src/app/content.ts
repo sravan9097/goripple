@@ -176,18 +176,14 @@ export const STORY = {
     index: '03',
     label: 'Product fragmentation',
     title: ['Every product was built with care.', 'Every product was built alone.'],
-    captions: [
-      'The same button, built again by every team.',
-      'Nothing was broken. Everything was separate.',
-      'Nobody chose this. It is what happens when good teams work fast without a shared foundation.',
-    ],
-    gap: 'The fault was never a person. It was the gap.',
-    button: 'Continue',
+    /** The two amber tiles of the bento grid (Figma 60:3443). */
+    notes: ['Nothing was broken', 'Everything was separate'],
+    /** Pile order: the same button, built four times, four ways. */
     products: [
-      { area: 'seafarm', name: 'Stolt Sea Farm', when: 'Year one', cta: 'Continue' },
-      { area: 'containers', name: 'Stolt Tank Containers', when: 'Year two', cta: 'Submit' },
-      { area: 'tankers', name: 'Stolt Tankers', when: 'Year three', cta: 'Confirm' },
-      { area: 'terminals', name: 'Stolthaven Terminals', when: 'Year four', cta: 'Next step' },
+      { area: 'seafarm', name: 'Stolt Sea Farm', cta: 'Continue' },
+      { area: 'containers', name: 'Stolt Tank Containers', cta: 'Submit' },
+      { area: 'tankers', name: 'Stolt Tankers', cta: 'Confirm' },
+      { area: 'terminals', name: 'Stolthaven Terminals', cta: 'Move forward' },
     ],
   },
   iteration: {
@@ -239,13 +235,22 @@ export const STORY = {
   shared: {
     index: '09',
     label: 'Shared promise',
-    body: 'A shared language, a living foundation and a promise of sameness, helping every Stolt product feel consistent, connected and instantly familiar.',
+    /** Swipe up inside the merged square, one after another (Figma 91:1196, 91:1214, 91:1224). */
+    panels: [
+      { colour: 'var(--rippl-ref-color-magenta-500)', text: 'A shared language, a living foundation' },
+      { colour: 'var(--rippl-ref-color-cyan-500)', text: 'A promise of sameness' },
+      {
+        colour: 'var(--rippl-ref-color-light-green-500)',
+        text: 'Helping every Stolt product feel consistent, connected, and instantly familiar.',
+      },
+    ],
   },
   closing: {
+    index: '10',
+    label: 'Closing',
     lines: ['One drop.', 'Every product.'],
     last: 'Starting now.',
     credit: 'Rippl, built by DICe, for every Stolt business.',
-    chapters: 'Explore the chapters',
   },
 };
 
