@@ -4,13 +4,18 @@ import { STORY } from '../content';
 import { RevealOnScroll } from '../reveal.directive';
 import { Wordmark, WORDMARK_LETTERS } from '../wordmark/wordmark';
 import {
+  clamp01,
   closingZoom,
+  NAMING_LAYOUT,
+  namingToOpening,
   openingFrame,
   openingLayout,
   progressToScroll,
   sceneProgress,
+  span,
   travellerAt,
   type Box,
+  type OpeningFrame,
   type OpeningLayout,
   type Station,
 } from './scenes';
@@ -20,6 +25,9 @@ const INTRO_LOCK_MS = 1700;
 /** Share of the remaining distance covered per frame: Lenis-like inertia without Lenis. */
 const SMOOTHING = 0.12;
 const CLOSING_LINES_AT = 0.44;
+/** Act 3's split window on --p; matches `--s` on `.s-frag` in story.scss. */
+const SPLIT = [0.46, 0.62] as const;
+const GOO_BLUR = 11;
 
 interface SceneRef {
   el: HTMLElement;
@@ -28,6 +36,8 @@ interface SceneRef {
   top: number;
   height: number;
   p: number;
+  /** `data-on`: progress at which the scene's class-driven text reveal fires. */
+  on?: number;
 }
 
 interface AnchorRef {
@@ -36,16 +46,8 @@ interface AnchorRef {
   station: Station;
 }
 
-const DOT_PALETTE = [
-  'var(--amber)',
-  'var(--rippl-ref-color-cyan-400)',
-  'var(--rippl-ref-color-light-green-400)',
-  'var(--rippl-ref-color-magenta-400)',
-  'var(--rippl-ref-color-white)',
-];
-
 /**
- * The landing story: ten scenes on one scroll. A single rAF loop turns the
+ * The landing story: nine scenes on one scroll. A single rAF loop turns the
  * smoothed scroll position into per-scene progress (`--p`), paints the opening
  * SVG and closing zoom, and carries the amber traveller between anchors.
  */
@@ -64,15 +66,11 @@ export class Story implements OnDestroy {
   readonly letters = WORDMARK_LETTERS;
   readonly reduced = signal(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
-  /** 7 x 7 field; `d` is distance from the centre, so colour spreads like a ring. */
+  /** 7 x 7 field; `d` is distance from the centre, so the change spreads like a ring. */
   readonly dots = Array.from({ length: 49 }, (_, i) => {
     const r = Math.floor(i / 7) - 3;
     const c = (i % 7) - 3;
-    return {
-      d: (Math.hypot(r, c) / Math.hypot(3, 3)).toFixed(3),
-      c: DOT_PALETTE[(i * 3) % DOT_PALETTE.length],
-      centre: i === 24,
-    };
+    return { d: (Math.hypot(r, c) / Math.hypot(3, 3)).toFixed(3), centre: i === 24 };
   });
 
   readonly panels = STORY.how.ideas.map((idea, i) => ({
@@ -108,6 +106,11 @@ export class Story implements OnDestroy {
     drop: SVGGElement;
     dropShape: SVGRectElement;
     tag: HTMLElement;
+    goo: HTMLElement;
+    gooBlur: SVGFEGaussianBlurElement;
+    nameE: SVGGElement;
+    nameDrop: SVGGElement;
+    nameDot: SVGRectElement;
     closeMark: HTMLElement;
     closeInner: HTMLElement;
   };
@@ -151,6 +154,11 @@ export class Story implements OnDestroy {
       drop: q('.o-drop'),
       dropShape: q('.o-drop-shape'),
       tag: q('.o-tag'),
+      goo: q('.goo'),
+      gooBlur: q('.goo-blur'),
+      nameE: q('.n-e'),
+      nameDrop: q('.n-drop'),
+      nameDot: q('.n-dot'),
       closeMark: q('.close-mark'),
       closeInner: q('.close-inner'),
     };
@@ -161,6 +169,7 @@ export class Story implements OnDestroy {
       top: 0,
       height: 0,
       p: 0,
+      on: el.dataset['on'] === undefined ? undefined : Number(el.dataset['on']),
     }));
 
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
@@ -213,7 +222,7 @@ export class Story implements OnDestroy {
       s.top = r.top + window.scrollY;
       s.height = r.height;
     }
-    this.measurePile();
+    this.measureWheel();
 
     const L = openingLayout(w, h, el.tag.offsetWidth, el.tag.offsetHeight);
     this.layout = L;
@@ -265,31 +274,13 @@ export class Story implements OnDestroy {
     this.zoomFrom = { x: w / 2 - dotX, y: h / 2 - dotY };
   }
 
-  /**
-   * Act 3: each button's offset from its tile to the pile, in untransformed
-   * layout units (offset*, not client rects) so a mid-scroll resize measures
-   * the same. Buttons stack 18px apart, in product order.
-   */
-  private measurePile(): void {
-    const bento = this.host.querySelector<HTMLElement>('.bento');
-    const pile = this.host.querySelector<HTMLElement>('.t-pile');
-    if (!bento || !pile) return;
-    const centre = (el: HTMLElement): [number, number] => {
-      let x = el.offsetWidth / 2;
-      let y = el.offsetHeight / 2;
-      for (let n: HTMLElement | null = el; n && n !== bento; n = n.offsetParent as HTMLElement | null) {
-        x += n.offsetLeft;
-        y += n.offsetTop;
-      }
-      return [x, y];
-    };
-    const [px, py] = centre(pile);
-    this.host.querySelectorAll<HTMLElement>('.cta').forEach((btn, i, all) => {
-      const [bx, by] = centre(btn);
-      const k = i - (all.length - 1) / 2;
-      btn.style.setProperty('--dx', `${(px - bx + k * 6).toFixed(1)}px`);
-      btn.style.setProperty('--dy', `${(py - by + k * 18).toFixed(1)}px`);
-    });
+  /** Act 3: the word wheel's two widths, so its slot narrows as it turns. */
+  private measureWheel(): void {
+    const wheel = this.host.querySelector<HTMLElement>('.wheel');
+    const [a, b] = Array.from(wheel?.querySelectorAll<HTMLElement>('em') ?? []);
+    if (!wheel || !a || !b) return;
+    wheel.style.setProperty('--wa', `${a.offsetWidth}px`);
+    wheel.style.setProperty('--wb', `${b.offsetWidth}px`);
   }
 
   private anchorBox(i: number): Box {
@@ -310,8 +301,13 @@ export class Story implements OnDestroy {
       ? null
       : travellerAt(y, this.anchors.map((a) => a.station), (i) => this.anchorBox(i));
 
-    for (const s of this.scenes) s.el.style.setProperty('--p', s.p.toFixed(4));
+    for (const s of this.scenes) {
+      s.el.style.setProperty('--p', s.p.toFixed(4));
+      if (s.on !== undefined) s.el.classList.toggle('on', s.p >= s.on);
+    }
     this.paintOpening(this.scenes[0].p);
+    this.paintSplit(this.scenes.find((s) => s.el.classList.contains('s-frag'))!.p);
+    this.paintNaming(this.scenes.find((s) => s.el.classList.contains('s-name'))!.p);
     this.paintClosing(this.scenes[this.scenes.length - 1].p);
 
     const max = document.documentElement.scrollHeight - window.innerHeight;
@@ -336,24 +332,44 @@ export class Story implements OnDestroy {
       el.rings[k].setAttribute('r', String(ring.r));
       el.rings[k].style.opacity = String(ring.o);
     });
-    el.e.setAttribute('transform', `translate(0 ${f.e.dy}) rotate(${f.e.rot} 467 190)`);
-    el.e.style.opacity = String(f.e.o);
-
+    this.paintDrop(f, el.e, el.drop, el.dropShape);
     const d = f.drop;
-    el.drop.setAttribute('transform', `translate(${d.x} ${d.y}) scale(${d.sx} ${d.sy})`);
-    el.dropShape.setAttribute('x', String(-d.half));
-    el.dropShape.setAttribute('y', String(-d.half));
-    el.dropShape.setAttribute('width', String(2 * d.half));
-    el.dropShape.setAttribute('height', String(2 * d.half));
-    el.dropShape.setAttribute('rx', String(d.radius));
     el.echo.setAttribute('cx', String(d.x));
     el.echo.setAttribute('cy', String(d.y));
     el.echo.setAttribute('r', String(f.echo.r));
     el.echo.style.opacity = String(f.echo.o);
 
     el.openInner.style.transform = `translate3d(0, ${f.drift}px, 0)`;
-    el.tag.classList.toggle('on', f.promise);
     el.openPin.classList.toggle('scrolled', p > 0.002);
+  }
+
+  /**
+   * Act 3: the goo blur rises from 0 as the button starts to divide and falls back to 0 as the
+   * cells settle, so the same bodies end crisp. Off entirely outside the split.
+   */
+  private paintSplit(p: number): void {
+    const s = span(p, ...SPLIT);
+    const blur = GOO_BLUR * clamp01(Math.min(s, 1 - s) * 6);
+    this.el.gooBlur.setAttribute('stdDeviation', blur.toFixed(2));
+    this.el.goo.style.filter = blur > 0.05 ? 'url(#frag-goo)' : '';
+  }
+
+  /** The ghost E loosening and falling, and the drop's arc, squaring and squash. */
+  private paintDrop(f: OpeningFrame, e: SVGGElement, drop: SVGGElement, shape: SVGRectElement): void {
+    e.setAttribute('transform', `translate(0 ${f.e.dy}) rotate(${f.e.rot} 467 190)`);
+    e.style.opacity = String(f.e.o);
+    const d = f.drop;
+    drop.setAttribute('transform', `translate(${d.x} ${d.y}) scale(${d.sx} ${d.sy})`);
+    shape.setAttribute('x', String(-d.half));
+    shape.setAttribute('y', String(-d.half));
+    shape.setAttribute('width', String(2 * d.half));
+    shape.setAttribute('height', String(2 * d.half));
+    shape.setAttribute('rx', String(d.radius));
+  }
+
+  private paintNaming(p: number): void {
+    const { el } = this;
+    this.paintDrop(openingFrame(namingToOpening(p), NAMING_LAYOUT), el.nameE, el.nameDrop, el.nameDot);
   }
 
   private paintClosing(p: number): void {

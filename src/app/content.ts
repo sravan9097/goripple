@@ -175,39 +175,29 @@ export const STORY = {
   fragmentation: {
     index: '03',
     label: 'Product fragmentation',
-    title: ['Every product was built with care.', 'Every product was built alone.'],
-    /** The two amber tiles of the bento grid (Figma 60:3443). */
-    notes: ['Nothing was broken', 'Everything was separate'],
-    /** Pile order: the same button, built four times, four ways. */
-    products: [
-      { area: 'seafarm', name: 'Stolt Sea Farm', cta: 'Continue' },
-      { area: 'containers', name: 'Stolt Tank Containers', cta: 'Submit' },
-      { area: 'tankers', name: 'Stolt Tankers', cta: 'Confirm' },
-      { area: 'terminals', name: 'Stolthaven Terminals', cta: 'Move forward' },
-    ],
-  },
-  iteration: {
-    index: '04',
-    label: 'Iteration',
-    word: 'teration',
-    asides: ['A local fix.', 'A neighbouring shift.', 'Another isolated choice.'],
-    body: 'Every new iteration solved local challenges, but often without awareness of how neighbouring products were evolving.',
+    title: 'Every product was built',
+    /** The title's last words, flipped on scroll: care, then alone. The full stop is the drop. */
+    flip: ['with care', 'alone'],
+    /** One per beat: beside the single button, the split, then the three screens. */
+    notes: ['Nothing was broken', 'Everything was separate', 'Same button. Different places.'],
+    /** The one button, then the three it drifts into; the first is also the shared label. */
+    buttons: ['Continue', 'Submit', 'Confirm'],
   },
   newWay: {
-    index: '05',
+    index: '04',
     label: 'The new way',
     kicker: 'The new way:',
     title: ['Change once.', 'Rippl everywhere.'],
     body: 'Rippl is Stolt-Nielsen’s design system: one shared foundation of building blocks, patterns and guidelines that every digital product draws from, built by DICe for every Stolt business.',
   },
   naming: {
-    index: '06',
+    index: '05',
     label: 'Naming story',
-    body: 'We dropped the final letter deliberately. ‘Ripple’ is a word the world owns. ‘Rippl’ is a word only we own. It is distinct, searchable, protectable, and it signals intent: this is not a metaphor we borrowed, it is a name we made.',
+    body: 'We dropped the final letter deliberately. ‘Ripple’ is a word the world owns. ‘Rippl’ is a word only we own.',
     signature: 'The absence is the signature.',
   },
   how: {
-    index: '07',
+    index: '06',
     label: 'How it works',
     title: 'How Rippl works?',
     ideas: [
@@ -217,7 +207,7 @@ export const STORY = {
     ],
   },
   movements: {
-    index: '08',
+    index: '07',
     label: 'Two movements',
     cards: [
       {
@@ -233,7 +223,7 @@ export const STORY = {
     ],
   },
   shared: {
-    index: '09',
+    index: '08',
     label: 'Shared promise',
     /** Swipe up inside the merged square, one after another (Figma 91:1196, 91:1214, 91:1224). */
     panels: [
@@ -246,7 +236,7 @@ export const STORY = {
     ],
   },
   closing: {
-    index: '10',
+    index: '09',
     label: 'Closing',
     lines: ['One drop.', 'Every product.'],
     last: 'Starting now.',

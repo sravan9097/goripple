@@ -70,61 +70,63 @@
   </div>
 </section>
 
-<!-- 03 · The world before: every product built alone -->
-<section class="scene s-frag navy" data-scene data-pin style="--len: 300vh">
+<!-- 03 · The world before: one button, built alone in each product, drifts into three -->
+<section class="scene s-frag paper" data-scene data-pin style="--len: 420vh">
   <div class="pin">
     <header class="sec-head annotation">
       <span>{{ copy.fragmentation.index }}</span><i></i><span>{{ copy.fragmentation.label }}</span>
     </header>
-    <h2 class="frag-title h1 lines" revealOnScroll>
-      @for (line of copy.fragmentation.title; track line) {
-        <span class="line"><span>{{ line }}</span></span>
-      }
+    <!-- The common half stays; the last words turn like a wheel, then the line rises to the top. -->
+    <h2
+      class="frag-title h1 lines"
+      [attr.aria-label]="copy.fragmentation.title + ' ' + copy.fragmentation.flip.join('. ') + '.'"
+      revealOnScroll
+    >
+      <span class="line" aria-hidden="true">
+        <span>
+          {{ copy.fragmentation.title }}
+          <span class="wheel"><span class="wheel-list">
+            <em>{{ copy.fragmentation.flip[0] }}</em>
+            <em class="amber">{{ copy.fragmentation.flip[1] }}</em>
+          </span></span><i class="frag-dot anchor" data-hold="0.05,0.9"></i>
+        </span>
+      </span>
     </h2>
 
-    <!--
-      Bento grid (Figma 60:3443). Four products, each with its own take on the
-      same button; on scroll the buttons leave their tiles and pile up in the
-      grey tile, one on top of the other. story.ts measures each button's
-      offset to the pile (--dx, --dy) once per layout.
-    -->
-    <div class="bento">
-      <p class="tile t-note t-left h3"><span>{{ copy.fragmentation.notes[0] }}</span></p>
-      <i class="tile t-magenta" aria-hidden="true"></i>
-      @for (prod of copy.fragmentation.products; track prod.area; let i = $index) {
-        <div class="tile t-prod" [attr.data-area]="prod.area" [style.--i]="i" aria-hidden="true">
-          <span class="annotation tile-label">{{ prod.name }}</span>
-          <span class="cta">{{ prod.cta }}</span>
+    <div class="frag-stage">
+      <div class="frag-notes h3">
+        <p style="--a: 0.32; --b: 0.46">{{ copy.fragmentation.notes[0] }}</p>
+        <p style="--a: 0.48; --b: 0.66">{{ copy.fragmentation.notes[1] }}</p>
+        <p style="--a: 0.68; --b: 2">{{ copy.fragmentation.notes[2] }}</p>
+      </div>
+      <!-- One button divides like a cell into three near-copies, then each lands somewhere else in the same UI. -->
+      <div class="drift" aria-hidden="true">
+        <!-- Goo: blur, then threshold the alpha so nearby blobs fuse and pinch apart. story.ts drives the blur. -->
+        <svg class="goo-defs" width="0" height="0">
+          <filter id="frag-goo" color-interpolation-filters="sRGB">
+            <feGaussianBlur class="goo-blur" in="SourceGraphic" stdDeviation="0" />
+            <feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 24 -10" />
+          </filter>
+        </svg>
+        @for (n of [0, 1, 2]; track n) {
+          <i class="ui" [style.--i]="n"></i>
+        }
+        <div class="goo">
+          @for (label of copy.fragmentation.buttons; track label; let i = $index) {
+            <i class="btn-shape" [attr.data-v]="i"></i>
+          }
         </div>
-      }
-      <i class="tile t-pile" aria-hidden="true"></i>
-      <i class="frag-dot anchor" data-hold="0.1,0.85" aria-hidden="true"></i>
-      <p class="tile t-note t-right h3"><span>{{ copy.fragmentation.notes[1] }}</span></p>
+        @for (label of copy.fragmentation.buttons; track label; let i = $index) {
+          <span class="btn-shape btn-art" [attr.data-v]="i">
+            <span>{{ copy.fragmentation.buttons[0] }}</span><span>{{ label }}</span>
+          </span>
+        }
+      </div>
     </div>
   </div>
 </section>
 
-<!-- 04 · Iteration: the drop becomes the dot of the i -->
-<section class="scene s-iter paper" data-scene>
-  <header class="sec-head annotation">
-    <span>{{ copy.iteration.index }}</span><i></i><span>{{ copy.iteration.label }}</span>
-  </header>
-  <div class="iter-grid">
-    <h2 class="iter-word title" aria-label="iteration">
-      <span class="iter-i" aria-hidden="true">ı<i class="iter-dot anchor" data-hold="0.45,0.55"></i></span><span aria-hidden="true">{{ copy.iteration.word }}</span>
-    </h2>
-    <ul class="iter-asides annotation" revealOnScroll>
-      @for (aside of copy.iteration.asides; track aside) {
-        <li>{{ aside }}</li>
-      }
-    </ul>
-    <div class="iter-body" revealOnScroll>
-      <p class="h3">{{ copy.iteration.body }}</p>
-    </div>
-  </div>
-</section>
-
-<!-- 05 · The new way: one dot becomes every dot -->
+<!-- 04 · The new way: one dot becomes every dot -->
 <section class="scene s-new navy" data-scene data-pin style="--len: 220vh">
   <div class="pin">
     <header class="sec-head annotation">
@@ -150,7 +152,6 @@
             [attr.data-hold]="dot.centre ? '0.1,0.9' : null"
             [attr.data-round]="dot.centre ? '' : null"
             [style.--d]="dot.d"
-            [style.--c]="dot.c"
           ></i>
         }
       </div>
@@ -158,23 +159,38 @@
   </div>
 </section>
 
-<!-- 06 · The name: the dot squares off into the signature -->
-<section class="scene s-name navy" data-scene data-pin style="--len: 200vh">
+<!-- 05 · The name: Ripple is already on screen. The drop replays the opening: it arcs from the p's bowl, squares off, knocks the E out and lands with a ripple. -->
+<section class="scene s-name navy" data-scene data-pin data-on="0.54" style="--len: 260vh">
   <div class="pin">
     <header class="sec-head annotation">
       <span>{{ copy.naming.index }}</span><i></i><span>{{ copy.naming.label }}</span>
     </header>
     <div class="name-mark" aria-hidden="true">
-      <app-wordmark class="anchor" data-hold="0.3,0.35" />
+      <svg class="name-svg" viewBox="0 0 620 250" xmlns="http://www.w3.org/2000/svg">
+        <!-- Landing ripple: the opening's three rings, run out from the slot. -->
+        <circle class="n-ring" style="--n: 0" cx="477.5" cy="179.5" r="520" />
+        <circle class="n-ring" style="--n: 1" cx="477.5" cy="179.5" r="520" />
+        <circle class="n-ring" style="--n: 2" cx="477.5" cy="179.5" r="520" />
+        @for (d of letters; track $index) {
+          <path fill="currentColor" [attr.d]="d" />
+        }
+        <!-- Same ghost E as the opening; story.ts tips it and drops it as the drop arrives. -->
+        <g class="n-e">
+          <path d="M592.5 122A57.5 57.5 0 1 0 575.66 162.66" />
+          <path d="M477.5 122H603" />
+        </g>
+        <!-- The traveller hands over here as a big circle in the p's bowl; story.ts flies it from there. -->
+        <g class="n-drop"><rect class="n-dot anchor" data-hold="0.06,0.06" data-round /></g>
+      </svg>
     </div>
-    <div class="name-copy" revealOnScroll>
-      <p class="h3">{{ copy.naming.body }}</p>
-      <p class="h4 amber">{{ copy.naming.signature }}</p>
+    <div class="name-copy">
+      <p class="line h3"><span>{{ copy.naming.body }}</span></p>
+      <p class="line h4 amber"><span>{{ copy.naming.signature }}</span></p>
     </div>
   </div>
 </section>
 
-<!-- 07 · How Rippl works: a brochure that unfolds idea by idea -->
+<!-- 06 · How Rippl works: a brochure that unfolds idea by idea -->
 <section class="scene s-how paper" data-scene data-pin style="--len: 300vh">
   <div class="pin">
     <header class="sec-head annotation">
@@ -215,7 +231,7 @@
   </div>
 </ng-template>
 
-<!-- 08 · The two verbs: hover and the colours trade places -->
+<!-- 07 · The two verbs: hover and the colours trade places -->
 <section class="scene s-move paper" data-scene>
   <header class="sec-head annotation">
     <span>{{ copy.movements.index }}</span><i></i><span>{{ copy.movements.label }}</span>
@@ -234,7 +250,7 @@
   </div>
 </section>
 
-<!-- 09 · Shared promise: two become one, then each promise swipes up inside the square -->
+<!-- 08 · Shared promise: two become one, then each promise swipes up inside the square -->
 <section class="scene s-shared amber-bg" data-scene data-pin data-rest="0.9" style="--len: 320vh">
   <div class="pin">
     <header class="sec-head annotation">
@@ -255,7 +271,7 @@
   </div>
 </section>
 
-<!-- 10 · The promise: the square pulls back into the name, then only "Starting now." stays -->
+<!-- 09 · The promise: the square pulls back into the name, then only "Starting now." stays -->
 <section class="scene s-close navy" data-scene data-pin data-rest="0.6" style="--len: 320vh">
   <div class="pin">
     <header class="sec-head annotation">

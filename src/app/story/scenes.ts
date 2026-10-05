@@ -81,7 +81,6 @@ export const OPENING = {
   echo: [0.48, 0.62],
   move: [0.5, 0.7],
   drift: [0.72, 1],
-  promise: 0.58,
   handoff: 0.9,
 } as const;
 
@@ -131,7 +130,6 @@ export interface OpeningFrame {
   drop: { x: number; y: number; half: number; radius: number; sx: number; sy: number };
   echo: { r: number; o: number };
   drift: number;
-  promise: boolean;
 }
 
 export function openingFrame(p: number, L: OpeningLayout): OpeningFrame {
@@ -190,9 +188,26 @@ export function openingFrame(p: number, L: OpeningLayout): OpeningFrame {
     drop,
     echo,
     drift: -span(p, ...OPENING.drift) * L.h * 0.08,
-    promise: p >= OPENING.promise,
   };
 }
+
+// ── Naming: replays the opening's drop on a static mark, in SVG units ──
+
+/** Scene progress over which the drop goes from the p's bowl to landed in the E's slot. */
+export const NAMING = { from: 0.06, to: 0.38 } as const;
+
+export const NAMING_LAYOUT: OpeningLayout = {
+  w: 620,
+  h: 250,
+  diag: 0,
+  start: { x: 0, y: 0, s: 1 },
+  end: { x: 0, y: 0, s: 1 },
+  tag: { x: 0, y: 0 },
+};
+
+/** Maps naming progress onto the opening's own loosen-to-landed window. */
+export const namingToOpening = (p: number): number =>
+  lerp(OPENING.loosen[0], OPENING.land[1], span(p, NAMING.from, NAMING.to));
 
 // ── Closing: the square zooms out into the full wordmark ──
 
