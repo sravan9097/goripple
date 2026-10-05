@@ -949,23 +949,51 @@
   }
 }
 
-// ── 07 · Two movements: the viewport's centre line wipes each card into its opposite colours ──
+// ── 07 + 08 · The line wipes both cards, they collide into one square and mix to green,
+// then each promise swipes up and navy grows into the close. Every beat is a transform,
+// a clip or a colour front on --p; nothing cross-fades.
 
 .s-move {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  padding: 120px var(--pad);
+  --S: min(70vh, 48vw, 680px);
+  --gap: 10px;
+  --cw: calc((min(100vw - 2 * var(--pad), 760px) - 2 * var(--gap)) / 2);
+  --ch: 340px;
+  --wipe: clamp(0, calc(var(--p) / 0.12), 1);
+  --out1: clamp(0, calc((var(--p) - 0.12) / 0.05), 1);
+  --out2: clamp(0, calc((var(--p) - 0.14) / 0.05), 1);
+  --j: clamp(0, calc((var(--p) - 0.19) / 0.11), 1);
+  // Accelerates into the collision, so the impact has speed behind it.
+  --k: calc(var(--j) * var(--j));
+  --t: clamp(0, calc((var(--p) - 0.3) / 0.08), 1);
+  // Damped wobble after impact: one and a half swings, dying out.
+  --hit: calc(sin(var(--t) * 540deg) * (1 - var(--t)));
+  --mix: clamp(0, calc((var(--p) - 0.29) / 0.09), 1);
+  --hand: clamp(0, calc((var(--p) - 0.33) / 0.04), 1);
+  --r1: clamp(0, calc((var(--p) - 0.37) / 0.05), 1);
+  --r2: clamp(0, calc((var(--p) - 0.39) / 0.05), 1);
+  --x: clamp(0, calc((var(--p) - 0.86) / 0.04), 1);
+  --g: clamp(0, calc((var(--p) - 0.89) / 0.11), 1);
+  --grow: calc(var(--g) * var(--g) * (3 - 2 * var(--g)));
+
+  // Section label hands over through its own box: 07 slides out the top, 08 in from below.
+  .mv-now {
+    transform: translateY(calc(var(--hand) * -100%));
+    clip-path: inset(calc(var(--hand) * 100%) 0 0 0);
+  }
+
+  .mv-next {
+    transform: translateY(calc((1 - var(--hand)) * 100%));
+    clip-path: inset(0 0 calc((1 - var(--hand)) * 100%) 0);
+  }
 }
 
 .move-grid {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  position: absolute;
+  inset: 0;
 }
 
-// --w is how far the line has passed through the card (0 above it, 1 below); story.ts writes it.
+// Each card interpolates its own box from card size to half of the square, so the pair
+// lands exactly on the promise square below without a swap.
 .move-card {
   --bg: var(--navy);
   --ink: var(--white);
@@ -973,17 +1001,34 @@
   --fill-ink: var(--navy);
   --chip: var(--amber);
   --chip-on: var(--navy);
-  --face-pad: clamp(24px, 3vw, 44px);
-  position: relative;
+  --seam: to left;
+  --face-pad: clamp(20px, 2.2vw, 28px);
+  --mw: calc(var(--cw) + (var(--S) / 2 - var(--cw)) * var(--k));
+  --mh: calc(var(--ch) + (var(--S) - var(--ch)) * var(--k));
+  position: absolute;
+  top: calc(50% - var(--mh) / 2);
+  left: calc(50% - var(--mw) - var(--gap) * (1 - var(--k)));
+  width: var(--mw);
+  height: var(--mh);
   overflow: hidden;
-  aspect-ratio: 1;
-  max-height: 80vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  gap: 40px;
   padding: var(--face-pad);
   background: var(--bg);
   color: var(--ink);
+  transform-origin: right center;
+  transform: scale(calc(1 - 0.07 * var(--hit)), calc(1 + 0.035 * var(--hit)));
+
+  // Copy drops out through the card's bottom edge, body first.
+  .mc-copy {
+    transform: translateY(calc(var(--out1) * var(--out1) * (var(--S) + 40px)));
+  }
+
+  .mc-top {
+    transform: translateY(calc(var(--out2) * var(--out2) * (var(--S) + 40px)));
+  }
 
   &.alt {
     --bg: var(--amber);
@@ -992,21 +1037,29 @@
     --fill-ink: var(--white);
     --chip: var(--navy);
     --chip-on: var(--amber);
+    --seam: to right;
+    left: calc(50% + var(--gap) * (1 - var(--k)));
+    transform-origin: left center;
   }
 }
 
-// The opposite-coloured face, laid over the first and clipped to the part the line has passed.
+// The opposite-coloured face, clipped to the part the line has passed. Once the halves touch,
+// green floods out from the seam through both: navy and amber mixing.
 .mc-flip {
   position: absolute;
-  inset: 0;
+  // Bleeds past the card so its edge never antialiases against the colour underneath.
+  inset: -1px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: var(--face-pad);
-  background: var(--fill);
+  background: linear-gradient(
+    var(--seam),
+    var(--green) calc(var(--mix) * 160% - 60%),
+    var(--fill) calc(var(--mix) * 160%)
+  );
   color: var(--fill-ink);
-  clip-path: inset(0 0 calc((1 - var(--w, 0)) * 100%) 0);
-  will-change: clip-path;
+  clip-path: inset(0 0 calc((1 - var(--wipe)) * 100%) 0);
 
   .mc-chip {
     background: var(--chip-on);
@@ -1022,80 +1075,89 @@
 }
 
 .mc-chip {
-  width: 22px;
-  height: 22px;
+  width: 14px;
+  height: 14px;
   background: var(--chip);
 }
 
-// ── 08 · Shared promise: two halves slide together, merge, open ──
-
-.s-shared {
-  --S: min(46vw, 64vh, 640px);
-  --m: clamp(0, calc((var(--p) - 0.04) / 0.24), 1);
-  --g: clamp(0, calc((var(--p) - 0.3) / 0.1), 1);
-  --c: clamp(0, calc((var(--p) - 0.9) / 0.1), 1);
-
-  .pin {
-    display: grid;
-    place-items: center;
-  }
+.mc-name {
+  font-size: clamp(24px, 2.4vw, 32px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
 }
 
-.merge,
+.mc-line {
+  margin-top: 6px;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.mc-copy .p {
+  margin-top: 12px;
+}
+
+// Sits exactly on the merged halves. The first panel is unfilled (the halves are its green);
+// the rest swipe up inside it, and the box itself grows into the close.
 .promise-box {
-  grid-area: 1 / 1;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
   width: var(--S);
   height: var(--S);
-}
-
-.merge {
-  position: relative;
-}
-
-.half {
-  --side: -1;
-  position: absolute;
-  left: 25%;
-  top: 25%;
-  width: 50%;
-  height: 50%;
-  background: var(--navy);
-  transform: translateX(calc(var(--side) * (1 - var(--m)) * (var(--S) / 4 + 12px)))
-    scale(calc(1 + var(--g) + var(--c) * 5));
-}
-
-.half-r {
-  --side: 1;
-}
-
-.promise-box {
-  position: relative;
-  z-index: 1;
   overflow: hidden;
   color: var(--white);
-  opacity: calc(1 - var(--c) * 4);
+  transform: translate(-50%, -50%) scale(calc(1 + var(--grow) * 4));
 }
 
-// Panel i swipes up from the bottom edge in its own `--p` window; later panels sit on top.
 .pb-panel {
-  --s: clamp(0, calc((var(--p) - 0.42 - var(--i) * 0.16) / 0.1), 1);
+  --s0: clamp(0, calc((var(--p) - 0.5 - (var(--i) - 1) * 0.12) / 0.07), 1);
+  --s: calc(var(--s0) * var(--s0) * (3 - 2 * var(--s0)));
   position: absolute;
   inset: 0;
   display: flex;
   flex-direction: column;
-  gap: calc(var(--S) * 0.04);
-  padding: calc(var(--S) * 0.08);
+  gap: calc(var(--S) * 0.03);
+  padding: calc(var(--S) * 0.06) calc(var(--S) * 0.04) calc(var(--S) * 0.06) calc(var(--S) * 0.08);
   transform: translateY(calc((1 - var(--s)) * 100%));
-  will-change: transform;
 
-  .h3 {
-    margin: 0;
+  &:first-child {
+    --s: 1;
+  }
+}
+
+// Line masks: content rises in through its own box and, at the end, rises out the top.
+.pb-mask {
+  margin: 0;
+  overflow: hidden;
+
+  > * {
+    display: block;
+    transform: translateY(calc(var(--x) * -110%));
+  }
+}
+
+.pb-panel:first-child {
+  .pb-mask:first-child > * {
+    transform: translateY(calc((1 - var(--r1)) * 110% - var(--x) * 110%));
+  }
+
+  .pb-text > span {
+    transform: translateY(calc((1 - var(--r2)) * 110% - var(--x) * 110%));
   }
 }
 
 .pb-mark {
-  align-self: flex-start;
-  font-size: calc(var(--S) * 0.22);
+  width: max-content;
+  font-size: calc(var(--S) * 0.24);
+}
+
+.pb-text {
+  font-family: var(--rippl-ref-type-font-family-pt-serif);
+  font-weight: 700;
+  font-size: calc(var(--S) * 0.071);
+  line-height: 1.16;
 }
 
 // ── 09 · Closing: zoom back from the square, then erase all but "Starting now." ──
@@ -1286,18 +1348,29 @@
     display: none;
   }
 
-  .move-grid {
-    grid-template-columns: 1fr;
+  // Stacked: the cards meet top to bottom and become the square's two halves that way.
+  .s-move {
+    --S: min(86vw, 60vh);
+    --cw: calc(100vw - 2 * var(--pad));
+    --ch: 230px;
   }
 
   .move-card {
-    aspect-ratio: auto;
-    min-height: 80vw;
+    --seam: to top;
+    --mw: calc(var(--cw) + (var(--S) - var(--cw)) * var(--k));
+    --mh: calc(var(--ch) + (var(--S) / 2 - var(--ch)) * var(--k));
+    left: calc(50% - var(--mw) / 2);
+    top: calc(50% - var(--mh) - var(--gap) * (1 - var(--k)));
     gap: 24px;
-  }
+    transform-origin: center bottom;
+    transform: scale(calc(1 + 0.035 * var(--hit)), calc(1 - 0.07 * var(--hit)));
 
-  .s-shared {
-    --S: 86vw;
+    &.alt {
+      --seam: to bottom;
+      left: calc(50% - var(--mw) / 2);
+      top: calc(50% + var(--gap) * (1 - var(--k)));
+      transform-origin: center top;
+    }
   }
 }
 
