@@ -73,13 +73,21 @@ export class Story implements OnDestroy {
     return { d: (Math.hypot(r, c) / Math.hypot(3, 3)).toFixed(3), centre: i === 24 };
   });
 
+  /** Each card's 5 x 5 field around the centre dot; `d` is distance from it, so the third card spreads like section 4. */
   readonly panels = STORY.how.ideas.map((idea, i) => ({
     ...idea,
     colour: ['var(--amber)', 'var(--rippl-ref-color-cyan-600)', 'var(--rippl-ref-color-light-green-600)'][i],
-    hi: [12, 12, 24][i],
     big: i > 0,
+    ripple: i === 2,
+    /** The first card's dot is the traveller's last stop. */
+    hold: i ? null : '0.4,0.4',
+    dots: Array.from({ length: 25 }, (_, n) => ({
+      n,
+      row: Math.floor(n / 5),
+      hi: n === 12,
+      d: (Math.hypot(Math.floor(n / 5) - 2, (n % 5) - 2) / Math.hypot(2, 2)).toFixed(3),
+    })),
   }));
-  readonly panelDots = Array.from({ length: 25 }, (_, n) => ({ n, row: Math.floor(n / 5) }));
 
   private scenes: SceneRef[] = [];
   private anchors: AnchorRef[] = [];
@@ -243,6 +251,7 @@ export class Story implements OnDestroy {
 
     // Stations: scroll positions at which the traveller rests on each anchor.
     this.anchors = Array.from(this.host.querySelectorAll<HTMLElement | SVGElement>('.anchor[data-hold]'))
+      .filter((a) => a.getClientRects().length > 0)
       .map((a) => {
         const scene = this.scenes.find((s) => s.el.contains(a))!;
         const [from, to] = (a.dataset['hold'] ?? '0,0').split(',').map(Number);
@@ -278,8 +287,11 @@ export class Story implements OnDestroy {
 
   private anchorBox(i: number): Box {
     const a = this.anchors[i];
-    const r = a.target.getBoundingClientRect();
-    return { x: r.left, y: r.top, w: r.width, h: r.height, r: a.round ? r.width / 2 : 0 };
+    const t = a.target;
+    const r = t.getBoundingClientRect();
+    // An SVG rect carries its own corner radius: the naming drop rounds off to a square mid-flight.
+    const rx = t instanceof SVGRectElement ? (t.rx.baseVal.value / t.width.baseVal.value) * r.width || 0 : 0;
+    return { x: r.left, y: r.top, w: r.width, h: r.height, r: a.round ? r.width / 2 : rx };
   }
 
   private render(): void {

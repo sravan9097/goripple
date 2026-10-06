@@ -194,8 +194,8 @@
           <path d="M592.5 122A57.5 57.5 0 1 0 575.66 162.66" />
           <path d="M477.5 122H603" />
         </g>
-        <!-- The traveller hands over here as a big circle in the p's bowl; story.ts flies it from there. -->
-        <g class="n-drop"><rect class="n-dot anchor" data-hold="0.06,0.06" data-round /></g>
+        <!-- The traveller rides this rect through the flight (story.ts drives it, and reads its corner radius), then carries the landed square on to section 6. -->
+        <g class="n-drop"><rect class="n-dot anchor" data-hold="0.06,0.9" /></g>
       </svg>
     </div>
     <div class="name-copy">
@@ -219,7 +219,15 @@
         </div>
         <div class="leaf l2">
           <div class="face front"><ng-container *ngTemplateOutlet="panel; context: { $implicit: panels[1] }" /></div>
-          <div class="face back cover" aria-hidden="true"><app-wordmark /></div>
+          <!-- Closed cover: the mark inlined so its dot can be the traveller's stop before the brochure opens. -->
+          <div class="face back cover" aria-hidden="true">
+            <svg class="cover-mark" viewBox="0 0 488 250" xmlns="http://www.w3.org/2000/svg">
+              @for (d of letters; track $index) {
+                <path fill="currentColor" [attr.d]="d" />
+              }
+              <rect class="cover-dot anchor" data-hold="0,0.12" x="467" y="169" width="21" height="21" />
+            </svg>
+          </div>
           <div class="leaf l3">
             <div class="face front"><ng-container *ngTemplateOutlet="panel; context: { $implicit: panels[2] }" /></div>
             <div class="face back" aria-hidden="true"></div>
@@ -231,14 +239,27 @@
 </section>
 
 <ng-template #panel let-idea>
-  <div class="panel">
+  <div class="panel" [class.ripple]="idea.ripple">
     <div class="panel-top">
       <span class="annotation">{{ idea.kicker }}</span>
       <i class="panel-chip" [style.background]="idea.colour"></i>
     </div>
+    <!-- On the third card, section 4's spread in miniature: rings and amber run out from the centre dot. -->
     <div class="panel-dots" aria-hidden="true">
-      @for (dot of panelDots; track dot.n) {
-        <i [class.hi]="dot.n === idea.hi" [class.big]="dot.n === idea.hi && idea.big" [style.--row]="dot.row"></i>
+      @if (idea.ripple) {
+        <span class="pd-ring"></span>
+        <span class="pd-ring pd-ring-2"></span>
+      }
+      @for (dot of idea.dots; track dot.n) {
+        <i
+          [class.hi]="dot.hi"
+          [class.big]="dot.hi && idea.big"
+          [class.anchor]="dot.hi && idea.hold"
+          [attr.data-hold]="dot.hi ? idea.hold : null"
+          [attr.data-round]="dot.hi ? '' : null"
+          [style.--row]="dot.row"
+          [style.--d]="dot.d"
+        ></i>
       }
     </div>
     <p class="h4">{{ idea.line }}</p>

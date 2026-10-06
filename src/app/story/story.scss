@@ -880,7 +880,15 @@
   place-items: center;
   background: var(--navy);
   color: var(--white);
-  font-size: calc(var(--W) * 0.22);
+}
+
+.cover-mark {
+  width: 43%;
+  overflow: visible;
+}
+
+.cover-dot {
+  fill: var(--amber);
 }
 
 .l1 > .face {
@@ -936,19 +944,59 @@
   padding: 8% 6%;
 
   i {
+    --on: 0;
     width: 12px;
     aspect-ratio: 1;
     border-radius: 50%;
-    background: color-mix(in oklch, var(--navy) calc(25% + var(--row) * 18%), var(--white));
+    background: color-mix(
+      in oklch,
+      var(--amber) calc(var(--on) * 100%),
+      color-mix(in oklch, var(--navy) calc(25% + var(--row) * 18%), var(--white))
+    );
+    transform: scale(calc(0.7 + 0.3 * var(--on)));
   }
 
   .hi {
-    background: var(--amber);
+    --on: 1;
   }
 
   .big {
     width: 36px;
   }
+}
+
+// Third card: section 4's spread once the leaf is open (--f3 ends at 0.8), amber reaching each dot by its distance from the centre.
+.panel.ripple {
+  --t: clamp(0, calc((var(--p) - 0.78) / 0.2), 1);
+
+  .panel-dots {
+    position: relative;
+  }
+
+  i {
+    --on: clamp(0, calc((var(--t) - var(--d) * 0.6) * 4), 1);
+  }
+
+  .hi {
+    --on: 1;
+  }
+}
+
+.pd-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 40%;
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in oklch, var(--amber) 60%, transparent);
+  border-radius: 50%;
+  opacity: calc((1 - var(--t)) * clamp(0, var(--t) * 20, 1));
+  transform: translate(-50%, -50%) scale(calc(0.3 + var(--t) * 1.4));
+  pointer-events: none;
+}
+
+.pd-ring-2 {
+  width: 70%;
 }
 
 // ── 07 + 08 · The line wipes both cards, they collide into one square, then each promise
