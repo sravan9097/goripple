@@ -246,15 +246,8 @@
   </div>
 </ng-template>
 
-<!-- 07 into 08: the line wipes both cards, they collide into one square and mix to green, then magenta, blue, navy -->
-<section
-  class="scene s-move paper"
-  data-scene
-  data-pin
-  data-rest="0.46"
-  style="--len: 560vh"
-  [style.--green]="copy.shared.panels[0].colour"
->
+<!-- 07 into 08: the line wipes both cards, they collide into one square, then each promise swipes up -->
+<section class="scene s-move paper" data-scene data-pin data-rest="0.46" style="--len: 560vh">
   <div class="pin">
     <header class="sec-head annotation mv-now">
       <span>{{ copy.movements.index }}</span><i></i><span>{{ copy.movements.label }}</span>
@@ -273,7 +266,7 @@
         </article>
       }
     </div>
-    <!-- The first panel has no fill: the merged cards are its green. -->
+    <!-- The first panel has no fill: the stretched yellow card is its background. -->
     <div class="promise-box">
       @for (panel of copy.shared.panels; track panel.colour; let i = $index) {
         <div class="pb-panel" [style.--i]="i" [style.background]="i ? panel.colour : null">

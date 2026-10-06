@@ -235,20 +235,15 @@ export const STORY = {
     index: '08',
     label: 'Shared promise',
     /**
-     * Copy from Figma 138:159. The first colour is what navy and amber mix into as the two
-     * cards merge; navy is last because it grows into the close.
+     * Copy from Figma 138:159, one beat per square. The first is the yellow card itself once it
+     * has pushed navy out; navy is last because it grows into the close.
      */
     panels: [
-      { colour: 'var(--rippl-ref-color-light-green-500)', text: 'A shared language, a living foundation' },
+      { colour: 'var(--amber)', text: 'A shared language, a living foundation' },
       { colour: 'var(--rippl-ref-color-magenta-500)', text: 'a promise of sameness' },
-      {
-        colour: 'var(--rippl-ref-color-cyan-600)',
-        text: 'Helping every Stolt product feel consistent, connected, and instantly familiar.',
-      },
-      {
-        colour: 'var(--navy)',
-        text: 'A shared language, a living foundation, and a promise of sameness helping every Stolt product feel consistent, connected, and instantly familiar.',
-      },
+      { colour: 'var(--rippl-ref-color-cyan-600)', text: 'helping every Stolt product feel consistent,' },
+      { colour: 'var(--rippl-ref-color-light-green-500)', text: 'connected, and instantly familiar.' },
+      { colour: 'var(--navy)', text: 'One shared promise.' },
     ],
   },
   closing: {
