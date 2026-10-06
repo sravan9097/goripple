@@ -219,27 +219,31 @@ export const STORY = {
     cards: [
       {
         kicker: '01 / Adopt',
-        title: 'GoRippl: the adoption movement.',
-        body: 'When a product joins the system, it goes Rippl: it connects to the shared foundation and starts moving with everyone else. GoRippl is the journey every product takes from island to ecosystem.',
+        title: 'GoRippl',
+        line: 'The adoption movement.',
+        body: 'A product joins the shared foundation and starts moving with everyone else.',
       },
       {
         kicker: '02 / Contribute',
-        title: 'DoRippl: the contribution culture.',
-        body: 'The system is built by DICe, but it grows through everyone. When you improve a component, propose a pattern or report a gap, you do Rippl: you drop something into the water and the whole organisation feels the ring.',
+        title: 'DoRippl',
+        line: 'The contribution culture.',
+        body: 'Improve something, and the whole organisation feels the ring.',
       },
     ],
   },
   shared: {
     index: '08',
     label: 'Shared promise',
-    /** Swipe up inside the merged square, one after another (Figma 91:1196, 91:1214, 91:1224). */
+    /**
+     * Copy from Figma 138:159, one beat per square. The first is the yellow card itself once it
+     * has pushed navy out; navy is last because it grows into the close.
+     */
     panels: [
-      { colour: 'var(--rippl-ref-color-magenta-500)', text: 'A shared language, a living foundation' },
-      { colour: 'var(--rippl-ref-color-cyan-500)', text: 'A promise of sameness' },
-      {
-        colour: 'var(--rippl-ref-color-light-green-500)',
-        text: 'Helping every Stolt product feel consistent, connected, and instantly familiar.',
-      },
+      { colour: 'var(--amber)', text: 'A shared language, a living foundation' },
+      { colour: 'var(--rippl-ref-color-magenta-500)', text: 'a promise of sameness' },
+      { colour: 'var(--rippl-ref-color-cyan-600)', text: 'helping every Stolt product feel consistent,' },
+      { colour: 'var(--rippl-ref-color-light-green-500)', text: 'connected, and instantly familiar.' },
+      { colour: 'var(--navy)', text: 'One shared promise.' },
     ],
   },
   closing: {

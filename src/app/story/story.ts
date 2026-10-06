@@ -128,14 +128,6 @@ export class Story implements OnDestroy {
     document.body.classList.remove('lock-scroll');
   }
 
-  /** GoRippl / DoRippl: the colour swap spreads from wherever the pointer came in. */
-  aim(event: PointerEvent): void {
-    const card = event.currentTarget as HTMLElement;
-    const r = card.getBoundingClientRect();
-    card.style.setProperty('--x', `${event.clientX - r.left}px`);
-    card.style.setProperty('--y', `${event.clientY - r.top}px`);
-  }
-
   private boot(): void {
     const q = <T extends Element>(s: string) => this.host.querySelector(s) as T;
     const qa = <T extends Element>(s: string) => Array.from(this.host.querySelectorAll(s)) as T[];
