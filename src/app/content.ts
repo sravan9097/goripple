@@ -187,9 +187,8 @@ export const STORY = {
     index: '04',
     label: 'The new way',
     kicker: 'The new way:',
-    title: 'Change',
-    /** Turns on scroll, the same wheel as section 3: once, then Rippl everywhere. */
-    flip: ['once.', 'Rippl everywhere.'],
+    /** The whole line swaps on scroll: "Change once." gives way to "Rippl everywhere." */
+    flip: ['Change once.', 'Rippl everywhere.'],
     /** Fill from outline, one line per beat, as the dots spread. */
     lines: [
       'Rippl is Stolt-Nielsen’s design system.',

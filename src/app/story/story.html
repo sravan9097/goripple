@@ -71,29 +71,33 @@
     <header class="sec-head annotation">
       <span>{{ copy.fragmentation.index }}</span><i></i><span>{{ copy.fragmentation.label }}</span>
     </header>
-    <!-- The common half stays; the last words turn like a wheel, then the line rises to the top. -->
-    <h2
-      class="frag-title h1 lines"
-      [attr.aria-label]="copy.fragmentation.title + ' ' + copy.fragmentation.flip.join('. ') + '.'"
-      revealOnScroll
-    >
-      <span class="line" aria-hidden="true">
-        <span>
-          {{ copy.fragmentation.title }}
-          <span class="wheel"><span class="wheel-list">
-            <em>{{ copy.fragmentation.flip[0] }}</em>
-            <em class="amber">{{ copy.fragmentation.flip[1] }}</em>
-          </span></span><i class="frag-dot anchor" data-hold="0.05,0.9"></i>
+    <!-- The title rises, and the three lines flip under it on the same beats as before. -->
+    <div class="frag-head">
+      <h2
+        class="frag-title h1 lines"
+        [attr.aria-label]="copy.fragmentation.title + ' ' + copy.fragmentation.flip.join('. ') + '. ' + copy.fragmentation.notes.join('. ') + '.'"
+        revealOnScroll
+      >
+        <span class="line" aria-hidden="true">
+          <span>
+            {{ copy.fragmentation.title }}
+            <span class="wheel"><span class="wheel-list">
+              <em>{{ copy.fragmentation.flip[0] }}</em>
+              <em class="amber">{{ copy.fragmentation.flip[1] }}</em>
+            </span></span><i class="frag-dot anchor" data-hold="0.05,0.9"></i>
+          </span>
         </span>
-      </span>
-    </h2>
+      </h2>
+      <p class="frag-lines h3" aria-hidden="true">
+        <span class="wheel-list">
+          @for (line of copy.fragmentation.notes; track line) {
+            <em>{{ line }}</em>
+          }
+        </span>
+      </p>
+    </div>
 
     <div class="frag-stage">
-      <div class="frag-notes h3">
-        <p style="--a: 0.32; --b: 0.46">{{ copy.fragmentation.notes[0] }}</p>
-        <p style="--a: 0.48; --b: 0.82">{{ copy.fragmentation.notes[1] }}</p>
-        <p style="--a: 0.82; --b: 2">{{ copy.fragmentation.notes[2] }}</p>
-      </div>
       <!-- One button divides like a cell into three near-copies, then each lands somewhere else in the same UI. -->
       <div class="drift" aria-hidden="true">
         <!-- Goo: blur, then threshold the alpha so nearby blobs fuse and pinch apart. story.ts drives the blur. -->
@@ -104,7 +108,7 @@
           </filter>
         </svg>
         @for (n of [0, 1, 2]; track n) {
-          <i class="ui" [style.--i]="n"><i></i></i>
+          <i class="ui" [style.--i]="n"><i></i><i></i><i></i></i>
         }
         <div class="goo">
           @for (label of copy.fragmentation.buttons; track label; let i = $index) {
@@ -132,17 +136,14 @@
         <p class="kicker annotation">{{ copy.newWay.kicker }}</p>
         <h2
           class="new-title h1 lines"
-          [attr.aria-label]="copy.newWay.title + ' ' + copy.newWay.flip.join(' ')"
+          [attr.aria-label]="copy.newWay.flip.join(' ')"
           revealOnScroll
         >
           <span class="line" aria-hidden="true">
-            <span>
-              {{ copy.newWay.title }}
-              <span class="wheel"><span class="wheel-list">
-                <em>{{ copy.newWay.flip[0] }}</em>
-                <em class="amber">{{ copy.newWay.flip[1] }}</em>
-              </span></span>
-            </span>
+            <span class="wheel"><span class="wheel-list">
+              <em>{{ copy.newWay.flip[0] }}</em>
+              <em class="amber">{{ copy.newWay.flip[1] }}</em>
+            </span></span>
           </span>
         </h2>
         <i class="bar" aria-hidden="true"></i>
