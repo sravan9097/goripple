@@ -1,6 +1,9 @@
 import {
   closingZoom,
   MARK,
+  NAMING,
+  NAMING_LAYOUT,
+  namingToOpening,
   OPENING,
   openingFrame,
   openingLayout,
@@ -104,5 +107,17 @@ describe('scenes', () => {
       expect(b.w).toBeCloseTo(20, 6);
       expect(b.r).toBeCloseTo(7.5, 6);
     });
+  });
+
+  it('naming replays the opening drop: a circle in the bowl, then squared in the slot with the E gone', () => {
+    const start = openingFrame(namingToOpening(NAMING.from), NAMING_LAYOUT);
+    expect([start.drop.x, start.drop.y]).toEqual([...MARK.impact]);
+    expect(start.drop.radius).toBeCloseTo(start.drop.half, 6);
+    const end = openingFrame(namingToOpening(1), NAMING_LAYOUT);
+    expect(end.drop.x).toBeCloseTo(MARK.slot[0], 6);
+    expect(end.drop.y).toBeCloseTo(MARK.slot[1], 6);
+    expect(end.drop.half).toBeCloseTo(MARK.slotHalf, 6);
+    expect(end.drop.radius).toBeCloseTo(0, 6);
+    expect(end.e.o).toBe(0);
   });
 });
