@@ -966,11 +966,9 @@
   --t: clamp(0, calc((var(--p) - 0.3) / 0.08), 1);
   // Damped wobble after impact: one and a half swings, dying out.
   --hit: calc(sin(var(--t) * 540deg) * (1 - var(--t)));
-  // Yellow stretches over navy's half and shoves it out; navy then keeps going off screen.
+  // Yellow grows into navy's half; navy stays right-aligned and shrinks to nothing in place.
   --u: clamp(0, calc((var(--p) - 0.3) / 0.07), 1);
   --push: calc(var(--u) * var(--u) * (3 - 2 * var(--u)));
-  --v: clamp(0, calc((var(--p) - 0.35) / 0.07), 1);
-  --fly: calc(var(--v) * var(--v));
   --r1: clamp(0, calc((var(--p) - 0.39) / 0.05), 1);
   --r2: clamp(0, calc((var(--p) - 0.41) / 0.05), 1);
   --hand: clamp(0, calc((var(--p) - 0.33) / 0.04), 1);
@@ -1039,8 +1037,10 @@
     --fill-ink: var(--white);
     --chip: var(--navy);
     --chip-on: var(--amber);
-    left: calc(50% + var(--gap) * (1 - var(--k)) + var(--push) * var(--S) / 2 + var(--fly) * 60vw);
-    width: var(--mw);
+    // Right edge fixed; width and pad collapse so yellow eats the space without shoving navy away.
+    left: calc(50% + var(--gap) * (1 - var(--k)) + var(--push) * var(--mw));
+    width: calc(var(--mw) * (1 - var(--push)));
+    padding: calc(var(--face-pad) * (1 - var(--push)));
     transform-origin: left center;
   }
 }
@@ -1361,11 +1361,12 @@
     transform-origin: center bottom;
     transform: scale(calc(1 + 0.035 * var(--hit)), calc(1 - 0.07 * var(--hit)));
 
-    // Yellow stretches down instead, and navy is shoved out the bottom.
+    // Yellow stretches down; navy stays bottom-aligned and shrinks to nothing in place.
     &.alt {
       left: calc(50% - var(--mw) / 2);
-      top: calc(50% + var(--gap) * (1 - var(--k)) + var(--push) * var(--S) / 2 + var(--fly) * 60vh);
-      height: var(--mh);
+      top: calc(50% + var(--gap) * (1 - var(--k)) + var(--push) * var(--mh));
+      height: calc(var(--mh) * (1 - var(--push)));
+      padding: calc(var(--face-pad) * (1 - var(--push)));
       transform-origin: center top;
     }
   }
