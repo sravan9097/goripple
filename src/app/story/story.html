@@ -91,8 +91,8 @@
     <div class="frag-stage">
       <div class="frag-notes h3">
         <p style="--a: 0.32; --b: 0.46">{{ copy.fragmentation.notes[0] }}</p>
-        <p style="--a: 0.48; --b: 0.66">{{ copy.fragmentation.notes[1] }}</p>
-        <p style="--a: 0.68; --b: 2">{{ copy.fragmentation.notes[2] }}</p>
+        <p style="--a: 0.48; --b: 0.82">{{ copy.fragmentation.notes[1] }}</p>
+        <p style="--a: 0.82; --b: 2">{{ copy.fragmentation.notes[2] }}</p>
       </div>
       <!-- One button divides like a cell into three near-copies, then each lands somewhere else in the same UI. -->
       <div class="drift" aria-hidden="true">
@@ -104,7 +104,7 @@
           </filter>
         </svg>
         @for (n of [0, 1, 2]; track n) {
-          <i class="ui" [style.--i]="n"></i>
+          <i class="ui" [style.--i]="n"><i></i></i>
         }
         <div class="goo">
           @for (label of copy.fragmentation.buttons; track label; let i = $index) {

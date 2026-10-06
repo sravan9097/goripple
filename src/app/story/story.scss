@@ -397,7 +397,7 @@
 }
 
 // ── 03 · Fragmentation: the title flips to "alone" and rises; one button divides into three, each placed its own way ──
-// Beats on --p: flip 0.1–0.2, rise 0.22–0.32, one button 0.32, split 0.46–0.62, UIs 0.66–0.82.
+// Beats on --p: flip 0.1–0.2, rise 0.22–0.32, one button 0.32, split 0.46–0.62, pause, UIs 0.82–0.96.
 
 .s-frag {
   --m: clamp(0, calc((var(--p) - 0.22) / 0.1), 1);
@@ -405,7 +405,7 @@
   --s: clamp(0, calc((var(--p) - 0.46) / 0.16), 1);
   // Cubic through the midpoint: quick to start and finish, slow at e 0.5, where the necks pinch.
   --e: calc(0.5 + 4 * (var(--s) - 0.5) * (var(--s) - 0.5) * (var(--s) - 0.5));
-  --u: clamp(0, calc((var(--p) - 0.68) / 0.14), 1);
+  --u: clamp(0, calc((var(--p) - 0.82) / 0.14), 1);
   container-type: inline-size;
 }
 
@@ -473,16 +473,17 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: clamp(12px, 2.4vh, 28px);
+  gap: clamp(16px, 3.2vh, 36px);
   min-width: 0;
   font-size: clamp(20px, 2.4vw, 36px);
 
   p {
-    --on: calc(clamp(0, calc((var(--p) - var(--a)) * 12), 1) - clamp(0, calc((var(--p) - var(--b)) * 12), 1));
+    --in: clamp(0, calc((var(--p) - var(--a)) * 12), 1);
+    --on: calc(var(--in) - clamp(0, calc((var(--p) - var(--b)) * 12), 1));
     margin: 0;
     text-wrap: pretty;
     opacity: calc(0.16 + 0.84 * var(--on));
-    transform: translateY(calc((1 - var(--on)) * 16px));
+    transform: translateY(calc((1 - var(--in)) * 16px));
   }
 }
 
@@ -508,7 +509,7 @@
   opacity: var(--f);
   transform: translateY(calc((1 - var(--f)) * 3cqh));
 
-  // Header bar, then a column of text lines.
+  // Header bar, then two empty fields. The last screen keeps the old text lines instead.
   &::before,
   &::after {
     content: '';
@@ -521,16 +522,39 @@
     border-bottom: 1.5px solid var(--navy);
   }
 
-  // A band of text lines across the middle, clear of the top and bottom where the buttons land.
-  &::after {
+  &::after,
+  > i {
     left: 10%;
     right: 10%;
-    top: 42%;
-    height: 26%;
-    background: repeating-linear-gradient(
-      color-mix(in oklch, var(--navy) 22%, transparent) 0 1.5px,
-      transparent 1.5px 25%
-    );
+    height: 12%;
+    border: 1.5px solid var(--navy);
+    border-radius: 0.5cqw;
+  }
+
+  &::after {
+    top: 32%;
+  }
+
+  > i {
+    position: absolute;
+    top: 48%;
+  }
+
+  &:last-of-type {
+    > i {
+      display: none;
+    }
+
+    &::after {
+      top: 42%;
+      height: 26%;
+      border: 0;
+      border-radius: 0;
+      background: repeating-linear-gradient(
+        color-mix(in oklch, var(--navy) 22%, transparent) 0 1.5px,
+        transparent 1.5px 25%
+      );
+    }
   }
 }
 
@@ -558,14 +582,14 @@
     --sy: 50;
     --ux: 12.5;
     --uy: 73;
-    --r: 3.75;
-    --bw: 26;
+    --r: 1.6;
+    --bw: 24;
   }
 
   &[data-v='1'] {
     --v: 1;
-    --c: var(--navy);
-    --ink: var(--white);
+    --c: var(--amber);
+    --ink: var(--navy);
     --sx: 50;
     --sy: 50;
     --ux: 54;
@@ -576,14 +600,14 @@
 
   &[data-v='2'] {
     --v: 2;
-    --c: var(--amber);
-    --ink: var(--navy);
+    --c: var(--navy);
+    --ink: var(--white);
     --sx: 82;
     --sy: 50;
     --ux: 88;
     --uy: 36;
-    --r: 1.6;
-    --bw: 24;
+    --r: 3.75;
+    --bw: 26;
   }
 }
 
@@ -631,7 +655,7 @@
     opacity: clamp(0, calc((var(--s) - 0.85) / 0.15), 1);
   }
 
-  &[data-v='2'] {
+  &[data-v='0'] {
     > :last-child {
       font-size: 2.1cqw;
       letter-spacing: 0.08em;
@@ -696,7 +720,7 @@
     --on: clamp(0, calc((var(--p) - var(--a)) * 8), 1);
     margin: 0;
     color: color-mix(in srgb, var(--white) calc(var(--on) * 100%), transparent);
-    -webkit-text-stroke: calc((1 - var(--on)) * 1px) color-mix(in srgb, var(--white) 75%, transparent);
+    -webkit-text-stroke: calc((1 - var(--on)) * 0.45px) color-mix(in srgb, var(--white) 38%, transparent);
     paint-order: stroke fill;
   }
 }

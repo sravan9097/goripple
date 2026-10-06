@@ -179,7 +179,7 @@ export const STORY = {
     /** The title's last words, flipped on scroll: care, then alone. The full stop is the drop. */
     flip: ['with care', 'alone'],
     /** One per beat: beside the single button, the split, then the three screens. */
-    notes: ['Nothing was broken', 'Everything was separate', 'Same button. Different places.'],
+    notes: ['Nothing was broken', 'Everything was separate', 'Same Purpose. Different Faces.'],
     /** The one button, then the three it drifts into; the first is also the shared label. */
     buttons: ['Continue', 'Submit', 'Confirm'],
   },
