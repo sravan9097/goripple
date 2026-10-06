@@ -241,7 +241,6 @@ export class Story implements OnDestroy {
       ring.setAttribute('cx', String(ix));
       ring.setAttribute('cy', String(iy));
     }
-    this.host.querySelector('.o-glimmer')?.setAttribute('r', String(0.2 * min));
     this.host.querySelector('.o-idle')?.setAttribute('r', String(0.3 * min));
     this.host.querySelectorAll('.o-burst').forEach((c) => c.setAttribute('r', String(0.45 * L.diag)));
     const rest = 18 * L.start.s;

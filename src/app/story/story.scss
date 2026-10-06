@@ -211,7 +211,6 @@
 .o-ghost,
 .o-burst,
 .o-idle,
-.o-glimmer,
 .o-breathe {
   transform-box: fill-box;
   transform-origin: 50% 50%;
@@ -232,10 +231,6 @@
 .o-burst {
   opacity: 0;
   animation: burst 2.6s cubic-bezier(0.16, 1, 0.3, 1) calc(1.45s + var(--k) * 0.18s) both;
-}
-
-.o-glimmer {
-  animation: glimmer 2.4s cubic-bezier(0.16, 1, 0.3, 1) 1.5s both;
 }
 
 .o-breathe {
@@ -313,12 +308,6 @@
   100% {
     transform: scale(1);
     opacity: 0;
-  }
-}
-
-@keyframes glimmer {
-  from {
-    transform: scale(0);
   }
 }
 
