@@ -417,15 +417,18 @@
   // Cubic through the midpoint: quick to start and finish, slow at e 0.5, where the necks pinch.
   --e: calc(0.5 + 4 * (var(--s) - 0.5) * (var(--s) - 0.5) * (var(--s) - 0.5));
   --u: clamp(0, calc((var(--p) - 0.68) / 0.14), 1);
+  container-type: inline-size;
 }
 
 // Big and on one line, centred in the screen; then it rises to the top at the same size.
 .frag-title {
   position: absolute;
   left: var(--pad);
+  right: var(--pad);
   top: 84px;
   margin: 0;
-  font-size: clamp(32px, 4.4vw, 76px);
+  font-size: clamp(22px, 5.6cqi, 64px);
+  line-height: 1.12;
   white-space: nowrap;
   transform: translateY(calc((1 - var(--m)) * (50vh - 84px - 50%)));
 }
@@ -477,24 +480,23 @@
   opacity: var(--b);
 }
 
-// The three lines share the full height, Dropbox-style: all present, the current one steps forward.
 .frag-notes {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  align-self: stretch;
-  height: 100%;
-  font-size: clamp(26px, 2.8vw, 44px);
+  justify-content: center;
+  gap: clamp(12px, 2.4vh, 28px);
+  min-width: 0;
+  font-size: clamp(20px, 2.4vw, 36px);
 
   p {
     --on: calc(clamp(0, calc((var(--p) - var(--a)) * 12), 1) - clamp(0, calc((var(--p) - var(--b)) * 12), 1));
     margin: 0;
+    text-wrap: pretty;
     opacity: calc(0.16 + 0.84 * var(--on));
     transform: translateY(calc((1 - var(--on)) * 16px));
   }
 }
 
-// Positions are in container units: x in cqw, y in cqh.
 .drift {
   position: relative;
   justify-self: end;
@@ -544,7 +546,7 @@
 }
 
 // One geometry for the filled bodies and their labels. At --s 0 all three sit on one spot as one
-// navy button; then each eases (--e) to its place in the row, taking its own colour, corners and
+// cyan button; then each eases (--e) to its place in the row, taking its own colour, corners and
 // width (--c, --r, --bw); at --u it moves into its own UI.
 .btn-shape {
   --x: calc(50 + var(--e) * (var(--sx) - 50) + var(--u) * (var(--ux) - var(--sx)));
@@ -611,8 +613,8 @@
   // Like dividing cells, each rounds up (narrower, taller) mid-split so the necks open early, then settles.
   .btn-shape {
     --q: sin(calc(var(--e) * 3.1416));
-    // Navy while dividing; each takes its own colour once it has pinched off.
-    background: color-mix(in srgb, var(--c) calc(clamp(0, calc((var(--s) - 0.55) / 0.3), 1) * 100%), var(--navy));
+    // Cyan while dividing; each takes its own colour once it has pinched off.
+    background: color-mix(in srgb, var(--c) calc(clamp(0, calc((var(--s) - 0.55) / 0.3), 1) * 100%), #008ecf);
     transform: translate(calc(var(--x) * 1cqw - 50%), calc(var(--y) * 1cqh - 50%))
       scale(calc((1 - 0.45 * var(--q)) * (1 - 0.45 * var(--u))), calc((1 + 0.25 * var(--q)) * (1 - 0.45 * var(--u))));
   }
@@ -1175,36 +1177,6 @@
   clip-path: inset(-100vh -100vw -100vh calc(var(--e) * (100% + 6vw) - 6vw));
 }
 
-.signature {
-  position: absolute;
-  right: 0;
-  bottom: 0.3em;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  i {
-    display: block;
-    border-radius: 50%;
-    background: var(--white);
-    width: 8px;
-    height: 8px;
-
-    &:nth-child(2) {
-      width: 14px;
-      height: 14px;
-      background: #7a99ac;
-    }
-
-    &:nth-child(3) {
-      width: 24px;
-      height: 24px;
-      border-radius: 0;
-      background: var(--amber);
-    }
-  }
-}
-
 .close-mark {
   display: block;
   width: max-content;
@@ -1268,17 +1240,16 @@
   }
 
   .frag-stage {
-    top: 30vh;
+    top: auto;
+    bottom: 24px;
     grid-template-columns: 1fr;
-    align-content: start;
+    align-content: end;
+    gap: 20px;
   }
 
   .frag-notes {
-    height: auto;
-    justify-content: flex-start;
-    gap: 16px;
-    margin-bottom: 28px;
-    font-size: clamp(24px, 6vw, 36px);
+    gap: 10px;
+    font-size: clamp(18px, 5vw, 28px);
   }
 
   .drift {

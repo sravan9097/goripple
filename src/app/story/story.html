@@ -297,15 +297,13 @@
       <span>{{ copy.closing.index }}</span><i></i><span>{{ copy.closing.label }}</span>
     </header>
     <div class="close-inner">
+      <app-wordmark class="close-mark" />
       <div class="erasable">
-        <app-wordmark class="close-mark" />
         <p class="close-lines h1">
           @for (line of copy.closing.lines; track line) {
             <span class="line"><span>{{ line }}</span></span>
           }
         </p>
-        <!-- Ripple signature (Figma 60:3632): dot, ring, square. -->
-        <span class="signature" aria-hidden="true"><i></i><i></i><i></i></span>
       </div>
       <p class="close-last h1 amber"><span class="line"><span>{{ copy.closing.last }}</span></span></p>
     </div>
