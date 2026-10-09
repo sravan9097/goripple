@@ -60,28 +60,28 @@ export const OUTRO_QUOTE = {
 const LIGHT = 'var(--rippl-ref-color-white, #fff)';
 
 /**
- * Tile order is grid / prev-next order. The World Before leads, then The Drop.
+ * Tile order is grid / prev-next order. The North Star leads, then The Rippl effect.
  * Ids are route paths and art hooks.
  */
 export const TILES: Tile[] = [
-  { id: 'why', title: 'The World Before', accent: 'var(--rippl-ref-color-navy-blue-700)', ink: LIGHT },
-  { id: 'what', title: 'The Drop', accent: 'var(--rippl-ref-color-cyan-500)', ink: LIGHT },
-  { id: 'how', title: 'The Idea', accent: 'var(--rippl-ref-color-magenta-600)', ink: LIGHT },
+  { id: 'why', title: 'The North Star', accent: 'var(--rippl-ref-color-navy-blue-700)', ink: LIGHT },
+  { id: 'what', title: 'The Rippl effect', accent: 'var(--rippl-ref-color-cyan-500)', ink: LIGHT },
+  { id: 'how', title: 'The Fleet', accent: 'var(--rippl-ref-color-magenta-600)', ink: LIGHT },
   {
     id: 'foundations',
-    title: 'The Name',
+    title: 'The Shipyard',
     accent: 'var(--rippl-ref-color-primrose-yellow-400)',
     ink: LIGHT,
   },
   {
     id: 'components',
-    title: 'The World Inside',
+    title: 'The rules of the Sea',
     accent: 'var(--rippl-ref-color-light-green-600)',
     ink: LIGHT,
   },
-  { id: 'patterns', title: 'The Two Verbs', accent: 'var(--rippl-ref-color-orange-500)', ink: LIGHT },
-  { id: 'who', title: 'The Promise', accent: 'var(--rippl-ref-color-cyan-800)', ink: LIGHT },
-  { id: 'resources', title: 'Links', accent: 'var(--rippl-ref-color-stolt-red-500)', ink: LIGHT },
+  { id: 'patterns', title: 'Beyond the Horizon', accent: 'var(--rippl-ref-color-orange-500)', ink: LIGHT },
+  { id: 'who', title: 'The Designer port', accent: 'var(--rippl-ref-color-cyan-800)', ink: LIGHT },
+  { id: 'resources', title: 'The Developer Port', accent: 'var(--rippl-ref-color-stolt-red-500)', ink: LIGHT },
 ];
 
 export const SECTIONS: Section[] = [
