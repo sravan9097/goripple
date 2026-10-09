@@ -13,10 +13,6 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
 import {
   DIVISIONS,
-  ISLAND_BUTTON,
-  ISLAND_CAPTIONS,
-  ISLAND_GAP,
-  ISLANDS,
   LINKS,
   OUTRO_QUOTE,
   SECTIONS,
@@ -29,6 +25,7 @@ import { HeroGrid } from '../hero-grid/hero-grid';
 import { RevealOnScroll } from '../reveal.directive';
 import { Scene } from '../scene.directive';
 import { DropPool } from '../visuals/drop-pool';
+import { NorthStar } from '../visuals/north-star';
 import { Wordmark, WORDMARK_LETTERS } from '../wordmark/wordmark';
 
 /** Act 5 scene: the one colour at the centre that every part draws from. */
@@ -50,7 +47,7 @@ const DOT_PALETTE = [
 
 @Component({
   selector: 'app-section-page',
-  imports: [RouterLink, RevealOnScroll, Scene, DropPool, Wordmark, HeroGrid],
+  imports: [RouterLink, RevealOnScroll, Scene, DropPool, NorthStar, Wordmark, HeroGrid],
   templateUrl: './section-page.html',
   styleUrl: './section-page.scss',
 })
@@ -129,20 +126,6 @@ export class SectionPage implements OnDestroy {
   readonly divisions = DIVISIONS;
   readonly outro = OUTRO_QUOTE;
   readonly letters = WORDMARK_LETTERS;
-
-  // Act 2: four identical islands drift apart, and so do their buttons.
-  readonly islands = ISLANDS;
-  readonly islandButton = ISLAND_BUTTON;
-  readonly islandCaptions = ISLAND_CAPTIONS;
-  readonly islandGap = ISLAND_GAP;
-  readonly drift: Record<string, string> = {
-    seafarm: '--sx: -1; --sy: -1; --rot: -1.2; --bg2: var(--rippl-ref-color-cyan-600); --r2: 99px',
-    containers:
-      '--sx: 1; --sy: -1; --rot: 0.8; --bg2: var(--rippl-ref-color-light-green-700); --r2: 0px; --px2: 10px; --ls2: 0.08em',
-    tankers:
-      '--sx: -1; --sy: 1; --rot: 0.6; --bg2: transparent; --bd2: var(--navy); --fg2: var(--navy); --r2: 99px; --px2: 12px',
-    terminals: '--sx: 1; --sy: 1; --rot: -0.9; --bg2: var(--rippl-ref-color-magenta-700); --r2: 12px',
-  };
 
   // Act 3: 7 x 7 field; `d` is distance from the centre, so colour spreads like a ring.
   readonly dots = Array.from({ length: 49 }, (_, i) => {

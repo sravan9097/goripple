@@ -348,134 +348,6 @@
   border-bottom: 1px solid var(--site-line);
 }
 
-/* ── 02 · Four identical islands drift apart, and so do their buttons ── */
-
-.s-frag .pin {
-  display: grid;
-  align-items: center;
-  padding: 48px var(--pad) 40px;
-}
-
-.frag-grid {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: clamp(32px, 6vw, 96px);
-}
-
-// Captions take turns in one slot; each has a `--p` window [--a, --b].
-.frag-caps {
-  position: relative;
-  min-height: 7em;
-}
-
-.frag-cap {
-  --w: clamp(0, min((var(--p) - var(--a)) * 10, (var(--b) - var(--p)) * 20 + 1), 1);
-  position: absolute;
-  inset: 0 auto auto 0;
-  max-width: 22em;
-  margin: 0;
-  opacity: var(--w);
-  transform: translateY(calc((1 - var(--w)) * 16px));
-
-  &:nth-child(1) {
-    --a: 0.08;
-    --b: 0.4;
-  }
-
-  &:nth-child(2) {
-    --a: 0.44;
-    --b: 0.68;
-  }
-
-  &:nth-child(3) {
-    --a: 0.72;
-    --b: 2;
-  }
-
-  .amber {
-    display: block;
-    margin-top: 0.5em;
-  }
-}
-
-// `--t` brings the cluster in; `--k` is the drift (time passing).
-.drift-stage {
-  --t: clamp(0, calc((var(--p) - 0.02) * 8), 1);
-  --k: clamp(0, calc((var(--p) - 0.16) / 0.64), 1);
-  --S: min(40vh, 24vw);
-  --dx: 44px;
-  --dy: 36px;
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(2, var(--S));
-  grid-template-rows: repeat(2, calc(var(--S) * 0.66));
-  gap: 28px;
-  opacity: var(--t);
-  transform: scale(calc(0.9 + 0.1 * var(--t)));
-}
-
-.island {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 18px 20px;
-  background: var(--white);
-  color: var(--navy);
-  transform: translate(calc(var(--sx) * var(--k) * var(--dx)), calc(var(--sy) * var(--k) * var(--dy)))
-    rotate(calc(var(--rot) * var(--k) * 1deg));
-  will-change: transform;
-}
-
-.island-name {
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.island-when {
-  opacity: 0.55;
-}
-
-// One button, scrubbed from the shared look to whatever each team ended up with.
-.drift-btn {
-  --sw: clamp(0, calc((var(--k) - 0.45) * 5), 1);
-  position: relative;
-  display: inline-block;
-  padding: 10px calc(16px + var(--px2, 0px) * var(--k));
-  font: 700 13px/1 var(--site-font-body);
-  letter-spacing: calc(var(--ls2, 0em) * var(--k));
-  color: color-mix(in oklab, var(--white), var(--fg2, var(--white)) calc(var(--k) * 100%));
-  background: color-mix(in oklab, var(--navy), var(--bg2, var(--navy)) calc(var(--k) * 100%));
-  border: 1.5px solid
-    color-mix(in oklab, var(--navy), var(--bd2, var(--bg2, var(--navy))) calc(var(--k) * 100%));
-  border-radius: calc(4px + (var(--r2, 4px) - 4px) * var(--k));
-  white-space: nowrap;
-
-  .w1 {
-    opacity: calc(1 - var(--sw));
-  }
-
-  .w2 {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    opacity: var(--sw);
-  }
-}
-
-// The gap itself holds the drop: it widens as the islands drift.
-.frag-dot {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: calc(16px + 24px * var(--k));
-  height: calc(16px + 24px * var(--k));
-  translate: -50% -50%;
-  background: var(--amber);
-}
-
 /* ── 03 · One dot changes at the centre; colour spreads ring by ring ── */
 
 .s-new .pin {
@@ -1320,41 +1192,6 @@
     font-size: 18px;
   }
 
-  .s-frag .pin {
-    padding-top: 24px;
-    padding-bottom: 24px;
-    align-items: start;
-  }
-
-  .frag-grid {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-
-  .frag-caps {
-    order: 1;
-    min-height: 8.5em;
-  }
-
-  .drift-stage {
-    --S: min(38vw, 18vh);
-    --dx: 6vw;
-    --dy: 3vh;
-    grid-template-rows: repeat(2, calc(var(--S) * 0.86));
-    gap: 16px;
-    padding: var(--dy) var(--dx);
-    justify-self: center;
-  }
-
-  .island {
-    padding: 12px 14px;
-  }
-
-  .drift-btn {
-    padding-block: 8px;
-    font-size: 12px;
-  }
-
   .new-dots {
     width: min(100%, 44vh);
   }
@@ -1387,13 +1224,6 @@
 /* ────────────────────────  reduced motion  ────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
-  .frag-cap {
-    position: static;
-    opacity: 1;
-    transform: none;
-    margin-top: 0.6em;
-  }
-
   .cue {
     display: none;
   }

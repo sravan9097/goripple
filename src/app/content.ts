@@ -90,7 +90,7 @@ export const SECTIONS: Section[] = [
     kicker: '01',
     act: 'Recognition',
     title: 'Every product was built with care.\nEvery product was built alone.',
-    caption: 'Four teams, four years, one button. Scroll, and watch it drift.',
+    caption: 'Every part, built alone in its own place. Scroll, and watch them find each other.',
     lead: [
       'Stolt builds many digital products, across businesses, teams and years. Each has its own buttons, its own colours, its own way of saying the same thing.',
     ],
@@ -212,20 +212,18 @@ export const SECTIONS: Section[] = [
   },
 ];
 
-/** Act 2 scene: the same button, built four times, four years apart. */
-export const ISLANDS = [
-  { area: 'seafarm', name: 'Stolt Sea Farm', when: 'Year one', cta: 'Continue' },
-  { area: 'containers', name: 'Stolt Tank Containers', when: 'Year two', cta: 'Submit' },
-  { area: 'tankers', name: 'Stolt Tankers', when: 'Year three', cta: 'Confirm' },
-  { area: 'terminals', name: 'Stolthaven Terminals', when: 'Year four', cta: 'Next step' },
-];
-export const ISLAND_BUTTON = 'Continue';
-export const ISLAND_CAPTIONS = [
-  'The same button, built again by every team.',
-  'Nothing was broken. Everything was separate.',
-  'Nobody chose this. It is what happens when good teams work fast without a shared foundation.',
-];
-export const ISLAND_GAP = 'The fault was never a person. It was the gap.';
+/**
+ * Act 2 scene: every part of every product, floating alone in its own place.
+ * Three beats (why, the cost, the vision), then the parts gather into the mark.
+ */
+export const NORTH_STAR = {
+  parts: ['Button', 'Table', 'Form', 'Card', 'Menu', 'Toggle', 'Tab', 'Chip', 'Dialog', 'Badge', 'Input', 'Toast'],
+  beats: [
+    'Every button, table and form at Stolt was built with care. Each one alone, in its own product, by its own team.',
+    'Designers rebuild. Developers translate. Users relearn. Change waits.',
+    'What if every part had one home? One place to decide, one source every product trusts.',
+  ],
+};
 
 /** Act 7 scene: what the two halves open into. */
 export const SHARED_PROMISE = 'One Stolt. Every product. One foundation.';

@@ -57,35 +57,9 @@
       </section>
     }
     @case ('why') {
-      <!-- Four islands start identical, then drift: the same button, built four times. -->
-      <section class="stage navy s-frag" scene data-pin style="--len: 320vh" aria-label="The world before">
-        <div class="pin">
-          <div class="frag-grid">
-            <div class="frag-caps" aria-live="polite">
-              @for (cap of islandCaptions; track cap; let last = $last) {
-                <p class="frag-cap h3">
-                  {{ cap }}
-                  @if (last) {
-                    <span class="amber">{{ islandGap }}</span>
-                  }
-                </p>
-              }
-            </div>
-            <div class="drift-stage" aria-hidden="true">
-              @for (prod of islands; track prod.area) {
-                <div class="island" [style]="drift[prod.area]">
-                  <span class="annotation island-name">{{ prod.name }}</span>
-                  <span class="drift-btn">
-                    <span class="w1">{{ islandButton }}</span>
-                    <span class="w2">{{ prod.cta }}</span>
-                  </span>
-                  <span class="annotation island-when">{{ prod.when }}</span>
-                </div>
-              }
-              <i class="frag-dot"></i>
-            </div>
-          </div>
-        </div>
+      <!-- Every part of every product floats alone; scroll, and they find each other as the mark (GSAP, visuals/north-star.ts). -->
+      <section class="stage navy" scene data-pin style="--len: 360vh" aria-label="The North Star">
+        <div class="pin"><app-north-star /></div>
       </section>
     }
     @case ('how') {
