@@ -12,42 +12,48 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
 import {
-  DIVISIONS,
+  BUILD_BLOCKS,
+  DESIGN_PARTS,
   LINKS,
   OUTRO_QUOTE,
+  PRINCIPLES,
   SECTIONS,
-  SHARED_PROMISE,
   TILES,
-  VERBS,
   tileGridLines,
+  type ResourceLink,
 } from '../content';
 import { HeroGrid } from '../hero-grid/hero-grid';
 import { RevealOnScroll } from '../reveal.directive';
 import { Scene } from '../scene.directive';
-import { DropPool } from '../visuals/drop-pool';
+import { Brochure } from '../visuals/brochure';
+import { Builders } from '../visuals/builders';
+import { Consistency } from '../visuals/consistency';
+import { FoundationFlip } from '../visuals/foundation-flip';
+import { Icon } from '../visuals/icon';
+import { Network } from '../visuals/network';
 import { NorthStar } from '../visuals/north-star';
-import { Wordmark, WORDMARK_LETTERS } from '../wordmark/wordmark';
-
-/** Act 5 scene: the one colour at the centre that every part draws from. */
-const KIT_PALETTE = [
-  { name: 'Navy', value: 'var(--rippl-ref-color-navy-blue-700)' },
-  { name: 'Cyan', value: 'var(--rippl-ref-color-cyan-600)' },
-  { name: 'Green', value: 'var(--rippl-ref-color-light-green-700)' },
-  { name: 'Magenta', value: 'var(--rippl-ref-color-magenta-600)' },
-  { name: 'Red', value: 'var(--rippl-ref-color-stolt-red-500)' },
-];
-
-const DOT_PALETTE = [
-  'var(--amber)',
-  'var(--rippl-ref-color-cyan-400)',
-  'var(--rippl-ref-color-light-green-400)',
-  'var(--rippl-ref-color-magenta-400)',
-  'var(--rippl-ref-color-white)',
-];
+import { ProductLine } from '../visuals/product-line';
+import { WordCycle } from '../visuals/word-cycle';
+import { Wordmark } from '../wordmark/wordmark';
 
 @Component({
   selector: 'app-section-page',
-  imports: [RouterLink, RevealOnScroll, Scene, DropPool, NorthStar, Wordmark, HeroGrid],
+  imports: [
+    RouterLink,
+    RevealOnScroll,
+    Scene,
+    NorthStar,
+    Wordmark,
+    HeroGrid,
+    Icon,
+    FoundationFlip,
+    Brochure,
+    WordCycle,
+    Network,
+    ProductLine,
+    Consistency,
+    Builders,
+  ],
   templateUrl: './section-page.html',
   styleUrl: './section-page.scss',
 })
@@ -122,35 +128,15 @@ export class SectionPage implements OnDestroy {
   });
 
   readonly gridLines = tileGridLines;
-  readonly links = LINKS;
-  readonly divisions = DIVISIONS;
   readonly outro = OUTRO_QUOTE;
-  readonly letters = WORDMARK_LETTERS;
+  readonly principles = PRINCIPLES;
+  readonly designParts = DESIGN_PARTS;
+  readonly buildBlocks = BUILD_BLOCKS;
 
-  // Act 3: 7 x 7 field; `d` is distance from the centre, so colour spreads like a ring.
-  readonly dots = Array.from({ length: 49 }, (_, i) => {
-    const r = Math.floor(i / 7) - 3;
-    const c = (i % 7) - 3;
-    return {
-      d: (Math.hypot(r, c) / Math.hypot(3, 3)).toFixed(3),
-      c: i === 24 ? 'var(--amber)' : DOT_PALETTE[(i * 3) % DOT_PALETTE.length],
-      centre: i === 24,
-    };
-  });
+  /** 7 x 7 field. The centre turns amber first; the rest follow together. */
+  readonly dots = Array.from({ length: 49 }, (_, i) => ({ centre: i === 24 }));
 
-  // Act 5: change the centre, every part follows.
-  readonly palette = KIT_PALETTE;
-  readonly kit = signal(KIT_PALETTE[0]);
-
-  // Acts 6 and 7
-  readonly verbs = VERBS;
-  readonly sharedPromise = SHARED_PROMISE;
-
-  /** GoRippl / DoRippl: the colour swap spreads from wherever the pointer came in. */
-  aim(event: PointerEvent): void {
-    const card = event.currentTarget as HTMLElement;
-    const r = card.getBoundingClientRect();
-    card.style.setProperty('--x', `${event.clientX - r.left}px`);
-    card.style.setProperty('--y', `${event.clientY - r.top}px`);
+  linksFor(port: ResourceLink['port']): ResourceLink[] {
+    return LINKS.filter((link) => link.port === port);
   }
 }

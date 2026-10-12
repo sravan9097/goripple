@@ -41,8 +41,17 @@ export interface Section {
 export interface ResourceLink {
   label: string;
   href: string;
+  /** Which port lists this link. */
+  port: 'design' | 'build';
   comingSoon?: boolean;
   note?: string;
+}
+
+export interface StoryCard {
+  title: string;
+  body: string;
+  /** Icon name drawn by app-icon. */
+  icon: string;
 }
 
 /** Shown on the large centre box, before the first scroll. Primary tagline, see NARRATIVE.md §10. */
@@ -69,7 +78,7 @@ export const TILES: Tile[] = [
   { id: 'how', title: 'The Fleet', accent: 'var(--rippl-ref-color-magenta-600)', ink: LIGHT },
   {
     id: 'foundations',
-    title: 'The Shipyard',
+    title: 'The Compass',
     accent: 'var(--rippl-ref-color-primrose-yellow-400)',
     ink: LIGHT,
   },
@@ -106,109 +115,58 @@ export const SECTIONS: Section[] = [
   {
     id: 'what',
     kicker: '02',
-    act: 'Arrival',
-    title: 'One drop.\nEvery product.',
-    caption: 'Click anywhere. One drop reaches every division.',
-    lead: ['Nothing new to believe in. Only something everyone here already knows.'],
-    closing: 'One drop at the centre, motion at every edge.',
+    act: 'Why adopt',
+    title: 'Why every product\nshould feel like one.',
+    lead: ['One shared way of making, so every product feels like the same organisation.'],
+    closing: 'Familiar everywhere. Decided once.',
   },
   {
     id: 'how',
     kicker: '03',
-    act: 'Revelation',
-    title: 'Change once.\nRippl everywhere.',
-    caption: 'One dot changes at the centre. Every dot follows.',
-    lead: [
-      'What if everything was defined once? What if change moved like a ripple instead of like cargo?',
-      'Rippl is the single source every product trusts.',
-    ],
-    pillarsLabel: 'How it works',
-    pillars: [
-      { word: 'defined once,', title: 'Everything is defined once.', body: 'One set of decisions at the centre: colours, type, spacing, parts, patterns, words. No second copy anywhere to drift out of date.' },
-      { word: 'drawn from the centre,', title: 'Every product draws from the centre.', body: 'Products do not copy from Rippl, they connect to it. Everyone draws from the same well, so everyone’s water tastes the same.' },
-      { word: 'rippling outward', title: 'Change ripples outward.', body: 'When the centre improves, every connected product improves with it. Maintenance stops being a tour of islands and becomes a single drop.' },
-    ],
-    closing: 'Built once. Built right. Built the same.',
+    act: 'Foundations',
+    title: 'What creates Rippl.',
+    lead: ['Colour, type, space and pattern, decided once and shared by every product.'],
+    closing: 'Defined once. Drawn from the centre. Rippling outward.',
   },
   {
     id: 'foundations',
     kicker: '04',
-    act: 'Meaning',
-    title: 'Ripple is a word the world owns.\nRippl is ours.',
-    caption: 'Scroll: the last letter lets go, and the drop takes its place.',
-    lead: [
-      'Drop one drop into still water and you get a ripple: change that travels outward on its own, reaching every edge without being carried by hand.',
-      'We dropped the final letter deliberately. Not a borrowed metaphor, a name we made.',
-    ],
-    closing: 'The absence is the signature.',
+    act: 'How it works',
+    title: 'From an idea\nto a product.',
+    lead: ['Rippl turns an idea into a product, and gives a team a direction through the options.'],
+    closing: 'Think. Ideate. Create. Repeat.',
   },
   {
     id: 'components',
     kicker: '05',
-    act: 'Substance',
-    title: 'Everything you build with,\ndecided once and done right.',
-    caption: 'Pick a colour at the centre. Every part follows, at once.',
-    lead: [
-      'Rippl is Stolt-Nielsen’s design system: one shared foundation of building blocks, patterns and guidelines that every digital product draws from, built by DICe for every Stolt business.',
-    ],
-    pillarsLabel: 'What Rippl is',
-    pillars: [
-      { word: 'a shared language,', title: 'A shared language.', body: 'Every product speaks the same way, and every person instantly understands it.' },
-      { word: 'a living foundation,', title: 'A living foundation.', body: 'Maintained, versioned and growing. It improves continuously, and every product improves with it.' },
-      { word: 'a promise of sameness', title: 'A promise of sameness.', body: 'The same action looks and behaves the same everywhere. Users carry their learning with them.' },
-    ],
-    notes: [
-      'Not a restriction. It removes the repeated decisions, so energy goes to the ones that matter.',
-      'Not a one-time project. A product that serves products, for as long as we build.',
-      'Not only for designers. Developers, product owners, every DICer and every Stolt business builds on it.',
-    ],
-    closing: 'One library. One codebase of parts. One set of answers.',
+    act: 'GoRippl',
+    title: 'Products GoRippl.',
+    lead: ['One set of components makes products consistent. Every product joins the same design system.'],
+    closing: 'One system. Every product on the line.',
   },
   {
     id: 'patterns',
     kicker: '06',
-    act: 'Belonging',
-    title: 'Products GoRippl.\nPeople DoRippl.',
-    caption: 'Hover a verb: the colours trade places.',
-    lead: [
-      'A system is a thing. A culture is a behaviour. Rippl has two verbs because we are building both.',
-    ],
-    pillarsLabel: 'Which verb is yours today',
-    pillars: [
-      { word: 'your product joins,', title: 'Your product joins.', body: 'GoRippl brings products in: the journey from island to ecosystem.' },
-      { word: 'your improvement travels,', title: 'Your improvement travels.', body: 'DoRippl makes people owners: improve a part, propose a pattern, report a gap.' },
-      { word: 'both, in time', title: 'Both, in time.', body: 'Know which verb is yours today. Both will apply in time.' },
-    ],
-    closing: 'One is direction. The other is participation.',
+    act: 'DoRippl',
+    title: 'People DoRippl.',
+    lead: ['People make the system, and their contributions are what make it scale.'],
+    closing: 'The foundation holds. People build the height.',
   },
   {
     id: 'who',
     kicker: '07',
-    act: 'Invitation',
-    title: 'One drop. Every product.\nStarting now.',
-    caption: 'Two become one.',
-    lead: [
-      'Not because design systems are fashionable. Because one organisation should feel like one organisation, everywhere its people meet it.',
-      'Rippl is the way we build now. One library, one codebase, one source, and every product aligns to it.',
-    ],
-    pillarsLabel: 'Four reasons',
-    pillars: [
-      { word: 'one Stolt,', title: 'One Stolt, everywhere.', body: 'Every product a colleague or customer touches should feel like it came from the same hands.' },
-      { word: 'change once,', title: 'Change once, everywhere.', body: 'Improvements travel like ripples, not like cargo carried island to island.' },
-      { word: 'craft over repetition,', title: 'Craft over repetition.', body: 'Designers and developers stop rebuilding the known and start solving the new.' },
-      { word: 'speed with confidence', title: 'Speed with confidence.', body: 'Every part already decided, tested and trusted, so quality stops depending on who built which screen.' },
-    ],
-    closing: 'We are not asking whether to align. We are showing how good aligned feels.',
+    act: 'For designers',
+    title: 'A single design language\nacross every Stolt product.',
+    lead: ['Open the kit, and design from the centre.'],
+    closing: 'Start in Figma. The parts are already decided.',
   },
   {
     id: 'resources',
     kicker: '08',
-    act: 'The doorway',
-    title: 'Open the toolkit.',
-    lead: [
-      'The site holds the meaning. The system holds the depth. Start in Figma, build in Storybook, ship with @stolt/rippl.',
-    ],
-    closing: 'One drop, and the rings do the rest.',
+    act: 'For developers',
+    title: 'Foundations, components\nand patterns, ready to ship.',
+    lead: ['Build from the same centre every other product uses.'],
+    closing: 'One package. Every product draws from it.',
   },
 ];
 
@@ -225,40 +183,88 @@ export const NORTH_STAR = {
   ],
 };
 
-/** Act 7 scene: what the two halves open into. */
-export const SHARED_PROMISE = 'One Stolt. Every product. One foundation.';
+/** Chapter 2: six reasons, told on the accordion cards. */
+export const PRINCIPLES: StoryCard[] = [
+  { icon: 'clarity', title: 'Clarity', body: 'Make complexity understandable.' },
+  { icon: 'consistency', title: 'Consistency', body: 'Familiarity creates confidence.' },
+  { icon: 'humanity', title: 'Humanity', body: 'Technology should feel intuitive.' },
+  { icon: 'access', title: 'Accessibility', body: 'Design for everyone.' },
+  { icon: 'efficiency', title: 'Efficiency', body: 'Every interaction should move the user forward.' },
+  { icon: 'scale', title: 'Scalability', body: 'Design once, enable many.' },
+];
 
-/** Act 6 scene: the two verbs, side by side and equal in weight (§8). */
-export const VERBS = [
+/** Chapter 3: the foundations, one card at a time. */
+export const FOUNDATIONS: StoryCard[] = [
+  { icon: 'colour', title: 'Colour', body: 'The colours of every product, named once.' },
+  { icon: 'type', title: 'Typography', body: 'The type every screen reads in.' },
+  { icon: 'space', title: 'Spacing', body: 'The space between things, the same on every screen.' },
+  { icon: 'grid', title: 'Grid', body: 'The columns a layout is built on.' },
+  { icon: 'layout', title: 'Layout', body: 'How a page is put together.' },
+  { icon: 'elevation', title: 'Elevation', body: 'How far a surface sits above the one behind it.' },
+  { icon: 'pattern', title: 'Pattern', body: 'The arrangements of parts that teams reuse.' },
+];
+
+/** Chapter 3: the brochure, cover first, then each fold. */
+export const BROCHURE: { kicker: string; title: string; body: string }[] = [
   {
-    kicker: '01 / Adopt',
-    title: 'GoRippl',
-    body: 'When a product joins the system, it goes Rippl: it connects to the shared foundation and starts moving with everyone else.',
-    href: 'https://gorippl.com',
+    kicker: 'Idea one',
+    title: 'Everything is defined once.',
+    body: 'Colour, type, space and parts live in one place. There is no second copy to drift.',
   },
   {
-    kicker: '02 / Contribute',
-    title: 'DoRippl',
-    body: 'Built by DICe, grown through everyone. Improve a component, propose a pattern or report a gap, and you do Rippl.',
-    href: 'https://dorippl.com',
+    kicker: 'Idea two',
+    title: 'Every product draws from the centre.',
+    body: 'Products connect to Rippl. They do not keep a private copy.',
   },
+  {
+    kicker: 'Idea three',
+    title: 'Change ripples outward.',
+    body: 'Improve the centre, and every connected product improves with it.',
+  },
+];
+
+/** Chapter 4: the working loop. */
+export const CYCLE = ['Think', 'Ideate', 'Create', 'Repeat'];
+
+/** Chapter 4: the line under the network. */
+export const NETWORK_LINE = 'The connections you make are the ones everyone else uses.';
+
+/** Chapter 7: what a designer works with. */
+export const DESIGN_PARTS: { title: string; body: string }[] = [
+  { title: 'Colour', body: 'A palette every product shares, so a screen is recognisable before anyone reads a word.' },
+  { title: 'Typography', body: 'One set of type, so Stolt reads the same way everywhere.' },
+  { title: 'Accessibility', body: 'Contrast, focus and labels decided once, and held on every component.' },
+  { title: 'Tokens', body: 'The named values behind colour, type and space. Change the token, and the designs follow.' },
+  { title: 'Iconography', body: 'One family of icons, used the same way on every product.' },
+  { title: 'Components', body: 'Buttons, fields, tables and the rest, drawn once and reused.' },
+  { title: 'Patterns', body: 'How those parts sit together on a real screen.' },
+];
+
+/** Chapter 8: what a developer takes from the system. */
+export const BUILD_BLOCKS: { title: string; body: string }[] = [
+  { title: 'Foundations', body: 'Tokens for colour, type and space, so a screen starts from the same values everywhere.' },
+  { title: 'Components', body: 'Buttons, fields, tables and the rest, already built and ready to compose.' },
+  { title: 'Patterns', body: 'The ways those parts go together, so a flow feels like Stolt on every product.' },
 ];
 
 export const LINKS: ResourceLink[] = [
   {
     label: 'Figma: Rippl UI kit',
     href: 'https://www.figma.com/design/RbdGI9JdF0kv29eZjAlZSH',
+    port: 'design',
     note: 'File key RbdGI9JdF0kv29eZjAlZSH',
   },
   {
     label: 'Storybook',
     href: '#',
+    port: 'build',
     comingSoon: true,
     note: 'rippl.stolt.com (soon)',
   },
   {
     label: '@stolt/rippl',
     href: '#',
+    port: 'build',
     comingSoon: true,
     note: 'Azure Artifacts (soon)',
   },

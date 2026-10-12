@@ -50,9 +50,24 @@
   <!-- Scene: the act, enacted -->
   @switch (tile().id) {
     @case ('what') {
-      <section class="stage paper" scene aria-label="The drop">
-        <div class="stage-inner">
-          <app-drop-pool />
+      <section class="stage navy s-new" scene data-pin style="--len: 180vh" aria-label="Change once, Rippl everywhere">
+        <div class="pin">
+          <div class="new-dots" aria-hidden="true">
+            @for (dot of dots; track $index) {
+              <i [class.nd-centre]="dot.centre"></i>
+            }
+          </div>
+        </div>
+      </section>
+      <section class="stage paper s-principles" aria-label="Six reasons to adopt Rippl">
+        <div class="principles">
+          @for (card of principles; track card.title) {
+            <button type="button" class="principle">
+              <app-icon [name]="card.icon" />
+              <span class="principle-title">{{ card.title }}</span>
+              <span class="principle-body p-large">{{ card.body }}</span>
+            </button>
+          }
         </div>
       </section>
     }
@@ -63,125 +78,100 @@
       </section>
     }
     @case ('how') {
-      <!-- One dot changes at the centre; the colour spreads ring by ring. -->
-      <section class="stage navy s-new" scene data-pin style="--len: 240vh" aria-label="The idea">
-        <div class="pin">
-          <div class="new-dots" aria-hidden="true">
-            <span class="nd-ring"></span>
-            <span class="nd-ring nd-ring-2"></span>
-            @for (dot of dots; track $index) {
-              <i [class.nd-centre]="dot.centre" [style.--d]="dot.d" [style.--c]="dot.c"></i>
-            }
-          </div>
-        </div>
+      <section class="stage paper" scene data-pin style="--len: 420vh" aria-label="The foundations">
+        <div class="pin"><app-foundation-flip /></div>
+      </section>
+      <section class="stage navy s-fold" scene data-pin style="--len: 280vh" aria-label="Three ideas">
+        <div class="pin"><app-brochure /></div>
       </section>
     }
     @case ('foundations') {
-      <!-- "ripple": the last letter loosens, lets go and falls; the drop squares into its place. -->
-      <section class="stage navy s-name" scene data-pin style="--len: 260vh" aria-label="The name">
-        <div class="pin">
-          <svg class="name-svg" viewBox="0 0 620 250" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-            @for (d of letters; track $index) {
-              <path class="n-letter" [attr.d]="d" />
-            }
-            <g class="n-e">
-              <path d="M592.5 122A57.5 57.5 0 1 0 575.66 162.66" />
-              <path d="M477.5 122H603" />
-            </g>
-            <circle class="n-echo" cx="477.5" cy="179.5" r="10.5" />
-            <rect class="n-square" x="467" y="169" width="21" height="21" />
-          </svg>
-        </div>
+      <section class="stage navy" scene data-pin style="--len: 240vh" aria-label="Think, ideate, create, repeat">
+        <div class="pin"><app-word-cycle /></div>
+      </section>
+      <section class="stage paper" scene data-pin style="--len: 200vh" aria-label="Connections">
+        <div class="pin"><app-network /></div>
       </section>
     }
     @case ('components') {
-      <!-- Pick the one colour at the centre: every part is drawn from it, so every part follows. -->
-      <section class="stage paper s-kit" scene aria-label="The world inside">
-        <div class="stage-inner kit-wrap" [style.--kit]="kit().value">
-          <div class="kit-centre" role="radiogroup" aria-label="The colour at the centre">
-            <span class="annotation">The centre</span>
-            @for (c of palette; track c.name) {
-              <button
-                type="button"
-                class="kit-swatch"
-                role="radio"
-                [attr.aria-checked]="kit() === c"
-                [attr.aria-label]="c.name"
-                [style.--c]="c.value"
-                (click)="kit.set(c)"
-              ></button>
-            }
-          </div>
-          <div class="fig-kit">
-            <span class="kit-btn">Book a slot</span>
-            <span class="kit-btn ghost">Cancel</span>
-            <span class="kit-switch"><i></i></span>
-            <span class="kit-chip">Rotterdam</span>
-            <span class="kit-badge">12</span>
-            <span class="kit-field">Vessel name<i></i></span>
-            <span class="kit-tabs"><i class="on">Voyages</i><i>Berths</i><i>Crew</i></span>
-            <span class="kit-bar"><i></i></span>
-            <span class="kit-table">
-              <i class="kt-head"></i><i></i><i></i><i></i>
-            </span>
-          </div>
-        </div>
+      <section class="stage paper" scene data-pin style="--len: 200vh" aria-label="Products joined by one system">
+        <div class="pin"><app-product-line /></div>
+      </section>
+      <section class="stage paper" scene data-pin style="--len: 200vh" aria-label="Product and design system">
+        <div class="pin"><app-consistency /></div>
       </section>
     }
     @case ('patterns') {
-      <!-- Two verbs, equal in weight. Hover: the other colour pours in from the pointer. -->
-      <section class="stage paper s-move" scene aria-label="The two verbs">
-        <div class="stage-inner move-grid">
-          @for (card of verbs; track card.title; let i = $index) {
-            <article class="move-card" [class.alt]="i === 1" (pointerenter)="aim($event)">
-              <div class="mc-top">
-                <span class="annotation">{{ card.kicker }}</span>
-                <i class="mc-chip" aria-hidden="true"></i>
-              </div>
-              <h2 class="h1">{{ card.title }}</h2>
-              <p class="p-large">{{ card.body }}</p>
-            </article>
-          }
-        </div>
+      <section class="stage navy" scene data-pin style="--len: 240vh" aria-label="People build on the foundation">
+        <div class="pin"><app-builders /></div>
       </section>
     }
     @case ('who') {
-      <!-- Two halves slide together, merge, and open into the promise. -->
-      <section class="stage amber-bg s-shared" scene data-pin style="--len: 260vh" aria-label="The promise">
-        <div class="pin">
-          <div class="merge" aria-hidden="true">
-            <i class="half half-l"></i>
-            <i class="half half-r"></i>
-          </div>
-          <div class="promise-box">
-            <app-wordmark class="pb-mark" [redDot]="false" />
-            <p class="h3">{{ sharedPromise }}</p>
-          </div>
+      <section class="stage paper s-port" aria-label="For designers">
+        <div class="stage-inner">
+          <ul class="port-cards">
+            @for (card of designParts; track card.title) {
+              <li>
+                <h2 class="h4">{{ card.title }}</h2>
+                <p class="p-large">{{ card.body }}</p>
+              </li>
+            }
+          </ul>
+          <ul class="resource-links">
+            @for (link of linksFor('design'); track link.label) {
+              <li>
+                @if (link.comingSoon) {
+                  <span class="resource-link is-soon">
+                    <span>{{ link.label }}</span>
+                    <span class="soon annotation">soon</span>
+                  </span>
+                } @else {
+                  <a class="resource-link" [href]="link.href" target="_blank" rel="noopener">
+                    <span>{{ link.label }}</span>
+                    <span class="arrow" aria-hidden="true">↗</span>
+                  </a>
+                }
+                @if (link.note) {
+                  <span class="link-note annotation">{{ link.note }}</span>
+                }
+              </li>
+            }
+          </ul>
         </div>
       </section>
     }
     @case ('resources') {
-      <section class="stage paper s-links" aria-label="Where to start">
-        <ul class="resource-links stage-inner" revealOnScroll>
-          @for (link of links; track link.label) {
-            <li>
-              @if (link.comingSoon) {
-                <span class="resource-link is-soon">
-                  <span>{{ link.label }}</span>
-                  <span class="soon annotation">soon</span>
-                </span>
-              } @else {
-                <a class="resource-link" [href]="link.href" target="_blank" rel="noopener">
-                  <span>{{ link.label }}</span>
-                  <span class="arrow" aria-hidden="true">↗</span>
-                </a>
-              }
-              @if (link.note) {
-                <span class="link-note annotation">{{ link.note }}</span>
-              }
-            </li>
-          }
-        </ul>
+      <section class="stage paper s-port" aria-label="For developers">
+        <div class="stage-inner">
+          <ul class="port-cards">
+            @for (card of buildBlocks; track card.title) {
+              <li>
+                <h2 class="h4">{{ card.title }}</h2>
+                <p class="p-large">{{ card.body }}</p>
+              </li>
+            }
+          </ul>
+          <ul class="resource-links">
+            @for (link of linksFor('build'); track link.label) {
+              <li>
+                @if (link.comingSoon) {
+                  <span class="resource-link is-soon">
+                    <span>{{ link.label }}</span>
+                    <span class="soon annotation">soon</span>
+                  </span>
+                } @else {
+                  <a class="resource-link" [href]="link.href" target="_blank" rel="noopener">
+                    <span>{{ link.label }}</span>
+                    <span class="arrow" aria-hidden="true">↗</span>
+                  </a>
+                }
+                @if (link.note) {
+                  <span class="link-note annotation">{{ link.note }}</span>
+                }
+              </li>
+            }
+          </ul>
+        </div>
       </section>
     }
   }
@@ -231,14 +221,6 @@
         <li class="p-large">{{ note }}</li>
       }
     </ul>
-  }
-
-  @if (tile().id === 'who') {
-    <div class="divisions" revealOnScroll>
-      @for (division of divisions; track division.name) {
-        <img [src]="division.src" [alt]="division.name" loading="lazy" decoding="async" />
-      }
-    </div>
   }
 
   <!-- Closing line -->
