@@ -9,10 +9,16 @@
   --m-s: 0;
   --centre-size: min(800px, calc(min(100vw, 100vh) - 64px));
   --tile-ease: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  --navy: var(--rippl-ref-color-navy-blue-700);
+  --amber: var(--rippl-ref-color-primrose-yellow-500);
+  --white: var(--rippl-ref-color-white, #fff);
+  /* The square that replaces the E is the drop, so it stays amber all the way to the menu. */
+  --site-dot: var(--amber);
 
   display: block;
   position: relative;
-  height: 200vh;
+  /* One viewport on screen, OPEN_SCROLL_VH of opening scrub (hero-grid.ts), one of collapse. */
+  height: 400vh;
 }
 
 .nav-container {
@@ -107,7 +113,7 @@
   display: flex;
   flex-direction: column;
   font-family: var(--site-font-display);
-  font-weight: 800;
+  font-weight: 700;
   font-size: clamp(30px, 3.4vw, 60px);
   line-height: 1.1;
   letter-spacing: -0.025em;
@@ -150,338 +156,69 @@
 
 /* ─────────────────────────────  tile art  ─────────────────────────── */
 
+/*
+ * One Stolt brand icon per tile, the way each Dropbox tile carries a mark for
+ * its chapter. The PNG (public/icons, 320px copies of the brand set) is a
+ * mask over the tile's ink, so the icon inverts with the title on hover; each
+ * tile's mark then moves in its own way, as Dropbox's do.
+ *
+ * The image is a static rule per tile, never `mask: var(--icon)`: a var()
+ * image is re-resolved on every style recalc, and the host writes custom
+ * properties every scroll frame, so every tile repainted its mask each frame
+ * and the opening dropped frames (visible as a flicker).
+ */
 .art {
-  position: relative;
   display: block;
   justify-self: end;
   align-self: end;
   /* Square, and never larger than the space under the title. */
-  width: min(96px, 40cqw, 100cqh);
+  width: min(132px, 48cqw, 100cqh);
   aspect-ratio: 1;
-  color: inherit;
-}
-
-.art i {
-  position: absolute;
-  display: block;
-  background: var(--tile-art, currentColor);
+  background: currentColor;
+  mask: center / contain no-repeat;
   transition:
-    background-color var(--tile-ease),
-    box-shadow var(--tile-ease),
-    transform var(--tile-ease),
-    inset var(--tile-ease),
-    width var(--tile-ease),
-    height var(--tile-ease),
-    opacity var(--tile-ease);
+    transform 0.5s var(--site-ease-swoop),
+    background-color var(--tile-ease);
+}
+
+@each $id in why, what, how, foundations, components, patterns, who, resources {
+  .tile-#{$id} .art {
+    mask-image: url('/icons/#{$id}.png');
+  }
 }
 
 @media (any-hover: hover) {
-  .tile:hover .art i {
-    background-color: transparent;
-    box-shadow: inset 0 0 0 2px currentColor;
+  /* The world turns */
+  .tile-why:hover .art {
+    transform: rotate(-24deg);
   }
-}
-
-/* What — a drop with square ripples */
-.art-what .drop {
-  inset: 42% 42% 42% 42%;
-  z-index: 2;
-}
-.art-what .rip {
-  background: transparent;
-  box-shadow: inset 0 0 0 2px var(--tile-art);
-}
-.art-what .rip-1 {
-  inset: 28%;
-  opacity: 0.85;
-}
-.art-what .rip-2 {
-  inset: 14%;
-  opacity: 0.55;
-}
-.art-what .rip-3 {
-  inset: 0;
-  opacity: 0.3;
-}
-
-@media (any-hover: hover) {
-  .tile:hover .art-what .rip {
-    box-shadow: inset 0 0 0 2px currentColor;
+  /* The waves travel */
+  .tile-what:hover .art {
+    transform: translateX(-14%);
   }
-  .tile:hover .art-what .rip-1 {
-    inset: 18%;
+  /* The bulb lights */
+  .tile-how:hover .art {
+    transform: scale(1.14) rotate(-8deg);
   }
-  .tile:hover .art-what .rip-2 {
-    inset: 6%;
+  /* The type lifts */
+  .tile-foundations:hover .art {
+    transform: translateY(-10%);
   }
-  .tile:hover .art-what .rip-3 {
-    inset: -8%;
-    opacity: 0.5;
+  /* The piece turns to fit */
+  .tile-components:hover .art {
+    transform: rotate(-18deg);
   }
-}
-
-/* Why — a 3x3 field with one seed lit */
-.art-why {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  gap: 12%;
-}
-.art-why i {
-  position: relative;
-  inset: auto;
-  background: transparent;
-  box-shadow: inset 0 0 0 2px var(--tile-art);
-  opacity: 0.4;
-}
-.art-why i.seed {
-  background: var(--tile-art);
-  box-shadow: none;
-  opacity: 1;
-}
-
-@media (any-hover: hover) {
-  .tile:hover .art-why i {
-    box-shadow: inset 0 0 0 2px currentColor;
-    background-color: transparent;
-    opacity: 1;
+  /* The cycle runs */
+  .tile-patterns:hover .art {
+    transform: rotate(180deg);
   }
-  .tile:hover .art-why i.seed {
-    background-color: currentColor;
-    box-shadow: none;
+  /* The circle closes in */
+  .tile-who:hover .art {
+    transform: scale(1.14);
   }
-}
-
-/* How — three nodes on a rule, links stretch on hover */
-.art-how .node {
-  top: 50%;
-  width: 24%;
-  height: 24%;
-  transform: translateY(-50%);
-  z-index: 2;
-}
-.art-how .n-1 {
-  left: 0;
-}
-.art-how .n-2 {
-  left: 38%;
-}
-.art-how .n-3 {
-  left: 76%;
-}
-.art-how .link {
-  top: 50%;
-  height: 2px;
-  transform: translateY(-50%);
-}
-.art-how .l-1 {
-  left: 24%;
-  width: 14%;
-}
-.art-how .l-2 {
-  left: 62%;
-  width: 14%;
-}
-
-@media (any-hover: hover) {
-  .tile:hover .art-how .link {
-    background-color: currentColor;
-    box-shadow: none;
-  }
-  .tile:hover .art-how .n-2 {
-    left: 38%;
-    transform: translateY(-50%) rotate(45deg);
-  }
-}
-
-/* Foundations — four colour blocks, each with a dot; they swap on hover */
-.art-foundations {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 8%;
-}
-.art-foundations .blk {
-  position: relative;
-  inset: auto;
-  display: grid;
-  place-items: center;
-}
-.art-foundations .blk b {
-  width: 46%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: color-mix(in oklch, var(--tile-bg) 70%, #fff);
-  transition:
-    background-color var(--tile-ease),
-    box-shadow var(--tile-ease);
-}
-.art-foundations .b-1 {
-  background: var(--rippl-ref-color-navy-blue-700);
-}
-.art-foundations .b-2 {
-  background: var(--rippl-ref-color-orange-500);
-}
-.art-foundations .b-3 {
-  background: var(--rippl-ref-color-magenta-500);
-}
-.art-foundations .b-4 {
-  background: var(--rippl-ref-color-cyan-500);
-}
-
-@media (any-hover: hover) {
-  .tile:hover .art-foundations .blk b {
-    background-color: transparent;
-    box-shadow: inset 0 0 0 2px currentColor;
-  }
-  .tile:hover .art-foundations .b-1 {
-    transform: translate(calc(100% + 8%), 0);
-  }
-  .tile:hover .art-foundations .b-2 {
-    transform: translate(calc(-100% - 8%), 0);
-  }
-  .tile:hover .art-foundations .b-3 {
-    transform: translate(calc(100% + 8%), 0);
-  }
-  .tile:hover .art-foundations .b-4 {
-    transform: translate(calc(-100% - 8%), 0);
-  }
-}
-
-/* Components — stacked layers that fan out */
-.art-components .layer {
-  width: 74%;
-  height: 26%;
-}
-.art-components .ly-1 {
-  left: 0;
-  top: 8%;
-  opacity: 0.45;
-}
-.art-components .ly-2 {
-  left: 13%;
-  top: 37%;
-  opacity: 0.7;
-}
-.art-components .ly-3 {
-  left: 26%;
-  top: 66%;
-}
-
-@media (any-hover: hover) {
-  .tile:hover .art-components .layer {
-    opacity: 1;
-  }
-  .tile:hover .art-components .ly-1 {
-    left: 26%;
-  }
-  .tile:hover .art-components .ly-3 {
-    left: 0;
-  }
-}
-
-/* Patterns — a wireframe screen that reduces to outlines */
-.art-patterns .wf-side {
-  left: 0;
-  top: 0;
-  width: 20%;
-  height: 100%;
-}
-.art-patterns .wf-top {
-  left: 26%;
-  top: 0;
-  width: 74%;
-  height: 18%;
-}
-.art-patterns .wf-row {
-  left: 26%;
-  width: 74%;
-  height: 14%;
-  opacity: 0.55;
-}
-.art-patterns .r-1 {
-  top: 28%;
-}
-.art-patterns .r-2 {
-  top: 50%;
-}
-.art-patterns .r-3 {
-  top: 72%;
-  width: 46%;
-}
-
-@media (any-hover: hover) {
-  .tile:hover .art-patterns .wf-row {
-    opacity: 1;
-  }
-  .tile:hover .art-patterns .r-3 {
-    width: 74%;
-  }
-}
-
-/* Who — a row of units of differing height, like a fleet */
-.art-who .unit {
-  bottom: 0;
-  width: 14%;
-}
-.art-who .u-1 {
-  left: 0;
-  height: 44%;
-}
-.art-who .u-2 {
-  left: 21.5%;
-  height: 72%;
-}
-.art-who .u-3 {
-  left: 43%;
-  height: 100%;
-}
-.art-who .u-4 {
-  left: 64.5%;
-  height: 72%;
-}
-.art-who .u-5 {
-  left: 86%;
-  height: 44%;
-}
-
-@media (any-hover: hover) {
-  .tile:hover .art-who .u-1,
-  .tile:hover .art-who .u-5 {
-    height: 72%;
-  }
-  .tile:hover .art-who .u-2,
-  .tile:hover .art-who .u-4 {
-    height: 100%;
-  }
-  .tile:hover .art-who .u-3 {
-    height: 44%;
-  }
-}
-
-/* Resources — a crate with an arrow leaving it */
-.art-resources .crate {
-  left: 0;
-  bottom: 0;
-  width: 66%;
-  height: 66%;
-}
-.art-resources .out {
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 46%;
-  height: 46%;
-  color: var(--tile-art);
-  transition:
-    transform var(--tile-ease),
-    color var(--tile-ease);
-}
-
-@media (any-hover: hover) {
-  .tile:hover .art-resources .out {
-    color: currentColor;
-    transform: translate(14%, -14%);
+  /* The link tilts */
+  .tile-resources:hover .art {
+    transform: rotate(-45deg);
   }
 }
 
@@ -610,10 +347,11 @@
     transform: translateY(-50%) scaleX(var(--inv)) scaleY(1);
   }
 
-  .nav-container.animating-in.final .nav-tile-gridlines.nav-tile-6 .nav-t,
-  .nav-container.animating-in.final .nav-tile-gridlines.nav-tile-3 .nav-b,
-  .nav-container.animating-in.final .nav-tile-gridlines.nav-tile-7 .nav-l,
-  .nav-container.animating-in.final .nav-tile-gridlines.nav-tile-2 .nav-r {
+  /* .final comes and goes with the scroll, so the rules draw and retract either way. */
+  .nav-container:not(.reduced) .nav-tile-gridlines.nav-tile-6 .nav-t,
+  .nav-container:not(.reduced) .nav-tile-gridlines.nav-tile-3 .nav-b,
+  .nav-container:not(.reduced) .nav-tile-gridlines.nav-tile-7 .nav-l,
+  .nav-container:not(.reduced) .nav-tile-gridlines.nav-tile-2 .nav-r {
     transition: transform 1.25s cubic-bezier(0.4, 0, 0.3, 1);
   }
 }
@@ -711,7 +449,7 @@
   transform: scaleX(1);
 }
 
-.nav-container.animating-in.final .menu-gridlines .tile-line {
+.menu-gridlines .tile-line {
   transition: transform 1.25s cubic-bezier(0.4, 0, 0.3, 1);
 }
 
@@ -734,12 +472,13 @@
 }
 
 /*
- * Paper while the wordmark draws, then ink in step with the scroll
+ * Navy as the opening hands off, then paper in step with the scroll
  * (--box-ink). No colour transition: a timer here lags a slow scroll and
  * sticks when you scroll back.
  */
 .nav-button {
-  /* Where the settled wordmark sits in the box; the icon starts on its dot. */
+  /* Where the settled wordmark sits in the box; the icon starts on its dot.
+     Mirrored in hero-grid.ts (markTarget) so the opening lands on it exactly. */
   --mark-l: clamp(20px, 5%, 56px);
   --mark-w: min(46%, 280px);
   position: absolute;
@@ -747,8 +486,8 @@
   display: block;
   padding: 0;
   overflow: hidden;
-  background: color-mix(in oklch, var(--site-ink) calc(var(--box-ink) * 100%), var(--site-surface));
-  color: color-mix(in oklch, var(--site-paper) calc(var(--box-ink) * 100%), var(--site-ink));
+  background: color-mix(in oklch, var(--site-paper) calc(var(--box-ink) * 100%), var(--navy));
+  color: color-mix(in oklch, var(--site-ink) calc(var(--box-ink) * 100%), var(--white));
   box-shadow: none;
   z-index: 1;
   pointer-events: none;
@@ -764,9 +503,8 @@
 /* ──────────────────────  centre mark: outline → solid  ────────────── */
 
 /*
- * Starts large and centred. When .final lands it scales down and drops to the
- * bottom-left of the box in the same motion as the fill. Geometry is only
- * eased during that load-in; while scrolling it tracks the box exactly.
+ * Under the opening it is large and centred — keep it invisible until .final,
+ * or it flashes through as the navy open-bg shrinks onto the box.
  */
 .centre-mark {
   position: absolute;
@@ -775,19 +513,12 @@
   width: min(78%, 640px);
   aspect-ratio: 488 / 250;
   transform: translate(-50%, -50%);
-}
-
-.nav-container.animating-in.final .centre-mark {
-  transition:
-    width 1.4s cubic-bezier(0.5, 0, 0.05, 1),
-    left 1.25s cubic-bezier(0.5, 0, 0.3, 1),
-    bottom 1.25s cubic-bezier(0.5, 0, 0.3, 1),
-    top 1.25s cubic-bezier(0.5, 0, 0.3, 1),
-    transform 1.25s cubic-bezier(0.5, 0, 0.3, 1);
+  opacity: 0;
 }
 
 .nav-container.final .centre-mark,
 .nav-container.reduced .centre-mark {
+  opacity: 1;
   width: var(--mark-w);
   /* Bottom-left of the box, then to its centre as --m-centre runs 0 → 1.
      Lengths, so the load-in can ease down from the centred top. */
@@ -810,56 +541,15 @@
   opacity: calc(1 - var(--m-grow));
 }
 
-.home-logo .logo-letter,
-.home-logo .logo-dot {
-  fill-opacity: 0;
-  stroke-width: 2px;
-  /* pathLength="1" on each glyph; overshoot so compound paths (p counters) fully cover. */
-  stroke-dasharray: 1.08;
-  stroke-dashoffset: 1.08;
-}
-
 .home-logo .logo-letter {
-  fill: color-mix(in oklch, var(--site-paper) calc(var(--box-ink) * 100%), var(--site-ink));
-  stroke: color-mix(in oklch, var(--site-paper) calc(var(--box-ink) * 100%), var(--site-ink));
+  fill: color-mix(in oklch, var(--site-ink) calc(var(--box-ink) * 100%), var(--white));
 }
 
-/* Tip square: draws as a black border with the letters, then fills Stolt red. */
+/* Tip square: the drop that replaced the E, already filled when the opening hands off. */
 .home-logo .logo-dot {
   fill: var(--site-dot);
-  stroke: color-mix(in oklch, var(--site-paper) calc(var(--box-ink) * 100%), var(--site-ink));
 }
 
-.nav-container.animating-in:not(.final) .home-logo .logo-letter,
-.nav-container.animating-in:not(.final) .home-logo .logo-dot {
-  animation: logoDraw 1.6s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.45s;
-}
-
-@keyframes logoDraw {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-.nav-container.final .home-logo .logo-letter,
-.nav-container.reduced .home-logo .logo-letter {
-  stroke-dashoffset: 0;
-  fill-opacity: 1;
-  stroke-opacity: 0;
-  transition:
-    fill-opacity 0.8s ease-in-out,
-    stroke-opacity 0.5s ease-in-out 0.2s;
-}
-
-.nav-container.final .home-logo .logo-dot,
-.nav-container.reduced .home-logo .logo-dot {
-  stroke-dashoffset: 0;
-  fill-opacity: 1;
-  stroke-opacity: 0;
-  transition:
-    fill-opacity 1.4s ease-in-out 0.35s,
-    stroke-opacity 0.7s ease-in-out 0.9s;
-}
 
 /*
  * One square, shared by the red backing and the S mark: from the wordmark's
@@ -907,40 +597,280 @@
   opacity: 0 !important;
 }
 
-/* Square ripple rings, fired once when the dot lands. */
-.ripple {
+/* ───────────────────  opening: the drop, the ripple, the name  ─────────────── */
+
+/*
+ * The scroll story's opening (v1: story.scss), above the box. Beat A (the
+ * fall) is CSS keyframes on load; everything after is painted from the scroll
+ * by hero-grid.ts. Gone once .final lands and the box's own mark takes over.
+ */
+.opening {
   position: absolute;
   inset: 0;
+  z-index: 11;
+  color: var(--white);
   pointer-events: none;
 }
 
-.ring {
+.nav-container.final .opening,
+.nav-container.reduced .opening {
+  display: none;
+}
+
+/*
+ * Full-screen navy that shrinks onto the centre box during the hand-off.
+ * Painted as a clip rather than a scaled layer: a transform-scaled layer
+ * covering the viewport dropped out of the compositor for a few frames at the
+ * start of the intro, flashing the white page behind it.
+ */
+.open-bg {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--bsx, 1) * 100%);
+  height: calc(var(--bsy, 1) * 100%);
+  transform: translate(-50%, -50%);
+  background: var(--navy);
+}
+
+.open-svg {
   position: absolute;
   inset: 0;
-  box-shadow: inset 0 0 0 2px var(--site-dot);
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.o-letter {
+  fill: var(--white);
+}
+
+.o-e path {
+  fill: none;
+  stroke: var(--white);
+  stroke-width: 21;
+}
+
+.o-drop-shape,
+.o-ghost {
+  fill: var(--amber);
+}
+
+.o-ring,
+.o-burst,
+.o-idle,
+.o-echo {
+  fill: none;
+  stroke: var(--white);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.o-ring {
   opacity: 0;
-  pointer-events: none;
 }
 
-.nav-container.rings .ring {
-  animation: squareRipple 1.5s cubic-bezier(0.2, 0, 0.3, 1) forwards;
+.o-echo {
+  stroke: var(--amber);
 }
 
-.nav-container.rings .ring-2 {
-  animation-delay: 0.18s;
-}
-.nav-container.rings .ring-3 {
-  animation-delay: 0.36s;
+.o-fall,
+.o-ghost,
+.o-burst,
+.o-idle,
+.o-glimmer,
+.o-breathe {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
 }
 
-@keyframes squareRipple {
-  from {
+/* Beat A: forms, falls with gravity, squashes, rebounds once, settles. */
+.o-fall {
+  animation: dropIn 1.9s 0.4s both;
+}
+
+.o-ghost {
+  opacity: 0;
+  animation:
+    dropIn 1.9s calc(0.4s + var(--lag)) both,
+    ghost 1.9s calc(0.4s + var(--lag)) both;
+}
+
+.o-burst {
+  opacity: 0;
+  animation: burst 2.6s cubic-bezier(0.16, 1, 0.3, 1) calc(1.45s + var(--k) * 0.18s) both;
+}
+
+.o-glimmer {
+  animation: glimmer 2.4s cubic-bezier(0.16, 1, 0.3, 1) 1.5s both;
+}
+
+.o-breathe {
+  animation: breathe 3.2s ease-in-out 2.6s infinite alternate;
+}
+
+.o-idle {
+  opacity: 0;
+  animation: idle 4s ease-out 3.4s infinite;
+}
+
+/* Scroll owns the scene from the first pixel, and does not hand it back:
+   these rules only apply once .scrolled is on (hero-grid.ts never removes it),
+   because reapplying the animations replays the fall. The glimmer sits in the
+   reveal mask, so it is paused rather than cleared: animation: none would
+   snap it to full size and flash the P. */
+.scrolled .o-breathe,
+.scrolled .o-idle,
+.scrolled .o-fall,
+.scrolled .o-ghost {
+  animation: none;
+  transform: none;
+}
+
+.scrolled .o-glimmer,
+.scrolled .o-burst {
+  animation-play-state: paused;
+}
+
+@keyframes dropIn {
+  0% {
+    transform: translateY(-42vh) scale(0);
+    animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  18% {
+    transform: translateY(-42vh) scale(1);
+    animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+  }
+  55% {
+    transform: translateY(0) scale(0.85, 1.2);
+    animation-timing-function: cubic-bezier(0.2, 0.8, 0.4, 1);
+  }
+  60% {
+    transform: translateY(0) scale(1.35, 0.65);
+    animation-timing-function: cubic-bezier(0.25, 0.8, 0.5, 1);
+  }
+  72% {
+    transform: translateY(-28px) scale(0.94, 1.06);
+    animation-timing-function: cubic-bezier(0.5, 0, 0.75, 0);
+  }
+  81% {
+    transform: translateY(0) scale(1.12, 0.9);
+    animation-timing-function: ease-out;
+  }
+  90% {
+    transform: scale(0.97, 1.03);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes ghost {
+  0%,
+  12% {
+    opacity: 0;
+  }
+  18% {
+    opacity: var(--g);
+  }
+  50% {
+    opacity: calc(var(--g) * 0.6);
+  }
+  56%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes burst {
+  0% {
+    transform: scale(0.03);
+    opacity: 0;
+  }
+  4% {
+    opacity: 0.55;
+  }
+  100% {
     transform: scale(1);
-    opacity: 0.5;
+    opacity: 0;
+  }
+}
+
+@keyframes glimmer {
+  from {
+    transform: scale(0);
+  }
+}
+
+@keyframes breathe {
+  to {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes idle {
+  0% {
+    transform: scale(0.08);
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.22;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+/* The tagline, in the box's own type, fading in on the box's own spot as the navy shrinks to it. */
+.opening .nav-button-title {
+  left: var(--bx, 0);
+  top: var(--by, 0);
+  right: auto;
+  width: var(--bs, 100%);
+  opacity: var(--to, 0);
+}
+
+.cue {
+  position: absolute;
+  left: 50%;
+  bottom: 36px;
+  transform: translateX(-50%);
+  transition: opacity 0.5s var(--site-ease-nav);
+}
+
+.cue svg {
+  width: 26px;
+  animation: nudge 1.8s ease-in-out 3.6s infinite;
+}
+
+.cue-in {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  animation: cueIn 1s 2.6s both;
+}
+
+.scrolled .cue {
+  opacity: 0;
+}
+
+@keyframes cueIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
   to {
-    transform: scale(2.1);
-    opacity: 0;
+    opacity: 0.7;
+  }
+}
+
+@keyframes nudge {
+  50% {
+    transform: translateY(5px);
   }
 }
 
@@ -965,9 +895,16 @@
   letter-spacing: -0.03em;
   text-align: left;
   text-wrap: balance;
+  white-space: pre-line;
   opacity: 0;
   color: currentColor;
   /* No transition: opacity tracks --box-ink with the background, both ways. */
+}
+
+/* The primary tagline is the headline of the navy box: larger, on its own two lines. */
+.nav-button-title.title-1,
+.o-tag {
+  font-size: clamp(28px, 5vw, 76px);
 }
 
 /* Crossfade with the paper → ink settle so scroll-back matches scroll-forward. */
@@ -1012,6 +949,16 @@
 /* The reopened menu's centre is a plain close button: white, black cross. */
 .nav-container.overlay .nav-button {
   background: var(--site-paper);
+  transform-origin: center center;
+  transition:
+    transform 0.18s var(--site-ease-swoop),
+    opacity 0.16s var(--site-ease-nav),
+    background 0.25s var(--site-ease-nav);
+}
+
+.nav-container.overlay.is-leaving .nav-button {
+  transform: scale(0);
+  opacity: 0;
 }
 
 .nav-container.overlay .centre-close {
@@ -1040,7 +987,9 @@
   bottom: clamp(12px, 3%, 26px);
   width: 52px;
   height: 46px;
-  color: var(--site-line-strong);
+  /* Pale on the navy box, the usual grey once it has turned to paper. */
+  --chev: color-mix(in oklch, var(--site-line-strong) calc(var(--box-ink) * 100%), rgb(255 255 255 / 0.7));
+  color: var(--chev);
   opacity: 0;
 }
 
@@ -1075,7 +1024,7 @@
   72%,
   100% {
     transform: translateY(0);
-    color: var(--site-line-strong);
+    color: var(--chev);
   }
   26% {
     transform: translateY(14px);
@@ -1099,48 +1048,29 @@
   }
 }
 
-/* ────────────────────────  tile page opening  ─────────────────────── */
-
-.nav-container.closing .nav-tile:not(.enlarge) {
-  opacity: 0;
-  transition: opacity 0.45s var(--site-ease-nav);
-}
-
-.nav-container.closing .nav-wrapper-gridlines,
-.nav-container.closing .menu {
-  opacity: 0;
-  transition: opacity 0.4s var(--site-ease-nav);
-}
-
-/* Geometry is a FLIP written inline, so the tile grows from its own rect
- * into the viewport in its own colour before the route changes. */
-.nav-tile.enlarge {
-  z-index: 99;
-}
-
-.nav-tile.enlarge .tile-title {
-  font-size: clamp(36px, 7vw, 92px);
-  transition: font-size 0.7s cubic-bezier(0.65, 0, 0.15, 1);
-}
-
-.nav-tile.enlarge .tile-visual {
-  opacity: 0;
-  transition: opacity 0.35s ease;
-}
-
 /* ─────────────────────────────  overlay  ──────────────────────────── */
 
-.nav-container.overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  height: 100dvh;
+/* Overlay is fixed; host must not stretch the section page underneath. */
+:host.is-overlay-host {
+  height: 0;
+  overflow: visible;
 }
 
-.nav-container.overlay .nav-tile {
-  --tx: 0px;
-  --ty: 0px;
-  transform: none;
+.nav-container.overlay {
+  --overlay-fill: 1;
+  position: fixed;
+  inset: 0;
+  /* Above the section page bar so the menu covers the chrome. */
+  z-index: 120;
+  height: 100dvh;
+  /* White ↔ transparent tracks --overlay-fill with the tile fly. */
+  background: rgb(255 255 255 / var(--overlay-fill));
+}
+
+/* Motion is the entrance: skip the landing fade that .final uses on scroll. */
+.nav-container.overlay .nav-wrapper:not(.nav-wrapper-gridlines) {
+  opacity: 1;
+  transition: none;
 }
 
 .nav-container.overlay .nav-wrapper {
@@ -1177,8 +1107,9 @@
     padding: 18px;
   }
 
-  .nav-tile.enlarge .tile {
-    padding-left: 24px;
+  .nav-button-title.title-1,
+  .o-tag {
+    font-size: 28px;
   }
 }
 
@@ -1195,7 +1126,6 @@
   transform: none;
 }
 
-.nav-container.reduced .morph-dot,
-.nav-container.reduced .ring {
+.nav-container.reduced .morph-dot {
   display: none;
 }
