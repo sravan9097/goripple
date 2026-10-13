@@ -24,17 +24,11 @@ gsap.registerPlugin(SplitText);
         }
       }
     </h2>
-    <!-- The hero's star on a piece of its night sky, for "our north star" in the body. -->
-    <svg class="onward-star" viewBox="160 0 200 187" fill="none" aria-hidden="true">
-      <circle class="disc" cx="260" cy="93.5" r="93" />
-      <circle class="ring" cx="260" cy="93.5" r="78" stroke-dasharray="3 10" />
+    <!-- The hero's star, for "our north star" in the body. -->
+    <svg class="onward-star" viewBox="218 37.5 84 112" aria-hidden="true">
       <path
         class="body"
         d="M260 39.5L270 82.5L300 93.5L270 104.5L260 147.5L250 104.5L220 93.5L250 82.5L260 39.5Z"
-      />
-      <path
-        class="glint"
-        d="M230 63.5L252 84.5L260 93.5L245 84.5L230 63.5ZM290 123.5L268 102.5L260 93.5L275 102.5L290 123.5Z"
       />
     </svg>
     <p class="onward-body">{{ copy.body }}</p>
@@ -69,25 +63,11 @@ gsap.registerPlugin(SplitText);
 
     .onward-star {
       grid-column: 2;
-      width: clamp(56px, 5.6vw, 80px);
-    }
-
-    .disc {
-      fill: var(--navy);
-    }
-
-    .ring {
-      stroke: var(--amber);
-      opacity: 0.5;
+      width: clamp(36px, 3.4vw, 48px);
     }
 
     .body {
       fill: var(--amber);
-    }
-
-    .glint {
-      fill: var(--white);
-      opacity: 0.6;
     }
 
     @media (max-width: 719px) {
@@ -101,7 +81,7 @@ gsap.registerPlugin(SplitText);
 
       .onward-star {
         grid-column: 1;
-        width: 48px;
+        width: 32px;
       }
     }
   `,
@@ -144,20 +124,9 @@ export class Onward implements OnDestroy {
         )
         // The star last, turning into place as in the hero's first scene.
         .from(
-          host.querySelector('.disc'),
-          { scale: 0, svgOrigin: '260 93.5', duration: 0.6, ease: 'power3.out' },
-          '-=0.2',
-        )
-        .from(
           host.querySelector('.body'),
           { scale: 0, rotation: -90, svgOrigin: '260 93.5', duration: 1, ease: 'back.out(1.6)' },
-          '<0.2',
-        )
-        .from(host.querySelector('.glint'), { autoAlpha: 0, duration: 0.4 }, '<0.5')
-        .from(
-          host.querySelector('.ring'),
-          { scale: 0.5, rotation: -40, autoAlpha: 0, svgOrigin: '260 93.5', duration: 1 },
-          '<-0.4',
+          '-=0.2',
         )
         .to({}, { duration: 1.2 }); // hold, fully in view, before the pager scrolls in
       return () => {

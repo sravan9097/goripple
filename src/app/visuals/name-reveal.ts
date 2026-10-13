@@ -142,10 +142,10 @@ export const REVEAL_END = OPENING.move[1];
     .story {
       position: relative;
       display: grid;
-      gap: 14px;
-      padding-left: 24px;
+      gap: 20px;
+      padding-left: 32px;
       list-style: none;
-      font: 400 clamp(15px, 1.25vw, 18px) / 1.45 var(--site-font-body);
+      font: 400 clamp(20px, 1.9vw, 27px) / 1.4 var(--site-font-body);
     }
 
     .rail {

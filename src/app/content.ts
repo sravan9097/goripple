@@ -74,7 +74,7 @@ const LIGHT = 'var(--rippl-ref-color-white, #fff)';
  * Ids are route paths and art hooks.
  */
 export const TILES: Tile[] = [
-  { id: 'why', title: 'The North Star', accent: 'var(--rippl-ref-color-navy-blue-700)', ink: LIGHT },
+  { id: 'north-star', title: 'The North Star', accent: 'var(--rippl-ref-color-navy-blue-700)', ink: LIGHT },
   { id: 'what', title: 'The Rippl effect', accent: 'var(--rippl-ref-color-cyan-500)', ink: LIGHT },
   { id: 'how', title: 'The Fleet', accent: 'var(--rippl-ref-color-magenta-600)', ink: LIGHT },
   {
@@ -96,7 +96,7 @@ export const TILES: Tile[] = [
 
 export const SECTIONS: Section[] = [
   {
-    id: 'why',
+    id: 'north-star',
     kicker: '01',
     act: 'The North Star',
     title:
@@ -190,8 +190,8 @@ export const NORTH_STAR = {
     title: 'What’s in the',
     accent: 'Name?',
     lead: 'We dropped the final letter deliberately.',
-    world: { word: 'Ripple', line: 'is a word the world owns.' },
-    ours: { word: 'Rippl', line: 'is a word only we own.' },
+    world: { word: 'ripple', line: 'is a word the world owns.' },
+    ours: { word: 'rippl', line: 'is a word only we own.' },
   },
   onward: {
     title: 'Coherent by design.\nHuman by default.',

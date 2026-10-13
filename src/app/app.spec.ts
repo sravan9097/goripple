@@ -18,7 +18,7 @@ describe('App', () => {
 
   it('routes every tile to its own page', () => {
     const paths = routes.map((r) => r.path);
-    for (const id of ['why', 'what', 'how', 'foundations', 'components', 'patterns', 'who', 'resources']) {
+    for (const id of ['north-star', 'what', 'how', 'foundations', 'components', 'patterns', 'who', 'resources']) {
       expect(paths).withContext(`route for ${id}`).toContain(id);
     }
   });

@@ -23,7 +23,7 @@
     (hero-grid.ts), so the browser morphs them here as one. Those names must
     be unique, so they lift while the menu grid is open over this page.
   -->
-  @if (tile().id === 'why') {
+  @if (tile().id === 'north-star') {
     <!-- The North Star merges its opener with the illustration: one pin, one scrub (visuals/north-star.ts). -->
     <section #opener class="stage navy" scene data-pin style="--len: 560vh" aria-label="The North Star">
       <div class="pin navy" [style.view-transition-name]="menuOpen() ? null : 'section-panel'">
@@ -85,7 +85,7 @@
         </div>
       </section>
     }
-    @case ('why') {
+    @case ('north-star') {
       <!-- The rest of the Figma chapter, after the merged opener (visuals/slide-text.ts, name-reveal.ts, onward.ts). -->
       <section class="stage paper" scene data-pin style="--len: 300vh" aria-label="Less excess. More effect.">
         <div class="pin"><app-slide-text /></div>

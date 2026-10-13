@@ -31,6 +31,36 @@ export const TITLE_DRIFT = 28;
   selector: 'app-north-star',
   standalone: true,
   template: `
+    <div class="ns-sky" aria-hidden="true">
+      <!-- Star-chart overlay: faint orbits round the centre, and constellations that draw and fade. -->
+      <svg class="ns-chart" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <ellipse class="ns-orbit" cx="50" cy="52" rx="34" ry="42" />
+        <ellipse class="ns-orbit" cx="50" cy="52" rx="48" ry="60" />
+        @for (c of constellations; track $index) {
+          <polyline
+            class="ns-constellation"
+            pathLength="1"
+            [attr.points]="c.points"
+            [style.animation-delay.s]="$index * 3.2"
+          />
+        }
+      </svg>
+      @for (c of constellations; track $index) {
+        @for (p of c.stars; track $index) {
+          <i class="ns-node" [style.left.%]="p[0]" [style.top.%]="p[1]"></i>
+        }
+      }
+      @for (s of sky; track $index) {
+        <i
+          [class.tw]="s.tw"
+          [style.left.%]="s.x"
+          [style.top.%]="s.y"
+          [style.width.px]="s.size"
+          [style.height.px]="s.size"
+          [style.animation-delay.s]="s.delay"
+        ></i>
+      }
+    </div>
     <!-- Figma "Chapter introduction": eyebrow and title on the left, the act's line top right. -->
     <p class="ns-eyebrow">
       <span>{{ eyebrow() }}</span>
@@ -66,6 +96,12 @@ export const TITLE_DRIFT = 28;
         role="img"
         aria-label="The North Star guides the Rippl library, which feeds design and build, joined in one direction."
       >
+        <!-- The beams are dashed, so they extend as rays by growing a clip from the star, not by scaling. -->
+        <defs>
+          <clipPath id="ns-rays">
+            <circle class="ns-ray" cx="260" cy="93.5" r="300" />
+          </clipPath>
+        </defs>
         <!-- Scene 1: the star -->
         <g class="ns-star">
           <circle class="ns-ring-solid" cx="260" cy="93.5" r="68" opacity="0.25" />
@@ -80,6 +116,7 @@ export const TITLE_DRIFT = 28;
           <path class="ns-ticks" d="M260 22.5V37.5M260 149.5V164.5M189 93.5H204M316 93.5H331" />
           <path
             class="ns-beams"
+            clip-path="url(#ns-rays)"
             opacity="0.5"
             d="M215 138.5L90 335.5M305 138.5L430 335.5"
             stroke-dasharray="4 8"
@@ -199,6 +236,91 @@ export const TITLE_DRIFT = 28;
         overflow: hidden;
         --t0: 0.4s;
         --draw: 0.7s cubic-bezier(0.6, 0, 0.6, 1);
+      }
+
+      /* A faint night sky behind it all, taller than the pin so its parallax never shows an edge. */
+      .ns-sky {
+        position: absolute;
+        inset: -8% 0;
+        pointer-events: none;
+      }
+
+      .ns-sky i {
+        position: absolute;
+        translate: -50% -50%;
+        border-radius: 50%;
+        background: var(--white);
+        opacity: 0.42;
+      }
+
+      .ns-sky .tw {
+        animation: ns-twinkle 4.8s ease-in-out infinite;
+        box-shadow: 0 0 6px 1px color-mix(in oklch, var(--white) 50%, transparent);
+      }
+
+      @keyframes ns-twinkle {
+        50% {
+          opacity: 0.95;
+          scale: 1.7;
+        }
+      }
+
+      .ns-sky .ns-node {
+        width: 4px;
+        height: 4px;
+        opacity: 0.7;
+      }
+
+      .ns-chart {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        fill: none;
+        stroke: var(--white);
+      }
+
+      .ns-chart * {
+        vector-effect: non-scaling-stroke;
+      }
+
+      .ns-orbit {
+        stroke-dasharray: 2 8;
+        opacity: 0.12;
+      }
+
+      /* Draw the figure, hold it, let it fade, wait; each constellation on its own beat. */
+      /* Scaled stroke: non-scaling would measure the dash in screen px, not along pathLength. */
+      .ns-chart .ns-constellation {
+        vector-effect: none;
+        stroke-width: 0.1;
+        stroke-dasharray: 1;
+        opacity: 0.32;
+        animation: ns-chart 13s ease-in-out infinite backwards;
+      }
+
+      @keyframes ns-chart {
+        0% {
+          stroke-dashoffset: 1;
+          opacity: 0.32;
+        }
+        30%,
+        65% {
+          stroke-dashoffset: 0;
+          opacity: 0.32;
+        }
+        85%,
+        100% {
+          stroke-dashoffset: 0;
+          opacity: 0;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .ns-sky .tw,
+        .ns-constellation {
+          animation: none;
+        }
       }
 
       .ns-eyebrow {
@@ -500,6 +622,48 @@ export class NorthStar implements OnDestroy {
     return at > 0 ? [t.slice(0, at), t.slice(at + 1)] : [t];
   });
 
+  /** Spread evenly by the R2 low-discrepancy sequence, so the sky never clumps and is the same every visit. */
+  readonly sky = Array.from({ length: 42 }, (_, i) => ({
+    x: ((i * 0.7548777) % 1) * 100,
+    y: ((i * 0.5698403 + 0.3) % 1) * 100,
+    size: [1.5, 2, 1.5, 3, 2, 3.5, 2.5][i % 7],
+    tw: i % 7 === 3,
+    delay: (i % 5) * 0.9,
+  }));
+
+  /** Three figures (% of the sky), kept to the edges where the illustration and copy leave room. */
+  readonly constellations = (
+    [
+      // top right, a Cassiopeia "W"
+      [
+        [70, 14],
+        [75, 21],
+        [80, 15],
+        [86, 22],
+        [92, 16],
+      ],
+      // bottom left, a dipper: handle into bowl
+      [
+        [4, 84],
+        [9, 80],
+        [14, 82],
+        [19, 78],
+        [24, 84],
+        [20, 91],
+        [14, 82],
+      ],
+      // bottom right, a kite
+      [
+        [80, 70],
+        [87, 74],
+        [85, 84],
+        [78, 80],
+        [80, 70],
+        [74, 64],
+      ],
+    ] as [number, number][][]
+  ).map((stars) => ({ stars, points: stars.map((p) => p.join(',')).join(' ') }));
+
   readonly points = NORTH_STAR.points;
   readonly library = NORTH_STAR.library;
   readonly oneDirection = NORTH_STAR.oneDirection;
@@ -552,11 +716,7 @@ export class NorthStar implements OnDestroy {
         )
         .from(q('.ns-dot'), { scale: 0, autoAlpha: 0, ...origin, stagger: 0.12 }, '<0.2')
         .from(q('.ns-stem'), { drawSVG: '0%', duration: 0.8 }, '-=0.5')
-        .from(
-          q('.ns-beams'),
-          { scaleY: 0, transformOrigin: '50% 0', duration: 1.2, ease: 'power1.inOut' },
-          '<',
-        );
+        .from(q('.ns-ray'), { attr: { r: 0 }, duration: 1.2, ease: 'power1.in' }, '<');
 
       // Scene 2: the library stacks up under the star, with "Common language".
       tl.addLabel('library', '>-0.2')
@@ -601,6 +761,8 @@ export class NorthStar implements OnDestroy {
         .from(q('.ns-connector-text'), { autoAlpha: 0, y: 8, duration: 0.6 }, '-=0.3')
         .from(point(2), { autoAlpha: 0, y: 28, stagger: 0.12, duration: 0.9 }, '-=0.2')
         .to({}, { duration: 1 }); // hold on the finished picture before the pin lets go
+      // The sky thins out as the pin lets go (reduce jumps to the end, so it keeps its sky).
+      if (!reduce) tl.to(q('.ns-sky'), { autoAlpha: 0, duration: 0.6 }, '-=0.6');
 
       // Narrow screens stack the text right under the title, with no room to drift into.
       if (reduce || window.matchMedia('(max-width: 719px)').matches) return;
@@ -612,6 +774,7 @@ export class NorthStar implements OnDestroy {
         scrub: true,
       };
       gsap.to(host, { '--lift': TITLE_DRIFT, ease: 'none', scrollTrigger: { ...pin } });
+      gsap.to(q('.ns-sky'), { yPercent: -6, ease: 'none', scrollTrigger: { ...pin } });
       gsap.fromTo(
         q('.ns-point'),
         { y: (i: number) => DRIFT[i] },

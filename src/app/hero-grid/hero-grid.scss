@@ -181,7 +181,7 @@
     background-color var(--tile-ease);
 }
 
-@each $id in why, what, how, foundations, components, patterns, who, resources {
+@each $id in north-star, what, how, foundations, components, patterns, who, resources {
   .tile-#{$id} .art {
     mask-image: url('/icons/#{$id}.png');
   }
@@ -189,7 +189,7 @@
 
 @media (any-hover: hover) {
   /* The world turns */
-  .tile-why:hover .art {
+  .tile-north-star:hover .art {
     transform: rotate(-24deg);
   }
   /* The waves travel */
