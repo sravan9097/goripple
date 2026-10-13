@@ -138,6 +138,11 @@
   --mark: var(--navy);
 }
 
+/* The North Star follows the Figma chapter: PT Serif headings. */
+[data-section='north-star'] {
+  --site-font-display: var(--site-font-serif);
+}
+
 .scene {
   position: relative;
 }
@@ -349,6 +354,17 @@
   display: grid;
   place-items: center;
   padding: 48px var(--pad);
+}
+
+/*
+ * The last scene leaves room for the pager and footer under it, so when the page
+ * bottoms out all three share the screen and the title is never pushed under the bar.
+ * ponytail: --foot is the measured pager + footer height (201px at 390 and 1440 wide);
+ * if that chrome changes size, measure it in JS instead.
+ */
+.s-onward .pin {
+  --foot: 202px;
+  height: calc(100vh - var(--bar) - var(--foot));
 }
 
 .s-fold .pin {
@@ -867,6 +883,12 @@
 
 .site-footer .annotation {
   color: var(--muted);
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* ─────────────────────────────  narrow  ───────────────────────────── */

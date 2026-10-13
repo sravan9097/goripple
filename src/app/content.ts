@@ -28,14 +28,15 @@ export interface Section {
   act: string;
   /** Opener line(s); `\n` breaks the line. */
   title: string;
-  lead: string[];
+  /** Lead, pillars and closing are the generic chapter body; a chapter with its own sub-sections leaves them out. */
+  lead?: string[];
   /** Small label under the scene. */
   caption?: string;
   pillarsLabel?: string;
   pillars?: Pillar[];
   /** Quiet counterpoints after the pillars (what Rippl is not). */
   notes?: string[];
-  closing: string;
+  closing?: string;
 }
 
 export interface ResourceLink {
@@ -73,7 +74,7 @@ const LIGHT = 'var(--rippl-ref-color-white, #fff)';
  * Ids are route paths and art hooks.
  */
 export const TILES: Tile[] = [
-  { id: 'why', title: 'The North Star', accent: 'var(--rippl-ref-color-navy-blue-700)', ink: LIGHT },
+  { id: 'north-star', title: 'The North Star', accent: 'var(--rippl-ref-color-navy-blue-700)', ink: LIGHT },
   { id: 'what', title: 'The Rippl effect', accent: 'var(--rippl-ref-color-cyan-500)', ink: LIGHT },
   { id: 'how', title: 'The Fleet', accent: 'var(--rippl-ref-color-magenta-600)', ink: LIGHT },
   {
@@ -95,22 +96,11 @@ export const TILES: Tile[] = [
 
 export const SECTIONS: Section[] = [
   {
-    id: 'why',
+    id: 'north-star',
     kicker: '01',
-    act: 'Recognition',
-    title: 'Every product was built with care.\nEvery product was built alone.',
-    caption: 'Every part, built alone in its own place. Scroll, and watch them find each other.',
-    lead: [
-      'Stolt builds many digital products, across businesses, teams and years. Each has its own buttons, its own colours, its own way of saying the same thing.',
-    ],
-    pillarsLabel: 'What separate costs',
-    pillars: [
-      { word: 'designers rebuild,', title: 'Designers rebuild instead of design.', body: 'The same table, form and card, drawn again for every product.' },
-      { word: 'developers translate,', title: 'Developers translate instead of build.', body: 'Every handoff begins with questions a shared language would have already answered.' },
-      { word: 'users relearn,', title: 'Users relearn instead of flow.', body: 'A colleague moving between our products relearns patterns that should feel like home everywhere.' },
-      { word: 'change waits', title: 'Change moves at the speed of the slowest product.', body: 'One small improvement is carried by hand into every island. Most never finish the trip.' },
-    ],
-    closing: 'Nothing was broken. Everything was separate. And separate is expensive.',
+    act: 'The North Star',
+    title:
+      'Rippl exists to connect the decisions behind our digital experiences—so every team can build with greater clarity, and every person can feel the difference.',
   },
   {
     id: 'what',
@@ -170,17 +160,43 @@ export const SECTIONS: Section[] = [
   },
 ];
 
-/**
- * Act 2 scene: every part of every product, floating alone in its own place.
- * Three beats (why, the cost, the vision), then the parts gather into the mark.
- */
+/** Chapter 1, from the Figma "Why — The North Star" frame: the four sub-sections under the opener. */
 export const NORTH_STAR = {
-  parts: ['Button', 'Table', 'Form', 'Card', 'Menu', 'Toggle', 'Tab', 'Chip', 'Dialog', 'Badge', 'Input', 'Toast'],
-  beats: [
-    'Every button, table and form at Stolt was built with care. Each one alone, in its own product, by its own team.',
-    'Designers rebuild. Developers translate. Users relearn. Change waits.',
-    'What if every part had one home? One place to decide, one source every product trusts.',
+  /** The illustration's three text groups, in the order the scenes reveal them. */
+  points: [
+    {
+      title: 'Common language',
+      body: 'Designers and engineers use the same tokens, naming, and component patterns so every feature feels like the same product.',
+    },
+    {
+      title: 'Faster delivery',
+      body: 'Approved components reduce duplication and speed up implementation, so teams ship more consistently and with less rework.',
+    },
+    {
+      title: 'Better decisions',
+      body: 'Approved patterns for common flows give teams a clear direction, so product decisions become more predictable and coherent.',
+    },
   ],
+  library: { title: 'Rippl Library', tabs: ['Foundations', 'Components', 'Patterns', 'Governance'] },
+  oneDirection: 'One direction. Connected products.',
+  /** Three slides: the opening line, the title, the line under it. */
+  slides: {
+    lead: 'Bring reasoning into the open. A shared starting point helps teams spend less time reconciling choices and more time understanding needs.',
+    title: 'Less excess.\nMore effect.',
+    note: 'Similar interactions a common language. People should not have to relearn the interface every time they move between products.',
+  },
+  /** The Figma line, told as a pair: the word everyone owns, then the one only we do. */
+  name: {
+    title: 'What’s in the',
+    accent: 'Name?',
+    lead: 'We dropped the final letter deliberately.',
+    world: { word: 'ripple', line: 'is a word the world owns.' },
+    ours: { word: 'rippl', line: 'is a word only we own.' },
+  },
+  onward: {
+    title: 'Coherent by design.\nHuman by default.',
+    body: 'Our north star is a digital experience that feels connected, understandable and considerate. Rippl is the shared language that lets different teams work toward that same experience.',
+  },
 };
 
 /** Chapter 2: six reasons, told on the accordion cards. */

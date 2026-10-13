@@ -23,6 +23,19 @@
     (hero-grid.ts), so the browser morphs them here as one. Those names must
     be unique, so they lift while the menu grid is open over this page.
   -->
+  @if (tile().id === 'north-star') {
+    <!-- The North Star merges its opener with the illustration: one pin, one scrub (visuals/north-star.ts). -->
+    <section #opener class="stage navy" scene data-pin style="--len: 560vh" aria-label="The North Star">
+      <div class="pin navy" [style.view-transition-name]="menuOpen() ? null : 'section-panel'">
+        <app-north-star
+          [eyebrow]="section().kicker + '/ ' + section().act"
+          [title]="tile().title"
+          [lead]="section().title"
+          [named]="!menuOpen()"
+        />
+      </div>
+    </section>
+  } @else {
   <section
     #opener
     class="opener"
@@ -46,6 +59,7 @@
       <svg viewBox="0 0 52 18" fill="none"><path d="M2 2l24 14L50 2" stroke="currentColor" stroke-width="2" /></svg>
     </span>
   </section>
+  }
 
   <!-- Scene: the act, enacted -->
   @switch (tile().id) {
@@ -71,10 +85,16 @@
         </div>
       </section>
     }
-    @case ('why') {
-      <!-- Every part of every product floats alone; scroll, and they find each other as the mark (GSAP, visuals/north-star.ts). -->
-      <section class="stage navy" scene data-pin style="--len: 360vh" aria-label="The North Star">
-        <div class="pin"><app-north-star /></div>
+    @case ('north-star') {
+      <!-- The rest of the Figma chapter, after the merged opener (visuals/slide-text.ts, name-reveal.ts, onward.ts). -->
+      <section class="stage paper" scene data-pin style="--len: 300vh" aria-label="Less excess. More effect.">
+        <div class="pin"><app-slide-text /></div>
+      </section>
+      <section class="stage navy" scene data-pin style="--len: 380vh" aria-label="What's in the name">
+        <div class="pin"><app-name-reveal /></div>
+      </section>
+      <section class="stage paper s-onward" scene data-pin style="--len: 220vh" aria-label="Coherent by design. Human by default.">
+        <div class="pin"><app-onward /></div>
       </section>
     }
     @case ('how') {
@@ -181,11 +201,13 @@
   }
 
   <!-- Lead: the act in two or three sentences -->
-  <section class="lead" revealOnScroll>
-    @for (para of section().lead; track para) {
-      <p class="h3">{{ para }}</p>
-    }
-  </section>
+  @if (section().lead; as lead) {
+    <section class="lead" revealOnScroll>
+      @for (para of lead; track para) {
+        <p class="h3">{{ para }}</p>
+      }
+    </section>
+  }
 
   <!-- Pillars: the big statement, then each point -->
   @if (section().pillars; as pillars) {
@@ -224,10 +246,12 @@
   }
 
   <!-- Closing line -->
-  <section class="closing" revealOnScroll>
-    <i class="closing-bar" aria-hidden="true"></i>
-    <p class="closing-line">{{ section().closing }}</p>
-  </section>
+  @if (section().closing; as closing) {
+    <section class="closing" revealOnScroll>
+      <i class="closing-bar" aria-hidden="true"></i>
+      <p class="closing-line">{{ closing }}</p>
+    </section>
+  }
 
   <!-- The closing page only belongs at the end of the last chapter -->
   @if (!next()) {
@@ -290,5 +314,7 @@
 
 <footer class="site-footer">
   <a routerLink="/"><app-wordmark /></a>
-  <p class="annotation">Stolt-Nielsen Design System · Initial launch</p>
+  <p class="footer-brand annotation">
+    <img src="/brand/SNLogoIcon.svg" alt="" width="23" height="20" />Stolt-Nielsen
+  </p>
 </footer>
