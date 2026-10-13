@@ -1,12 +1,16 @@
 import { afterNextRender, Component, ElementRef, inject, NgZone, OnDestroy } from '@angular/core';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 import { NORTH_STAR } from '../content';
+import { scrubScene } from './scrub';
 
-gsap.registerPlugin(ScrollTrigger, SplitText);
+gsap.registerPlugin(SplitText);
 
-/** Chapter 1 close, "Coherent by design. Human by default.": the lines rise out of their masks as the section arrives. */
+/**
+ * Chapter 1 close, "Coherent by design. Human by default.": pinned, so the lines
+ * rise out of their masks with the scroll and hold in view; only then does the
+ * page move on to the pager.
+ */
 @Component({
   selector: 'app-onward',
   standalone: true,
@@ -26,9 +30,10 @@ gsap.registerPlugin(ScrollTrigger, SplitText);
     :host {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      grid-template-rows: auto auto;
+      align-content: center;
       gap: 24px var(--pad);
-      width: 100%;
+      height: 100%;
+      padding: clamp(24px, 5vh, 56px) var(--pad);
       color: var(--navy);
     }
 
@@ -78,18 +83,29 @@ export class Onward implements OnDestroy {
 
   private build(): void {
     const host = this.el.nativeElement;
-    this.mm = gsap.matchMedia(host);
-    this.mm.add('(prefers-reduced-motion: no-preference)', () => {
-      const split = SplitText.create(Array.from(host.children), { type: 'lines', mask: 'lines' });
-      gsap.from(split.lines, {
-        yPercent: 110,
-        autoAlpha: 0,
-        duration: 0.9,
-        stagger: 0.1,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: host, start: 'top 70%', toggleActions: 'play none none reverse' },
+    this.mm = scrubScene(host, (tl, reduce) => {
+      if (reduce) return;
+      const title = SplitText.create(host.querySelector('.onward-title'), {
+        type: 'lines',
+        mask: 'lines',
       });
-      return () => split.revert();
+      const body = SplitText.create(host.querySelector('.onward-body'), {
+        type: 'lines',
+        mask: 'lines',
+      });
+      // A line mask is the line box, which at 1.04 clips descenders (the g of "design"): pad it.
+      gsap.set(title.masks, { paddingBottom: '0.14em', marginBottom: '-0.14em' });
+      tl.from(title.lines, { yPercent: 110, duration: 1, stagger: 0.25, ease: 'power3.out' })
+        .from(
+          body.lines,
+          { yPercent: 110, autoAlpha: 0, duration: 0.8, stagger: 0.12, ease: 'power3.out' },
+          '-=0.4',
+        )
+        .to({}, { duration: 1.2 }); // hold, fully in view, before the pager scrolls in
+      return () => {
+        title.revert();
+        body.revert();
+      };
     });
   }
 }

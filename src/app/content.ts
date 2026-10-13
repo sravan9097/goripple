@@ -185,9 +185,13 @@ export const NORTH_STAR = {
     title: 'Less excess.\nMore effect.',
     note: 'Similar interactions a common language. People should not have to relearn the interface every time they move between products.',
   },
+  /** The Figma line, told as a pair: the word everyone owns, then the one only we do. */
   name: {
-    title: 'What’s in the Name?',
-    body: 'We dropped the final letter deliberately. "Ripple" is a word the world owns. "Rippl" is a word only we own.',
+    title: 'What’s in the',
+    accent: 'Name?',
+    lead: 'We dropped the final letter deliberately.',
+    world: { word: 'Ripple', line: 'is a word the world owns.' },
+    ours: { word: 'Rippl', line: 'is a word only we own.' },
   },
   onward: {
     title: 'Coherent by design.\nHuman by default.',

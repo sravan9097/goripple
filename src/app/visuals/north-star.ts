@@ -17,6 +17,8 @@ gsap.registerPlugin(DrawSVGPlugin);
 
 /** Parallax travel (px) of each text group across the whole pin; a different depth per group. */
 export const DRIFT = [48, 72, 56];
+/** The title's own parallax (px up across the pin), slower than the text groups so it reads as further back. */
+export const TITLE_DRIFT = 28;
 
 /**
  * Chapter 1 opener and hero (Figma "Chapter introduction"), one pin. The title
@@ -30,7 +32,9 @@ export const DRIFT = [48, 72, 56];
   standalone: true,
   template: `
     <!-- Figma "Chapter introduction": eyebrow and title on the left, the act's line top right. -->
-    <p class="ns-eyebrow">{{ eyebrow() }}</p>
+    <p class="ns-eyebrow">
+      <span>{{ eyebrow() }}</span>
+    </p>
     <p class="ns-lead">{{ lead() }}</p>
     <h1 class="ns-title" [style.view-transition-name]="named() ? 'section-title' : null">
       @for (line of titleLines(); track $index) {
@@ -185,7 +189,9 @@ export const DRIFT = [48, 72, 56];
         /* The title settles at this fraction of --t, so the illustration fits below it. */
         --t-end: 0.56;
         --top: clamp(24px, 5vh, 64px);
-        --slot: calc(var(--top) + 40px);
+        /* The eyebrow leaves as the title arrives, so the title takes its line. */
+        --slot: var(--top);
+        --lift: 0;
         --lead-w: min(518px, 36vw);
         position: relative;
         display: block;
@@ -202,7 +208,13 @@ export const DRIFT = [48, 72, 56];
         font: 700 12px / 1.4 var(--site-font-body);
         letter-spacing: 0.8px;
         text-transform: uppercase;
+        overflow: hidden;
         animation: ns-rise var(--draw) calc(var(--t0) + 0.3s) backwards;
+      }
+
+      /* Masked, so it slides up out of its own line as the title comes in under it. */
+      .ns-eyebrow span {
+        display: block;
       }
 
       .ns-lead {
@@ -218,7 +230,10 @@ export const DRIFT = [48, 72, 56];
       .ns-title {
         position: absolute;
         left: var(--pad);
-        top: calc((1 - var(--intro)) * (50% - 1.04 * var(--t)) + var(--intro) * var(--slot));
+        top: calc(
+          (1 - var(--intro)) * (50% - 1.04 * var(--t)) + var(--intro) * var(--slot) - var(--lift) *
+            1px
+        );
         margin: 0;
         font-family: var(--site-font-display);
         font-weight: 700;
@@ -306,7 +321,7 @@ export const DRIFT = [48, 72, 56];
       /* The illustration fills what the settled title leaves. */
       .ns-stage {
         position: absolute;
-        inset: calc(var(--slot) + 2.08 * var(--t-end) * var(--t) + 8px) 0 0;
+        inset: calc(var(--slot) + 2.08 * var(--t-end) * var(--t) + clamp(32px, 6vh, 72px)) 0 0;
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr) minmax(0, 1fr);
         grid-template-rows: minmax(0, 1fr);
@@ -510,6 +525,11 @@ export class NorthStar implements OnDestroy {
       // shrinks into its slot, and the star starts while it is still settling.
       scrub
         .to(q('.ns-rule'), { '--out': 1, duration: 0.8, stagger: 0.08, ease: 'power2.in' }, 0)
+        .to(
+          q('.ns-eyebrow span'),
+          { yPercent: -110, autoAlpha: 0, duration: 0.6, ease: 'power3.in' },
+          0.3,
+        )
         .to(host, { '--intro': 1, duration: 1.6, ease: 'power2.inOut' }, 0.2)
         .add(tl, 1.3);
 
@@ -584,19 +604,21 @@ export class NorthStar implements OnDestroy {
 
       // Narrow screens stack the text right under the title, with no room to drift into.
       if (reduce || window.matchMedia('(max-width: 719px)').matches) return;
-      // Slow parallax on the text groups, each at its own depth, over the whole pin.
+      // Slow parallax on the title and the text groups, each at its own depth, over the whole pin.
+      const pin = {
+        trigger: host.closest('[data-pin]') ?? host,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: true,
+      };
+      gsap.to(host, { '--lift': TITLE_DRIFT, ease: 'none', scrollTrigger: { ...pin } });
       gsap.fromTo(
         q('.ns-point'),
         { y: (i: number) => DRIFT[i] },
         {
           y: (i: number) => -DRIFT[i],
           ease: 'none',
-          scrollTrigger: {
-            trigger: host.closest('[data-pin]') ?? host,
-            start: 'top top',
-            end: 'bottom bottom',
-            scrub: true,
-          },
+          scrollTrigger: { ...pin },
         },
       );
     });

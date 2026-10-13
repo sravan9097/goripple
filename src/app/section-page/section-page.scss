@@ -356,6 +356,17 @@
   padding: 48px var(--pad);
 }
 
+/*
+ * The last scene leaves room for the pager and footer under it, so when the page
+ * bottoms out all three share the screen and the title is never pushed under the bar.
+ * ponytail: --foot is the measured pager + footer height (201px at 390 and 1440 wide);
+ * if that chrome changes size, measure it in JS instead.
+ */
+.s-onward .pin {
+  --foot: 202px;
+  height: calc(100vh - var(--bar) - var(--foot));
+}
+
 .s-fold .pin {
   overflow: visible;
 }
