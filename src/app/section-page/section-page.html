@@ -23,6 +23,19 @@
     (hero-grid.ts), so the browser morphs them here as one. Those names must
     be unique, so they lift while the menu grid is open over this page.
   -->
+  @if (tile().id === 'why') {
+    <!-- The North Star merges its opener with the illustration: one pin, one scrub (visuals/north-star.ts). -->
+    <section #opener class="stage navy" scene data-pin style="--len: 560vh" aria-label="The North Star">
+      <div class="pin navy" [style.view-transition-name]="menuOpen() ? null : 'section-panel'">
+        <app-north-star
+          [eyebrow]="section().kicker + '/ ' + section().act"
+          [title]="tile().title"
+          [lead]="section().title"
+          [named]="!menuOpen()"
+        />
+      </div>
+    </section>
+  } @else {
   <section
     #opener
     class="opener"
@@ -46,6 +59,7 @@
       <svg viewBox="0 0 52 18" fill="none"><path d="M2 2l24 14L50 2" stroke="currentColor" stroke-width="2" /></svg>
     </span>
   </section>
+  }
 
   <!-- Scene: the act, enacted -->
   @switch (tile().id) {
@@ -72,10 +86,7 @@
       </section>
     }
     @case ('why') {
-      <!-- The Figma chapter, sub-section by sub-section (visuals/north-star.ts, slide-text.ts, name-reveal.ts, onward.ts). -->
-      <section class="stage navy" scene data-pin style="--len: 460vh" aria-label="The North Star guides the Rippl library">
-        <div class="pin"><app-north-star /></div>
-      </section>
+      <!-- The rest of the Figma chapter, after the merged opener (visuals/slide-text.ts, name-reveal.ts, onward.ts). -->
       <section class="stage paper" scene data-pin style="--len: 300vh" aria-label="Less excess. More effect.">
         <div class="pin"><app-slide-text /></div>
       </section>

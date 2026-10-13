@@ -38,7 +38,7 @@ gsap.registerPlugin(ScrollTrigger, SplitText);
       font-weight: 700;
       font-size: clamp(40px, 6.6vw, 96px);
       line-height: 1.04;
-      letter-spacing: -0.04em;
+      letter-spacing: -0.048em;
     }
 
     .onward-body {

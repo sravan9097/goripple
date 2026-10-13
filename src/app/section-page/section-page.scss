@@ -138,6 +138,11 @@
   --mark: var(--navy);
 }
 
+/* The North Star follows the Figma chapter: PT Serif headings. */
+[data-section='why'] {
+  --site-font-display: var(--site-font-serif);
+}
+
 .scene {
   position: relative;
 }

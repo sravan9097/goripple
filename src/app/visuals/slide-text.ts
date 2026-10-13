@@ -84,8 +84,8 @@ export const SLIDE_DIR = [1, -1, 1];
       font-family: var(--site-font-display);
       font-weight: 700;
       font-size: clamp(48px, 9vw, 128px);
-      line-height: 1.02;
-      letter-spacing: -0.04em;
+      line-height: 1.04;
+      letter-spacing: -0.016em;
       white-space: pre-line;
     }
 

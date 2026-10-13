@@ -110,14 +110,15 @@ export const REVEAL_END = OPENING.move[1];
       font-weight: 700;
       font-size: clamp(36px, 7vw, 104px);
       line-height: 1.04;
-      letter-spacing: -0.04em;
+      letter-spacing: -0.048em;
     }
 
     .name-body {
       max-width: 60ch;
+      font-family: var(--site-font-display);
       font-weight: 700;
       font-size: clamp(16px, 1.7vw, 24px);
-      line-height: 1.4;
+      line-height: 1.3;
     }
   `,
 })
