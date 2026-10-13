@@ -30,9 +30,12 @@ import { Builders } from '../visuals/builders';
 import { Consistency } from '../visuals/consistency';
 import { FoundationFlip } from '../visuals/foundation-flip';
 import { Icon } from '../visuals/icon';
+import { NameReveal } from '../visuals/name-reveal';
 import { Network } from '../visuals/network';
 import { NorthStar } from '../visuals/north-star';
+import { Onward } from '../visuals/onward';
 import { ProductLine } from '../visuals/product-line';
+import { SlideText } from '../visuals/slide-text';
 import { WordCycle } from '../visuals/word-cycle';
 import { Wordmark } from '../wordmark/wordmark';
 
@@ -53,6 +56,9 @@ import { Wordmark } from '../wordmark/wordmark';
     ProductLine,
     Consistency,
     Builders,
+    SlideText,
+    NameReveal,
+    Onward,
   ],
   templateUrl: './section-page.html',
   styleUrl: './section-page.scss',

@@ -72,9 +72,18 @@
       </section>
     }
     @case ('why') {
-      <!-- Every part of every product floats alone; scroll, and they find each other as the mark (GSAP, visuals/north-star.ts). -->
-      <section class="stage navy" scene data-pin style="--len: 360vh" aria-label="The North Star">
+      <!-- The Figma chapter, sub-section by sub-section (visuals/north-star.ts, slide-text.ts, name-reveal.ts, onward.ts). -->
+      <section class="stage navy" scene data-pin style="--len: 460vh" aria-label="The North Star guides the Rippl library">
         <div class="pin"><app-north-star /></div>
+      </section>
+      <section class="stage paper" scene data-pin style="--len: 300vh" aria-label="Less excess. More effect.">
+        <div class="pin"><app-slide-text /></div>
+      </section>
+      <section class="stage navy" scene data-pin style="--len: 380vh" aria-label="What's in the name">
+        <div class="pin"><app-name-reveal /></div>
+      </section>
+      <section class="stage paper" aria-label="Coherent by design. Human by default.">
+        <app-onward />
       </section>
     }
     @case ('how') {
@@ -181,11 +190,13 @@
   }
 
   <!-- Lead: the act in two or three sentences -->
-  <section class="lead" revealOnScroll>
-    @for (para of section().lead; track para) {
-      <p class="h3">{{ para }}</p>
-    }
-  </section>
+  @if (section().lead; as lead) {
+    <section class="lead" revealOnScroll>
+      @for (para of lead; track para) {
+        <p class="h3">{{ para }}</p>
+      }
+    </section>
+  }
 
   <!-- Pillars: the big statement, then each point -->
   @if (section().pillars; as pillars) {
@@ -224,10 +235,12 @@
   }
 
   <!-- Closing line -->
-  <section class="closing" revealOnScroll>
-    <i class="closing-bar" aria-hidden="true"></i>
-    <p class="closing-line">{{ section().closing }}</p>
-  </section>
+  @if (section().closing; as closing) {
+    <section class="closing" revealOnScroll>
+      <i class="closing-bar" aria-hidden="true"></i>
+      <p class="closing-line">{{ closing }}</p>
+    </section>
+  }
 
   <!-- The closing page only belongs at the end of the last chapter -->
   @if (!next()) {
