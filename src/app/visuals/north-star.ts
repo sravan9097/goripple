@@ -454,7 +454,6 @@ export const TITLE_DRIFT = 28;
           top: calc(var(--top) + 28px);
           left: var(--pad);
           width: auto;
-          opacity: calc(1 - var(--intro));
         }
 
         .ns-rule-right {
@@ -530,6 +529,7 @@ export class NorthStar implements OnDestroy {
           { yPercent: -110, autoAlpha: 0, duration: 0.6, ease: 'power3.in' },
           0.3,
         )
+        .to(q('.ns-lead'), { y: -32, autoAlpha: 0, duration: 0.7, ease: 'power2.in' }, 0.35)
         .to(host, { '--intro': 1, duration: 1.6, ease: 'power2.inOut' }, 0.2)
         .add(tl, 1.3);
 

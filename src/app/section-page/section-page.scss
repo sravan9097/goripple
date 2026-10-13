@@ -885,6 +885,12 @@
   color: var(--muted);
 }
 
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* ─────────────────────────────  narrow  ───────────────────────────── */
 
 @media (max-width: 719px) {

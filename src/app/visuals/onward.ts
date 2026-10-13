@@ -25,6 +25,18 @@ gsap.registerPlugin(SplitText);
       }
     </h2>
     <p class="onward-body">{{ copy.body }}</p>
+    <!-- The hero's star, for "our north star" in the body. -->
+    <svg class="onward-star" viewBox="160 0 200 187" fill="none" aria-hidden="true">
+      <circle class="ring" cx="260" cy="93.5" r="93" stroke-dasharray="3 10" />
+      <path
+        class="body"
+        d="M260 39.5L270 82.5L300 93.5L270 104.5L260 147.5L250 104.5L220 93.5L250 82.5L260 39.5Z"
+      />
+      <path
+        class="glint"
+        d="M230 63.5L252 84.5L260 93.5L245 84.5L230 63.5ZM290 123.5L268 102.5L260 93.5L275 102.5L290 123.5Z"
+      />
+    </svg>
   `,
   styles: `
     :host {
@@ -54,6 +66,25 @@ gsap.registerPlugin(SplitText);
       line-height: 1.5;
     }
 
+    .onward-star {
+      grid-area: 2 / 1;
+      width: clamp(88px, 10vw, 140px);
+    }
+
+    .ring {
+      stroke: var(--navy);
+      opacity: 0.35;
+    }
+
+    .body {
+      fill: var(--amber);
+    }
+
+    .glint {
+      fill: var(--white);
+      opacity: 0.6;
+    }
+
     @media (max-width: 719px) {
       :host {
         grid-template-columns: 1fr;
@@ -61,6 +92,11 @@ gsap.registerPlugin(SplitText);
 
       .onward-body {
         grid-column: 1;
+      }
+
+      .onward-star {
+        grid-area: 1 / 1;
+        width: 56px;
       }
     }
   `,
@@ -100,6 +136,18 @@ export class Onward implements OnDestroy {
           body.lines,
           { yPercent: 110, autoAlpha: 0, duration: 0.8, stagger: 0.12, ease: 'power3.out' },
           '-=0.4',
+        )
+        // The star last, turning into place as in the hero's first scene.
+        .from(
+          host.querySelector('.body'),
+          { scale: 0, rotation: -90, svgOrigin: '260 93.5', duration: 1, ease: 'back.out(1.6)' },
+          '-=0.2',
+        )
+        .from(host.querySelector('.glint'), { autoAlpha: 0, duration: 0.4 }, '<0.5')
+        .from(
+          host.querySelector('.ring'),
+          { scale: 0.5, rotation: -40, autoAlpha: 0, svgOrigin: '260 93.5', duration: 1 },
+          '<-0.4',
         )
         .to({}, { duration: 1.2 }); // hold, fully in view, before the pager scrolls in
       return () => {
